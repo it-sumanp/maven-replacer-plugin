@@ -50,7 +50,7 @@ public class ReplacerMojo extends AbstractMojo {
 				throw new IOException("Could not read");
 			}
 			while (line != null) {
-				buffer.append(line.replaceAll(token, value));
+				buffer.append(line.replaceAll(token, value) + System.getProperty("line.separator"));
 				line = reader.readLine();
 			}
 			reader.close();
