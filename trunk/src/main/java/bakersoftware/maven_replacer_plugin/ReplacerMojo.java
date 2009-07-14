@@ -1,12 +1,12 @@
 package bakersoftware.maven_replacer_plugin;
 
-import java.io.BufferedReader;
+import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.io.Writer;
+import java.io.InputStream;
+import java.io.OutputStream;
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -18,7 +18,9 @@ import org.apache.maven.plugin.MojoExecutionException;
  * 
  * @phase compile
  */
-public class ReplacerMojo extends AbstractMojo {
+public class ReplacerMojo extends AbstractMojo implements StreamFactory {
+	private static final String LINE_SEPARATOR = System.getProperty("line.separator");
+
 	/**
      * File to check and replace tokens
      *
@@ -34,6 +36,13 @@ public class ReplacerMojo extends AbstractMojo {
     private String token;
     
     /**
+     * Ignore missing files
+     *
+     * @parameter expression=""
+     */
+    private boolean ignoreMissingFile;
+    
+    /**
      * Value to replace token with
      *
      * @parameter expression=""
@@ -43,26 +52,26 @@ public class ReplacerMojo extends AbstractMojo {
 	public void execute() throws MojoExecutionException {
 		getLog().info("Replacing " + token + " with " + value + " in " + file);
 		try {
-			BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(this.file)));
-			StringBuffer buffer = new StringBuffer();
-			String line = reader.readLine();
-			if (line == null) {
-				throw new IOException("Could not read");
+			if (ignoreMissingFile && !fileExists(file)) {
+				getLog().info("Ignoring missing file");
+				return;
 			}
-			while (line != null) {
-				buffer.append(line.replaceAll(token, value) + System.getProperty("line.separator"));
-				line = reader.readLine();
-			}
-			reader.close();
 			
-			Writer writer = new OutputStreamWriter(new FileOutputStream(this.file));
-			writer.write(buffer.toString());
-			writer.close();
+			TokenReplacer tokenReplacer = getTokenReplacer();
+			tokenReplacer.replaceTokens(token, value);
 		} catch (IOException e) {
 			throw new MojoExecutionException(e.getMessage());
 		}
 	}
+
+	private boolean fileExists(String filename) {
+		return new File(filename).exists();
+	}
 	
+	public TokenReplacer getTokenReplacer() {
+		return new TokenReplacer(this, LINE_SEPARATOR);
+	}
+
 	public void setFile(String file) {
 		this.file = file;
 	}
@@ -73,5 +82,25 @@ public class ReplacerMojo extends AbstractMojo {
 	
 	public void setValue(String value) {
 		this.value = value;
+	}
+
+	public void setIgnoreMissingFile(boolean ignoreMissingFile) {
+		this.ignoreMissingFile = ignoreMissingFile;
+	}
+
+	public InputStream getNewInputStream() {
+		try {
+			return new FileInputStream(file);
+		} catch (FileNotFoundException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	public OutputStream getNewOutputStream() {
+		try {
+			return new FileOutputStream(file);
+		} catch (FileNotFoundException e) {
+			throw new RuntimeException(e);
+		}
 	}
 }
