@@ -6,7 +6,22 @@
 	<artifactId>maven-replacer-plugin</artifactId>
 	<packaging>maven-plugin</packaging>
 	<version>1.0.0</version>
+	<url>http://code.google.com/p/maven-replacer-plugin</url>	
 	<name>maven-replacer-plugin Maven Mojo</name>
+	<description>
+		Maven plugin to replace tokens in a given file with a value
+	</description>
+	<scm>
+		<url>https://maven-replacer-plugin.googlecode.com/svn/</url>
+	</scm>
+	<licenses>
+    <license>
+      <name>GNU Lesser General Public License</name>
+      <url>http://www.gnu.org/licenses/lgpl.html</url>
+      <distribution>repo</distribution>
+    </license>
+  </licenses>
+	
 
 	<build>
 		<plugins>
