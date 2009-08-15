@@ -45,10 +45,10 @@ public class ReplacerMojoTest {
 	
 	@Test
 	public void shouldReturnFileStreams() throws IOException {
-		File file = new File("/tmp/tmpfile");
+		File file = new File("tmpfile");
 		try {
 			file.createNewFile();
-			replacer.setFile("/tmp/tmpfile");
+			replacer.setFile("tmpfile");
 			assertTrue(replacer.getNewInputStream() instanceof FileInputStream);
 			assertTrue(replacer.getNewOutputStream() instanceof FileOutputStream);
 		} finally {
