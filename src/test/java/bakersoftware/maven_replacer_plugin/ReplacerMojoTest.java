@@ -1,6 +1,7 @@
 package bakersoftware.maven_replacer_plugin;
 
 import static org.junit.Assert.assertTrue;
+import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
@@ -37,10 +38,11 @@ public class ReplacerMojoTest {
 		String token = "token";
 		String value = "value";
 		
+		replacer.setRegex(true);
 		replacer.setToken(token);
 		replacer.setValue(value);
 		replacer.execute();
-		verify(tokenReplacer).replaceTokens(token, value);
+		verify(tokenReplacer).replaceTokens(token, value, true);
 	}
 	
 	@Test
@@ -58,10 +60,10 @@ public class ReplacerMojoTest {
 	
 	@Test(expected = MojoExecutionException.class)	
 	public void shouldThrowMojoExceptionWhenIOException() throws MojoExecutionException, IOException {
-		doThrow(new IOException()).when(tokenReplacer).replaceTokens(anyString(), anyString());
+		doThrow(new IOException()).when(tokenReplacer).replaceTokens(anyString(), anyString(), anyBoolean());
 		
 		replacer.execute();
-		verify(tokenReplacer).replaceTokens(anyString(), anyString());
+		verify(tokenReplacer).replaceTokens(anyString(), anyString(), anyBoolean());
 	}
 	
 	@Test

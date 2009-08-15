@@ -49,19 +49,40 @@ public class ReplacerMojo extends AbstractMojo implements StreamFactory {
      */
     private String value;
 
+    /**
+     * Token uses regex
+     *
+     * @parameter expression=""
+     */
+	private boolean regex = true;
+	
+	/**
+     * Output to another file
+     *
+     * @parameter expression=""
+     */
+	private String outputFile;
+
 	public void execute() throws MojoExecutionException {
-		getLog().info("Replacing " + token + " with " + value + " in " + file);
 		try {
 			if (ignoreMissingFile && !fileExists(file)) {
 				getLog().info("Ignoring missing file");
 				return;
 			}
+			getLog().info("Replacing " + token + " with " + value + " in " + file);
 			
-			TokenReplacer tokenReplacer = getTokenReplacer();
-			tokenReplacer.replaceTokens(token, value);
+			getTokenReplacer().replaceTokens(token, value, isRegex());
 		} catch (IOException e) {
 			throw new MojoExecutionException(e.getMessage());
 		}
+	}
+
+	public boolean isRegex() {
+		return regex;
+	}
+	
+	public void setRegex(boolean regex) {
+		this.regex = regex;
 	}
 
 	private boolean fileExists(String filename) {
@@ -98,9 +119,21 @@ public class ReplacerMojo extends AbstractMojo implements StreamFactory {
 
 	public OutputStream getNewOutputStream() {
 		try {
-			return new FileOutputStream(file);
+			if (outputFile != null) {
+				return new FileOutputStream(outputFile);
+			} else {
+				return new FileOutputStream(file);
+			}
 		} catch (FileNotFoundException e) {
 			throw new RuntimeException(e);
 		}
+	}
+
+	public String getOutputFile() {
+		return outputFile;
+	}
+
+	public void setOutputFile(String outputFile) {
+		this.outputFile = outputFile;
 	}
 }
