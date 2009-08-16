@@ -18,13 +18,11 @@ public class TokenReplacerTest {
 	
 	private TokenReplacer tokenReplacer;
 	private StreamFactory streamFactory;
-	private String lineSeparator;
 
 	@Before
 	public void setUp() {
 		streamFactory = mock(StreamFactory.class);
-		lineSeparator = SEPARATOR;
-		tokenReplacer = new TokenReplacer(streamFactory, lineSeparator);
+		tokenReplacer = new TokenReplacer(streamFactory, SEPARATOR);
 	}
 
 	@Test
