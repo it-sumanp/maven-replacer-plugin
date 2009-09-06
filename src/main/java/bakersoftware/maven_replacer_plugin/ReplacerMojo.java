@@ -22,45 +22,45 @@ public class ReplacerMojo extends AbstractMojo implements StreamFactory {
 	private static final String LINE_SEPARATOR = System.getProperty("line.separator");
 
 	/**
-     * File to check and replace tokens
-     *
-     * @parameter expression=""
-     */
-    private String file;
-    
-    /**
-     * Token
-     *
-     * @parameter expression=""
-     */
-    private String token;
-    
-    /**
-     * Ignore missing files
-     *
-     * @parameter expression=""
-     */
-    private boolean ignoreMissingFile;
-    
-    /**
-     * Value to replace token with
-     *
-     * @parameter expression=""
-     */
-    private String value;
+	 * File to check and replace tokens
+	 * 
+	 * @parameter expression=""
+	 */
+	private String file;
 
-    /**
-     * Token uses regex
-     *
-     * @parameter expression=""
-     */
-	private boolean regex = true;
-	
 	/**
-     * Output to another file
-     *
-     * @parameter expression=""
-     */
+	 * Token
+	 * 
+	 * @parameter expression=""
+	 */
+	private String token;
+
+	/**
+	 * Ignore missing files
+	 * 
+	 * @parameter expression=""
+	 */
+	private boolean ignoreMissingFile;
+
+	/**
+	 * Value to replace token with
+	 * 
+	 * @parameter expression=""
+	 */
+	private String value;
+
+	/**
+	 * Token uses regex
+	 * 
+	 * @parameter expression=""
+	 */
+	private boolean regex = true;
+
+	/**
+	 * Output to another file
+	 * 
+	 * @parameter expression=""
+	 */
 	private String outputFile;
 
 	public void execute() throws MojoExecutionException {
@@ -70,7 +70,7 @@ public class ReplacerMojo extends AbstractMojo implements StreamFactory {
 				return;
 			}
 			getLog().info("Replacing " + token + " with " + value + " in " + file);
-			
+
 			getTokenReplacer().replaceTokens(token, value, isRegex());
 		} catch (IOException e) {
 			throw new MojoExecutionException(e.getMessage());
@@ -80,7 +80,7 @@ public class ReplacerMojo extends AbstractMojo implements StreamFactory {
 	public boolean isRegex() {
 		return regex;
 	}
-	
+
 	public void setRegex(boolean regex) {
 		this.regex = regex;
 	}
@@ -88,7 +88,7 @@ public class ReplacerMojo extends AbstractMojo implements StreamFactory {
 	private boolean fileExists(String filename) {
 		return new File(filename).exists();
 	}
-	
+
 	public TokenReplacer getTokenReplacer() {
 		return new TokenReplacer(this, LINE_SEPARATOR);
 	}
@@ -96,11 +96,11 @@ public class ReplacerMojo extends AbstractMojo implements StreamFactory {
 	public void setFile(String file) {
 		this.file = file;
 	}
-	
+
 	public void setToken(String token) {
 		this.token = token;
 	}
-	
+
 	public void setValue(String value) {
 		this.value = value;
 	}
@@ -120,12 +120,28 @@ public class ReplacerMojo extends AbstractMojo implements StreamFactory {
 	public OutputStream getNewOutputStream() {
 		try {
 			if (outputFile != null) {
+				if (!fileExists(outputFile)) {
+					ensureFolderStructureExists(outputFile);
+				}
 				return new FileOutputStream(outputFile);
 			} else {
 				return new FileOutputStream(file);
 			}
-		} catch (FileNotFoundException e) {
+		} catch (Exception e) {
 			throw new RuntimeException(e);
+		}
+	}
+
+	private void ensureFolderStructureExists(String file) throws MojoExecutionException {
+		File outputFile = new File(file);
+		if (!outputFile.isDirectory()) {
+			File parentPath = new File(outputFile.getParent());
+			if (!parentPath.exists()) {
+				parentPath.mkdirs();
+			}
+		} else {
+			String errorMsg = "Parameter outputFile can't be a directory! outputFile: " + file;
+			throw new MojoExecutionException(errorMsg);
 		}
 	}
 
