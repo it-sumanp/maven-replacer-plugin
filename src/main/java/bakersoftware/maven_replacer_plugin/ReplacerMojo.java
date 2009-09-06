@@ -140,7 +140,7 @@ public class ReplacerMojo extends AbstractMojo implements StreamFactory {
 				parentPath.mkdirs();
 			}
 		} else {
-			String errorMsg = "Parameter outputFile can't be a directory! outputFile: " + file;
+			String errorMsg = "Parameter outputFile cannot be a directory: " + file;
 			throw new MojoExecutionException(errorMsg);
 		}
 	}
