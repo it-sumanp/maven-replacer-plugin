@@ -29,19 +29,19 @@ public class ReplacerMojoTest {
 		replacer = spy(new ReplacerMojo());
 		doReturn(tokenReplacer).when(replacer).getTokenReplacer();
 	}
-		
-	@Test	
+
+	@Test
 	public void shouldReplaceTokensInFile() throws Exception {
 		String token = "token";
 		String value = "value";
-		
+
 		replacer.setRegex(true);
 		replacer.setToken(token);
 		replacer.setValue(value);
 		replacer.execute();
 		verify(tokenReplacer).replaceTokens(token, value, true);
 	}
-	
+
 	@Test
 	public void shouldReturnFileStreams() throws IOException {
 		File file = new File("tmpfile");
@@ -54,21 +54,34 @@ public class ReplacerMojoTest {
 			file.delete();
 		}
 	}
-	
-	@Test(expected = MojoExecutionException.class)	
-	public void shouldThrowMojoExceptionWhenIOException() throws MojoExecutionException, IOException {
-		doThrow(new IOException()).when(tokenReplacer).replaceTokens(anyString(), anyString(), anyBoolean());
-		
+
+	@Test(expected = MojoExecutionException.class)
+	public void shouldThrowMojoExceptionWhenIOException() throws MojoExecutionException,
+			IOException {
+		doThrow(new IOException()).when(tokenReplacer).replaceTokens(anyString(), anyString(),
+				anyBoolean());
+
 		replacer.execute();
 		verify(tokenReplacer).replaceTokens(anyString(), anyString(), anyBoolean());
 	}
-	
+
 	@Test
 	public void shouldIgnoreMissingFile() throws MojoExecutionException {
 		replacer.setFile("some missing file");
 		replacer.setIgnoreMissingFile(true);
-		
+
 		replacer.execute();
 		verifyZeroInteractions(tokenReplacer);
+	}
+
+	@Test
+	public void shouldCreateOutputFileDirectoryIfDoesntExist() throws Exception {
+		String outputFile = "/tmp/maven-replacer-plugin-test/outputTest";
+		try {
+			replacer.setOutputFile(outputFile);
+			assertTrue(replacer.getNewOutputStream() instanceof FileOutputStream);
+		} finally {
+			new File(outputFile).delete();
+		}
 	}
 }
