@@ -16,24 +16,18 @@ public class TokenReplacer {
 		this.streamFactory = streamFactory;
 	}
 
-	public void replaceTokens(String token, String value, boolean isTokenRegex)
-			throws IOException {
+	public void replaceTokens(String token, String value, boolean isTokenRegex) throws IOException {
 		StringBuffer buffer = new StringBuffer();
 
 		InputStream inputStream = streamFactory.getNewInputStream();
-		BufferedReader reader = new BufferedReader(new InputStreamReader(
-				inputStream));
+		BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
 
 		String line = reader.readLine();
 		if (line == null) {
 			throw new IOException("Could not read from stream");
 		}
 		while (line != null) {
-			if (isTokenRegex) {
-				buffer.append(line.replaceAll(token, value));
-			} else {
-				buffer.append(replaceNonRegex(line, token, value));
-			}
+			buffer.append(line);
 			if (lineSeparator != null) {
 				buffer.append(lineSeparator);
 			}
@@ -41,8 +35,16 @@ public class TokenReplacer {
 		}
 		reader.close();
 
+		final String result;
+		String valueToReplaceWith = value == null ? "" : value;
+		if (isTokenRegex) {
+			result = buffer.toString().replaceAll(token, valueToReplaceWith);
+		} else {
+			result = replaceNonRegex(buffer.toString(), token, valueToReplaceWith);
+		}
+
 		Writer writer = new OutputStreamWriter(streamFactory.getNewOutputStream());
-		writer.write(buffer.toString());
+		writer.write(result);
 		writer.close();
 	}
 
