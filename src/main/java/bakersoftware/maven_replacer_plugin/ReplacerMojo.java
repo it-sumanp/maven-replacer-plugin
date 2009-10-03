@@ -70,6 +70,9 @@ public class ReplacerMojo extends AbstractMojo implements StreamFactory {
 				return;
 			}
 			getLog().info("Replacing " + token + " with " + value + " in " + file);
+			if (outputFile != null) {
+				getLog().info("Outputting to: " + outputFile);
+			}
 
 			getTokenReplacer().replaceTokens(token, value, isRegex());
 		} catch (IOException e) {
