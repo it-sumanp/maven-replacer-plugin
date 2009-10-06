@@ -69,7 +69,11 @@ public class ReplacerMojo extends AbstractMojo implements StreamFactory {
 				getLog().info("Ignoring missing file");
 				return;
 			}
-			getLog().info("Replacing " + token + " with " + value + " in " + file);
+      if (value != null) {
+          getLog().info("Replacing " + token + " with " + value + " in " + file);
+		  } else {
+          getLog().info("Removing all instances of" + token + " in " + file);
+			}
 			if (outputFile != null) {
 				getLog().info("Outputting to: " + outputFile);
 			}
