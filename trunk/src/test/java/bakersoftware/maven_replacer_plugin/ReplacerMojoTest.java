@@ -3,6 +3,7 @@ package bakersoftware.maven_replacer_plugin;
 import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
 
@@ -24,6 +25,9 @@ import bakersoftware.maven_replacer_plugin.file.FileUtils;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ReplacerMojoTest {
+	private static final String TOKEN = "token";
+	private static final String VALUE = "value";
+
 	@Mock
 	private TokenReplacer tokenReplacer;
 
@@ -38,19 +42,22 @@ public class ReplacerMojoTest {
 	@Before
 	public void setUp() {
 		replacer = new ReplacerMojo(tokenReplacer, fileUtils);
-		replacer.setToken("some token");
+		replacer.setToken(TOKEN);
+		replacer.setValue(VALUE);
 	}
 
 	@Test
-	public void shouldReplaceTokensInFile() throws Exception {
-		String token = "token";
-		String value = "value";
-
+	public void shouldReplaceRegexTokensInFile() throws Exception {
 		replacer.setRegex(true);
-		replacer.setToken(token);
-		replacer.setValue(value);
 		replacer.execute();
-		verify(tokenReplacer).replaceTokens(token, value, true);
+		verify(tokenReplacer).replaceTokens(TOKEN, VALUE, true);
+	}
+
+	@Test
+	public void shouldReplaceNonRegexTokensInFile() throws Exception {
+		replacer.setRegex(false);
+		replacer.execute();
+		verify(tokenReplacer).replaceTokens(TOKEN, VALUE, false);
 	}
 
 	@Test(expected = MojoExecutionException.class)
@@ -64,7 +71,7 @@ public class ReplacerMojoTest {
 	}
 
 	@Test
-	public void shouldIgnoreMissingFile() throws MojoExecutionException {
+	public void shouldIgnoreMissingFileAndReturnImmediately() throws MojoExecutionException {
 		replacer.setFile("some missing file");
 		replacer.setIgnoreMissingFile(true);
 
@@ -86,38 +93,30 @@ public class ReplacerMojoTest {
 	@Test
 	public void shouldUseTokenInFileIfTokenFileSupplied() throws Exception {
 		String tokenFile = "tokenFile";
-		String token = "token";
-		String value = "value";
 
 		File file = folder.newFile(tokenFile);
 		BufferedWriter out = new BufferedWriter(new FileWriter(file));
-		out.write(token);
+		out.write(TOKEN);
 		out.close();
 
-		replacer.setRegex(true);
 		replacer.setToken(null);
 		replacer.setTokenFile(file.getAbsolutePath());
-		replacer.setValue(value);
 		replacer.execute();
-		verify(tokenReplacer).replaceTokens(token, value, true);
+		verify(tokenReplacer).replaceTokens(eq(TOKEN), eq(VALUE), anyBoolean());
 	}
 
 	@Test
 	public void shouldUseValueInFileIfValueFileSupplied() throws Exception {
 		String valueFile = "tokenFile";
-		String token = "token";
-		String value = "value";
 
 		File file = folder.newFile(valueFile);
 		BufferedWriter out = new BufferedWriter(new FileWriter(file));
-		out.write(value);
+		out.write(VALUE);
 		out.close();
 
-		replacer.setRegex(true);
-		replacer.setToken(token);
 		replacer.setValue(null);
 		replacer.setValueFile(file.getAbsolutePath());
 		replacer.execute();
-		verify(tokenReplacer).replaceTokens(token, value, true);
+		verify(tokenReplacer).replaceTokens(eq(TOKEN), eq(VALUE), anyBoolean());
 	}
 }
