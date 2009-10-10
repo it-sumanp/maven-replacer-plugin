@@ -13,6 +13,8 @@ import java.io.InputStream;
 import org.junit.Before;
 import org.junit.Test;
 
+import bakersoftware.maven_replacer_plugin.file.StreamFactory;
+
 public class TokenReplacerTest {
 	private static final String SEPARATOR = "separator";
 
