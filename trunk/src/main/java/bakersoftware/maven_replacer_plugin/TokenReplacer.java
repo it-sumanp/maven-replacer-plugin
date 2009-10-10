@@ -7,6 +7,8 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
 
+import bakersoftware.maven_replacer_plugin.file.StreamFactory;
+
 public class TokenReplacer {
 	private final String lineSeparator;
 	private final StreamFactory streamFactory;
@@ -17,10 +19,7 @@ public class TokenReplacer {
 	}
 
 	public void replaceTokens(String token, String value, boolean isTokenRegex) throws IOException {
-		InputStream inputStream = streamFactory.getNewInputStream();
-		BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
-
-		StringBuffer buffer = readContents(reader);
+		StringBuffer buffer = readContents(streamFactory.getNewInputStream());
 		String result = replaceContents(buffer.toString(), token, value, isTokenRegex);
 
 		Writer writer = new OutputStreamWriter(streamFactory.getNewOutputStream());
@@ -28,7 +27,9 @@ public class TokenReplacer {
 		writer.close();
 	}
 
-	private StringBuffer readContents(BufferedReader reader) throws IOException {
+	private StringBuffer readContents(InputStream inputStream) throws IOException {
+		BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+
 		StringBuffer buffer = new StringBuffer();
 		String line = reader.readLine();
 		if (line == null) {
@@ -46,8 +47,8 @@ public class TokenReplacer {
 	}
 
 	private String replaceContents(String contents, String token, String value, boolean isTokenRegex) {
-		final String result;
 		String valueToReplaceWith = value == null ? "" : value;
+		final String result;
 		if (isTokenRegex) {
 			result = contents.replaceAll(token, valueToReplaceWith);
 		} else {
