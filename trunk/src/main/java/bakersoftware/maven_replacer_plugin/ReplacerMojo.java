@@ -1,7 +1,5 @@
 package bakersoftware.maven_replacer_plugin;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
 import java.io.IOException;
 
 import org.apache.maven.plugin.AbstractMojo;
@@ -105,12 +103,12 @@ public class ReplacerMojo extends AbstractMojo implements FileParameterProvider 
 
 			String token = this.token;
 			if (token == null) {
-				token = readFile(tokenFile);
+				token = fileUtils.readFile(tokenFile);
 			}
 
 			String value = this.value;
 			if (value == null && valueFile != null) {
-				value = readFile(valueFile);
+				value = fileUtils.readFile(valueFile);
 			}
 			getLog().info("Replacing content in " + file);
 
@@ -118,21 +116,6 @@ public class ReplacerMojo extends AbstractMojo implements FileParameterProvider 
 		} catch (IOException e) {
 			throw new MojoExecutionException(e.getMessage());
 		}
-	}
-
-	private String readFile(String file) throws IOException {
-		StringBuilder contents = new StringBuilder();
-		BufferedReader input = new BufferedReader(new FileReader(file));
-		try {
-			String line = null;
-			while ((line = input.readLine()) != null) {
-				contents.append(line).append(LINE_SEPARATOR);
-			}
-		} finally {
-			input.close();
-		}
-
-		return contents.toString().trim();
 	}
 
 	public boolean isRegex() {

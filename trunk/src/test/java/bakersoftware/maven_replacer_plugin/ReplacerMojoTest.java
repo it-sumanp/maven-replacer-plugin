@@ -2,21 +2,17 @@ package bakersoftware.maven_replacer_plugin;
 
 import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.when;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 
 import org.apache.maven.plugin.MojoExecutionException;
 import org.junit.Before;
-import org.junit.Rule;
 import org.junit.Test;
-import org.junit.rules.TemporaryFolder;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
@@ -33,9 +29,6 @@ public class ReplacerMojoTest {
 
 	@Mock
 	private FileUtils fileUtils;
-
-	@Rule
-	public TemporaryFolder folder = new TemporaryFolder();
 
 	private ReplacerMojo replacer;
 
@@ -92,30 +85,22 @@ public class ReplacerMojoTest {
 
 	@Test
 	public void shouldUseTokenInFileIfTokenFileSupplied() throws Exception {
-		String tokenFile = "tokenFile";
-
-		File file = folder.newFile(tokenFile);
-		BufferedWriter out = new BufferedWriter(new FileWriter(file));
-		out.write(TOKEN);
-		out.close();
+		String file = "tokenFile";
+		when(fileUtils.readFile(file)).thenReturn(TOKEN);
 
 		replacer.setToken(null);
-		replacer.setTokenFile(file.getAbsolutePath());
+		replacer.setTokenFile(file);
 		replacer.execute();
 		verify(tokenReplacer).replaceTokens(eq(TOKEN), eq(VALUE), anyBoolean());
 	}
 
 	@Test
 	public void shouldUseValueInFileIfValueFileSupplied() throws Exception {
-		String valueFile = "tokenFile";
-
-		File file = folder.newFile(valueFile);
-		BufferedWriter out = new BufferedWriter(new FileWriter(file));
-		out.write(VALUE);
-		out.close();
+		String file = "valueFile";
+		when(fileUtils.readFile(file)).thenReturn(VALUE);
 
 		replacer.setValue(null);
-		replacer.setValueFile(file.getAbsolutePath());
+		replacer.setValueFile(file);
 		replacer.execute();
 		verify(tokenReplacer).replaceTokens(eq(TOKEN), eq(VALUE), anyBoolean());
 	}
