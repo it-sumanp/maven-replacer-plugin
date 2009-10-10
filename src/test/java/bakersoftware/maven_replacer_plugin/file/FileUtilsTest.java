@@ -1,9 +1,11 @@
 package bakersoftware.maven_replacer_plugin.file;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
+import java.io.FileWriter;
 
 import org.junit.Before;
 import org.junit.Rule;
@@ -46,5 +48,15 @@ public class FileUtilsTest {
 		File file = new File("/tmp/");
 		assertTrue(file.exists());
 		file.delete();
+	}
+
+	@Test
+	public void shouldReadContents() throws Exception {
+		File file = folder.newFile("some file");
+		FileWriter fileWriter = new FileWriter(file);
+		fileWriter.write("some data");
+		fileWriter.close();
+
+		assertEquals("some data", fileUtils.readFile(file.getAbsolutePath()));
 	}
 }
