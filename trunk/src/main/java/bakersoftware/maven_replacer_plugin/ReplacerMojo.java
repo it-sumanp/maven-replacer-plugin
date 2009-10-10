@@ -1,5 +1,7 @@
 package bakersoftware.maven_replacer_plugin;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
 import java.io.IOException;
 
 import org.apache.maven.plugin.AbstractMojo;
@@ -37,6 +39,13 @@ public class ReplacerMojo extends AbstractMojo implements FileParameterProvider 
 	private String token;
 
 	/**
+	 * Token file
+	 * 
+	 * @parameter expression=""
+	 */
+	private String tokenFile;
+
+	/**
 	 * Ignore missing files
 	 * 
 	 * @parameter expression=""
@@ -49,6 +58,13 @@ public class ReplacerMojo extends AbstractMojo implements FileParameterProvider 
 	 * @parameter expression=""
 	 */
 	private String value;
+
+	/**
+	 * Value file to read value to replace token with
+	 * 
+	 * @parameter expression=""
+	 */
+	private String valueFile;
 
 	/**
 	 * Token uses regex
@@ -78,20 +94,45 @@ public class ReplacerMojo extends AbstractMojo implements FileParameterProvider 
 
 	public void execute() throws MojoExecutionException {
 		try {
+			if (token == null && tokenFile == null) {
+				throw new MojoExecutionException("Token or token file required");
+			}
+
 			if (ignoreMissingFile && !fileUtils.fileExists(file)) {
 				getLog().info("Ignoring missing file");
 				return;
 			}
-			if (value != null) {
-				getLog().info("Replacing " + token + " with " + value + " in " + file);
-			} else {
-				getLog().info("Removing all instances of " + token + " in " + file);
+
+			String token = this.token;
+			if (token == null) {
+				token = readFile(tokenFile);
 			}
+
+			String value = this.value;
+			if (value == null && valueFile != null) {
+				value = readFile(valueFile);
+			}
+			getLog().info("Replacing content in " + file);
 
 			tokenReplacer.replaceTokens(token, value, isRegex());
 		} catch (IOException e) {
 			throw new MojoExecutionException(e.getMessage());
 		}
+	}
+
+	private String readFile(String file) throws IOException {
+		StringBuilder contents = new StringBuilder();
+		BufferedReader input = new BufferedReader(new FileReader(file));
+		try {
+			String line = null;
+			while ((line = input.readLine()) != null) {
+				contents.append(line).append(LINE_SEPARATOR);
+			}
+		} finally {
+			input.close();
+		}
+
+		return contents.toString().trim();
 	}
 
 	public boolean isRegex() {
@@ -112,6 +153,14 @@ public class ReplacerMojo extends AbstractMojo implements FileParameterProvider 
 
 	public void setValue(String value) {
 		this.value = value;
+	}
+
+	public void setTokenFile(String tokenFile) {
+		this.tokenFile = tokenFile;
+	}
+
+	public void setValueFile(String valueFile) {
+		this.valueFile = valueFile;
 	}
 
 	public void setIgnoreMissingFile(boolean ignoreMissingFile) {
