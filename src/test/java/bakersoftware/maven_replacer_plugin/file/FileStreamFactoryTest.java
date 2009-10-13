@@ -49,7 +49,7 @@ public class FileStreamFactoryTest {
 	}
 
 	@Test
-	public void shouldReturnOutputStreamForInputFile() {
+	public void shouldReturnOutputStreamForInputFile() throws Exception {
 		when(fileParameterProvider.getOutputFile()).thenReturn(null);
 		assertTrue(factory.getNewOutputStream() instanceof FileOutputStream);
 		verify(fileParameterProvider).getOutputFile();
@@ -57,14 +57,14 @@ public class FileStreamFactoryTest {
 	}
 
 	@Test
-	public void shouldUseOutputFileIfGiven() {
+	public void shouldUseOutputFileIfGiven() throws Exception {
 		assertTrue(factory.getNewOutputStream() instanceof FileOutputStream);
 		verify(fileParameterProvider).getOutputFile();
 		verify(fileParameterProvider, never()).getFile();
 	}
 
 	@Test
-	public void shouldCreateOutputFileIfGivenButDoesntExist() {
+	public void shouldCreateOutputFileIfGivenButDoesntExist() throws Exception {
 		when(fileParameterProvider.getOutputFile()).thenReturn("some new file");
 
 		assertTrue(factory.getNewOutputStream() instanceof FileOutputStream);
