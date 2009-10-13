@@ -52,6 +52,14 @@ public class ReplacerMojoTest {
 		replacer.execute();
 		verify(tokenReplacer).replaceTokens(TOKEN, VALUE, false);
 	}
+	
+	@Test
+	public void shouldReplaceBackslashContainingValueInFile() throws Exception {
+		replacer.setRegex(true);
+		replacer.setValue("some\\value");
+		replacer.execute();
+		verify(tokenReplacer).replaceTokens(TOKEN, "some\\value", true);
+	}
 
 	@Test(expected = MojoExecutionException.class)
 	public void shouldThrowMojoExceptionWhenIOException() throws MojoExecutionException,
