@@ -3,6 +3,7 @@ package bakersoftware.maven_replacer_plugin.file;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
@@ -15,15 +16,15 @@ public class FileStreamFactory implements StreamFactory {
 		this.fileUtils = fileUtils;
 	}
 
-	public InputStream getNewInputStream() {
+	public InputStream getNewInputStream() throws IOException {
 		try {
 			return new FileInputStream(fileParameterProvider.getFile());
 		} catch (FileNotFoundException e) {
-			throw new RuntimeException(e);
+			throw new IOException(e.getMessage());
 		}
 	}
 
-	public OutputStream getNewOutputStream() {
+	public OutputStream getNewOutputStream() throws IOException {
 		try {
 			String outputFile = fileParameterProvider.getOutputFile();
 			if (outputFile != null) {
@@ -36,7 +37,7 @@ public class FileStreamFactory implements StreamFactory {
 				return new FileOutputStream(fileParameterProvider.getFile());
 			}
 		} catch (Exception e) {
-			throw new RuntimeException(e);
+			throw new IOException(e.getMessage());
 		}
 	}
 }

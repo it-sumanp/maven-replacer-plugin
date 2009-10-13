@@ -86,6 +86,7 @@ public class ReplacerMojo extends AbstractMojo implements FileParameterProvider 
 	}
 
 	public ReplacerMojo(TokenReplacer tokenReplacer, FileUtils fileUtils) {
+		super();
 		this.tokenReplacer = tokenReplacer;
 		this.fileUtils = fileUtils;
 	}
@@ -114,7 +115,7 @@ public class ReplacerMojo extends AbstractMojo implements FileParameterProvider 
 
 			tokenReplacer.replaceTokens(token, value, isRegex());
 		} catch (IOException e) {
-			throw new MojoExecutionException(e.getMessage());
+			throw new MojoExecutionException(e.getMessage(), e);
 		}
 	}
 
