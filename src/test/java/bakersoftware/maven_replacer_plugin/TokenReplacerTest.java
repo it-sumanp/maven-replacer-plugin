@@ -9,6 +9,7 @@ import static org.mockito.Mockito.when;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
+import java.util.Properties;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -93,6 +94,20 @@ public class TokenReplacerTest {
 		tokenReplacer.replaceTokens("$token$", null, false);
 
 		assertEquals("some  data" + SEPARATOR, new String(outputStream.toByteArray()));
+		verify(inputStream).close();
+		verify(outputStream).close();
+	}
+	
+	@Test
+	public void shouldReplaceTokenWithValueContainingBackslashes() throws Exception {
+		InputStream inputStream = spy(new ByteArrayInputStream("some token data".getBytes()));
+		ByteArrayOutputStream outputStream = spy(new ByteArrayOutputStream());
+
+		when(streamFactory.getNewInputStream()).thenReturn(inputStream);
+		when(streamFactory.getNewOutputStream()).thenReturn(outputStream);
+
+		tokenReplacer.replaceTokens("token", "\\value\\", false);
+		assertEquals("some \\value\\ data" + SEPARATOR, new String(outputStream.toByteArray()));
 		verify(inputStream).close();
 		verify(outputStream).close();
 	}
