@@ -10,15 +10,10 @@ import java.io.Writer;
 import bakersoftware.maven_replacer_plugin.file.StreamFactory;
 
 public class TokenReplacer {
-	private final String lineSeparator;
-	private final StreamFactory streamFactory;
+	private static final String LINE_SEPARATOR = System.getProperty("line.separator");
 
-	public TokenReplacer(StreamFactory streamFactory, String lineSeparator) {
-		this.lineSeparator = lineSeparator;
-		this.streamFactory = streamFactory;
-	}
-
-	public void replaceTokens(String token, String value, boolean isTokenRegex) throws IOException {
+	public void replaceTokens(String token, String value, boolean isTokenRegex,
+			StreamFactory streamFactory) throws IOException {
 		StringBuffer buffer = readContents(streamFactory.getNewInputStream());
 		String result = replaceContents(buffer.toString(), token, value, isTokenRegex);
 
@@ -36,10 +31,7 @@ public class TokenReplacer {
 			throw new IOException("Could not read from stream");
 		}
 		while (line != null) {
-			buffer.append(line);
-			if (lineSeparator != null) {
-				buffer.append(lineSeparator);
-			}
+			buffer.append(line).append(LINE_SEPARATOR);
 			line = reader.readLine();
 		}
 		reader.close();
