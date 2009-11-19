@@ -42,6 +42,11 @@ public class FileUtilsTest {
 		file.delete();
 	}
 
+	@Test
+	public void shouldNotCreateDirectoryStructureIfNoParentPath() throws Exception {
+		fileUtils.ensureFolderStructureExists("somefile");
+	}
+
 	@Test(expected = IllegalArgumentException.class)
 	public void shouldThrowIllegalArgumentIfOutputFileIsDirectory() throws Exception {
 		fileUtils.ensureFolderStructureExists("/tmp/");
