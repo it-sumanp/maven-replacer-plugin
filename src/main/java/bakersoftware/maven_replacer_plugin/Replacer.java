@@ -42,4 +42,16 @@ public class Replacer {
 		tokenReplacer.replaceTokens(token, value, context.isRegex(), new FileStreamFactory(context,
 				fileUtils));
 	}
+
+	public Log getLog() {
+		return log;
+	}
+
+	public FileUtils getFileUtils() {
+		return fileUtils;
+	}
+
+	public TokenReplacer getTokenReplacer() {
+		return tokenReplacer;
+	}
 }
