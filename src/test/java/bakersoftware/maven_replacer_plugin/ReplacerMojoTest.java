@@ -1,11 +1,9 @@
 package bakersoftware.maven_replacer_plugin;
 
-import static org.mockito.Matchers.anyBoolean;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Matchers.eq;
+import static org.mockito.Matchers.argThat;
+import static org.mockito.Matchers.isA;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 
 import java.io.IOException;
@@ -14,6 +12,7 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentMatcher;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
@@ -30,86 +29,71 @@ public class ReplacerMojoTest {
 	@Mock
 	private FileUtils fileUtils;
 
-	private ReplacerMojo replacer;
+	@Mock
+	private ReplacerFactory replacerFactory;
+
+	@Mock
+	private Replacer replacer;
+
+	private ReplacerMojo replacerMojo;
 
 	@Before
 	public void setUp() {
-		replacer = new ReplacerMojo(tokenReplacer, fileUtils);
-		replacer.setToken(TOKEN);
-		replacer.setValue(VALUE);
+		when(replacerFactory.create()).thenReturn(replacer);
+
+		replacerMojo = new ReplacerMojo(fileUtils, tokenReplacer, replacerFactory);
+		replacerMojo.setToken(TOKEN);
+		replacerMojo.setValue(VALUE);
 	}
 
 	@Test
 	public void shouldReplaceRegexTokensInFile() throws Exception {
-		replacer.setRegex(true);
-		replacer.execute();
-		verify(tokenReplacer).replaceTokens(TOKEN, VALUE, true);
+		replacerMojo.setRegex(true);
+		replacerMojo.execute();
+		verify(replacer).replace(argThat(new ContextMatcher(TOKEN, VALUE, true)));
 	}
 
 	@Test
 	public void shouldReplaceNonRegexTokensInFile() throws Exception {
-		replacer.setRegex(false);
-		replacer.execute();
-		verify(tokenReplacer).replaceTokens(TOKEN, VALUE, false);
+		replacerMojo.setRegex(false);
+		replacerMojo.execute();
+		verify(replacer).replace(argThat(new ContextMatcher(TOKEN, VALUE, false)));
 	}
-	
+
 	@Test
 	public void shouldReplaceBackslashContainingValueInFile() throws Exception {
-		replacer.setRegex(true);
-		replacer.setValue("some\\value");
-		replacer.execute();
-		verify(tokenReplacer).replaceTokens(TOKEN, "some\\value", true);
+		replacerMojo.setRegex(true);
+		replacerMojo.setValue("some\\value");
+		replacerMojo.execute();
+		verify(replacer).replace(argThat(new ContextMatcher(TOKEN, "some\\value", true)));
 	}
 
 	@Test(expected = MojoExecutionException.class)
 	public void shouldThrowMojoExceptionWhenIOException() throws MojoExecutionException,
 			IOException {
-		doThrow(new IOException()).when(tokenReplacer).replaceTokens(anyString(), anyString(),
-				anyBoolean());
+		doThrow(new IOException()).when(replacer).replace(isA(ReplacerContext.class));
 
-		replacer.execute();
-		verify(tokenReplacer).replaceTokens(anyString(), anyString(), anyBoolean());
+		replacerMojo.execute();
+		verify(replacer).replace(isA(ReplacerContext.class));
 	}
 
-	@Test
-	public void shouldIgnoreMissingFileAndReturnImmediately() throws MojoExecutionException {
-		replacer.setFile("some missing file");
-		replacer.setIgnoreMissingFile(true);
+	private static class ContextMatcher extends ArgumentMatcher<ReplacerContext> {
+		private final String token;
+		private final String value;
+		private final boolean isRegex;
 
-		replacer.execute();
-		verify(fileUtils).fileExists("some missing file");
-		verifyZeroInteractions(tokenReplacer);
-	}
+		public ContextMatcher(String token, String value, boolean isRegex) {
+			this.token = token;
+			this.value = value;
+			this.isRegex = isRegex;
+		}
 
-	@Test(expected = MojoExecutionException.class)
-	public void shouldThrowMojoExceptionIfNoTokenOrTokenFileSupplied()
-			throws MojoExecutionException {
-		replacer.setToken(null);
-		replacer.setTokenFile(null);
-		replacer.execute();
+		@Override
+		public boolean matches(Object argument) {
+			ReplacerContext context = (ReplacerContext) argument;
+			return context.getToken().equals(token) && context.getValue().equals(value)
+					&& context.isRegex() == isRegex;
+		}
 
-		verifyZeroInteractions(tokenReplacer);
-	}
-
-	@Test
-	public void shouldUseTokenInFileIfTokenFileSupplied() throws Exception {
-		String file = "tokenFile";
-		when(fileUtils.readFile(file)).thenReturn(TOKEN);
-
-		replacer.setToken(null);
-		replacer.setTokenFile(file);
-		replacer.execute();
-		verify(tokenReplacer).replaceTokens(eq(TOKEN), eq(VALUE), anyBoolean());
-	}
-
-	@Test
-	public void shouldUseValueInFileIfValueFileSupplied() throws Exception {
-		String file = "valueFile";
-		when(fileUtils.readFile(file)).thenReturn(VALUE);
-
-		replacer.setValue(null);
-		replacer.setValueFile(file);
-		replacer.execute();
-		verify(tokenReplacer).replaceTokens(eq(TOKEN), eq(VALUE), anyBoolean());
 	}
 }

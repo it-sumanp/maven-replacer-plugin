@@ -12,6 +12,10 @@ public class FileUtils {
 
 	public void ensureFolderStructureExists(String file) {
 		File outputFile = new File(file);
+		if (outputFile.getParent() == null) {
+			return;
+		}
+
 		if (!outputFile.isDirectory()) {
 			File parentPath = new File(outputFile.getParent());
 			if (!parentPath.exists()) {

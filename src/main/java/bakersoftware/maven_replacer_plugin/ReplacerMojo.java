@@ -5,8 +5,6 @@ import java.io.IOException;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 
-import bakersoftware.maven_replacer_plugin.file.FileParameterProvider;
-import bakersoftware.maven_replacer_plugin.file.FileStreamFactory;
 import bakersoftware.maven_replacer_plugin.file.FileUtils;
 
 /**
@@ -16,11 +14,10 @@ import bakersoftware.maven_replacer_plugin.file.FileUtils;
  * 
  * @phase compile
  */
-public class ReplacerMojo extends AbstractMojo implements FileParameterProvider {
-	private static final String LINE_SEPARATOR = System.getProperty("line.separator");
-
+public class ReplacerMojo extends AbstractMojo {
 	private final FileUtils fileUtils;
 	private final TokenReplacer tokenReplacer;
+	private final ReplacerFactory replacerFactory;
 
 	/**
 	 * File to check and replace tokens
@@ -80,47 +77,32 @@ public class ReplacerMojo extends AbstractMojo implements FileParameterProvider 
 
 	public ReplacerMojo() {
 		super();
-		fileUtils = new FileUtils();
-		this.tokenReplacer = new TokenReplacer(new FileStreamFactory(this, fileUtils),
-				LINE_SEPARATOR);
+		this.fileUtils = new FileUtils();
+		this.tokenReplacer = new TokenReplacer();
+		this.replacerFactory = new ReplacerFactory(getLog(), fileUtils, tokenReplacer);
 	}
 
-	public ReplacerMojo(TokenReplacer tokenReplacer, FileUtils fileUtils) {
-		super();
-		this.tokenReplacer = tokenReplacer;
+	public ReplacerMojo(FileUtils fileUtils, TokenReplacer tokenReplacer,
+			ReplacerFactory replacerFactory) {
 		this.fileUtils = fileUtils;
+		this.tokenReplacer = tokenReplacer;
+		this.replacerFactory = replacerFactory;
 	}
 
 	public void execute() throws MojoExecutionException {
 		try {
-			if (token == null && tokenFile == null) {
-				throw new MojoExecutionException("Token or token file required");
-			}
+			ReplacerContext context = new ReplacerContext(getLog(), file, ignoreMissingFile, regex);
+			context.setToken(token);
+			context.setTokenFile(tokenFile);
+			context.setValue(value);
+			context.setValueFile(valueFile);
+			context.setOutputFile(outputFile);
 
-			if (ignoreMissingFile && !fileUtils.fileExists(file)) {
-				getLog().info("Ignoring missing file");
-				return;
-			}
-
-			String token = this.token;
-			if (token == null) {
-				token = fileUtils.readFile(tokenFile);
-			}
-
-			String value = this.value;
-			if (value == null && valueFile != null) {
-				value = fileUtils.readFile(valueFile);
-			}
-			getLog().info("Replacing content in " + file);
-
-			tokenReplacer.replaceTokens(token, value, isRegex());
+			Replacer replacer = replacerFactory.create();
+			replacer.replace(context);
 		} catch (IOException e) {
 			throw new MojoExecutionException(e.getMessage(), e);
 		}
-	}
-
-	public boolean isRegex() {
-		return regex;
 	}
 
 	public void setRegex(boolean regex) {
@@ -151,15 +133,7 @@ public class ReplacerMojo extends AbstractMojo implements FileParameterProvider 
 		this.ignoreMissingFile = ignoreMissingFile;
 	}
 
-	public String getOutputFile() {
-		return outputFile;
-	}
-
 	public void setOutputFile(String outputFile) {
 		this.outputFile = outputFile;
-	}
-
-	public String getFile() {
-		return file;
 	}
 }

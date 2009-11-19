@@ -1,7 +1,6 @@
 package bakersoftware.maven_replacer_plugin;
 
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -9,23 +8,27 @@ import static org.mockito.Mockito.when;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
-import java.util.Properties;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
 
 import bakersoftware.maven_replacer_plugin.file.StreamFactory;
 
+@RunWith(MockitoJUnitRunner.class)
 public class TokenReplacerTest {
-	private static final String SEPARATOR = "separator";
+	private static final String SEPARATOR = System.getProperty("line.separator");
+
+	@Mock
+	private StreamFactory streamFactory;
 
 	private TokenReplacer tokenReplacer;
-	private StreamFactory streamFactory;
 
 	@Before
 	public void setUp() {
-		streamFactory = mock(StreamFactory.class);
-		tokenReplacer = new TokenReplacer(streamFactory, SEPARATOR);
+		tokenReplacer = new TokenReplacer();
 	}
 
 	@Test
@@ -35,7 +38,7 @@ public class TokenReplacerTest {
 
 		when(streamFactory.getNewInputStream()).thenReturn(inputStream);
 		when(streamFactory.getNewOutputStream()).thenReturn(outputStream);
-		tokenReplacer.replaceTokens("token", "value", false);
+		tokenReplacer.replaceTokens("token", "value", false, streamFactory);
 
 		assertEquals("some value data" + SEPARATOR, new String(outputStream.toByteArray()));
 		verify(inputStream).close();
@@ -49,7 +52,7 @@ public class TokenReplacerTest {
 
 		when(streamFactory.getNewInputStream()).thenReturn(inputStream);
 		when(streamFactory.getNewOutputStream()).thenReturn(outputStream);
-		tokenReplacer.replaceTokens("to[a-z]en", "value", true);
+		tokenReplacer.replaceTokens("to[a-z]en", "value", true, streamFactory);
 
 		assertEquals("some value data" + SEPARATOR, new String(outputStream.toByteArray()));
 		verify(inputStream).close();
@@ -63,7 +66,7 @@ public class TokenReplacerTest {
 
 		when(streamFactory.getNewInputStream()).thenReturn(inputStream);
 		when(streamFactory.getNewOutputStream()).thenReturn(outputStream);
-		tokenReplacer.replaceTokens("$token$", "value", false);
+		tokenReplacer.replaceTokens("$token$", "value", false, streamFactory);
 
 		assertEquals("some value data" + SEPARATOR, new String(outputStream.toByteArray()));
 		verify(inputStream).close();
@@ -77,7 +80,7 @@ public class TokenReplacerTest {
 
 		when(streamFactory.getNewInputStream()).thenReturn(inputStream);
 		when(streamFactory.getNewOutputStream()).thenReturn(outputStream);
-		tokenReplacer.replaceTokens("$token$", "", false);
+		tokenReplacer.replaceTokens("$token$", "", false, streamFactory);
 
 		assertEquals("some  data" + SEPARATOR, new String(outputStream.toByteArray()));
 		verify(inputStream).close();
@@ -91,13 +94,13 @@ public class TokenReplacerTest {
 
 		when(streamFactory.getNewInputStream()).thenReturn(inputStream);
 		when(streamFactory.getNewOutputStream()).thenReturn(outputStream);
-		tokenReplacer.replaceTokens("$token$", null, false);
+		tokenReplacer.replaceTokens("$token$", null, false, streamFactory);
 
 		assertEquals("some  data" + SEPARATOR, new String(outputStream.toByteArray()));
 		verify(inputStream).close();
 		verify(outputStream).close();
 	}
-	
+
 	@Test
 	public void shouldReplaceTokenWithValueContainingBackslashes() throws Exception {
 		InputStream inputStream = spy(new ByteArrayInputStream("some token data".getBytes()));
@@ -106,7 +109,7 @@ public class TokenReplacerTest {
 		when(streamFactory.getNewInputStream()).thenReturn(inputStream);
 		when(streamFactory.getNewOutputStream()).thenReturn(outputStream);
 
-		tokenReplacer.replaceTokens("token", "\\value\\", false);
+		tokenReplacer.replaceTokens("token", "\\value\\", false, streamFactory);
 		assertEquals("some \\value\\ data" + SEPARATOR, new String(outputStream.toByteArray()));
 		verify(inputStream).close();
 		verify(outputStream).close();
