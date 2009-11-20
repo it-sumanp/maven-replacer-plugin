@@ -7,8 +7,6 @@ import bakersoftware.maven_replacer_plugin.file.FileParameterProvider;
 public class ReplacerContext implements FileParameterProvider {
 	private final Log log;
 	private final String file;
-	private final boolean ignoreMissingFile;
-	private final boolean regex;
 
 	private String outputFile;
 	private String token;
@@ -16,11 +14,9 @@ public class ReplacerContext implements FileParameterProvider {
 	private String value;
 	private String valueFile;
 
-	public ReplacerContext(Log log, String file, boolean ignoreMissingFile, boolean regex) {
+	public ReplacerContext(Log log, String file) {
 		this.log = log;
 		this.file = file;
-		this.ignoreMissingFile = ignoreMissingFile;
-		this.regex = regex;
 	}
 
 	public void setOutputFile(String outputFile) {
@@ -63,19 +59,11 @@ public class ReplacerContext implements FileParameterProvider {
 		return tokenFile;
 	}
 
-	public boolean isIgnoreMissingFile() {
-		return ignoreMissingFile;
-	}
-
 	public String getValue() {
 		return value;
 	}
 
 	public String getValueFile() {
 		return valueFile;
-	}
-
-	public boolean isRegex() {
-		return regex;
 	}
 }

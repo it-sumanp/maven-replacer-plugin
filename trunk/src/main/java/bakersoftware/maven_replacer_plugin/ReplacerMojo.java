@@ -1,6 +1,7 @@
 package bakersoftware.maven_replacer_plugin;
 
 import java.io.IOException;
+import java.util.List;
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -18,6 +19,7 @@ public class ReplacerMojo extends AbstractMojo {
 	private final FileUtils fileUtils;
 	private final TokenReplacer tokenReplacer;
 	private final ReplacerFactory replacerFactory;
+	private final TokenValueMapFactory tokenValueMapFactory;
 
 	/**
 	 * File to check and replace tokens
@@ -75,31 +77,48 @@ public class ReplacerMojo extends AbstractMojo {
 	 */
 	private String outputFile;
 
+	/**
+	 * Map of tokens and respective values to replace with
+	 * 
+	 * @parameter expression=""
+	 */
+	private String tokenValueMap;
+
 	public ReplacerMojo() {
 		super();
 		this.fileUtils = new FileUtils();
 		this.tokenReplacer = new TokenReplacer();
 		this.replacerFactory = new ReplacerFactory(getLog(), fileUtils, tokenReplacer);
+		this.tokenValueMapFactory = new TokenValueMapFactory(fileUtils);
 	}
 
 	public ReplacerMojo(FileUtils fileUtils, TokenReplacer tokenReplacer,
-			ReplacerFactory replacerFactory) {
+			ReplacerFactory replacerFactory, TokenValueMapFactory tokenValueMapFactory) {
 		this.fileUtils = fileUtils;
 		this.tokenReplacer = tokenReplacer;
 		this.replacerFactory = replacerFactory;
+		this.tokenValueMapFactory = tokenValueMapFactory;
 	}
 
 	public void execute() throws MojoExecutionException {
 		try {
-			ReplacerContext context = new ReplacerContext(getLog(), file, ignoreMissingFile, regex);
-			context.setToken(token);
-			context.setTokenFile(tokenFile);
-			context.setValue(value);
-			context.setValueFile(valueFile);
-			context.setOutputFile(outputFile);
-
 			Replacer replacer = replacerFactory.create();
-			replacer.replace(context);
+
+			if (tokenValueMap == null) {
+				ReplacerContext context = new ReplacerContext(getLog(), file);
+				context.setToken(token);
+				context.setTokenFile(tokenFile);
+				context.setValue(value);
+				context.setValueFile(valueFile);
+				context.setOutputFile(outputFile);
+				replacer.replace(context, ignoreMissingFile, regex);
+			} else {
+				List<ReplacerContext> contexts = tokenValueMapFactory.contextsForFile(
+						tokenValueMap, getLog(), file);
+				for (ReplacerContext context : contexts) {
+					replacer.replace(context, ignoreMissingFile, regex);
+				}
+			}
 		} catch (IOException e) {
 			throw new MojoExecutionException(e.getMessage(), e);
 		}
@@ -135,5 +154,9 @@ public class ReplacerMojo extends AbstractMojo {
 
 	public void setOutputFile(String outputFile) {
 		this.outputFile = outputFile;
+	}
+
+	public void setTokenValueMap(String tokenValueMap) {
+		this.tokenValueMap = tokenValueMap;
 	}
 }

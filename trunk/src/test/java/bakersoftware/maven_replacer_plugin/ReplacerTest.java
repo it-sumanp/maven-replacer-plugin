@@ -45,9 +45,8 @@ public class ReplacerTest {
 	@Test
 	public void shouldIgnoreMissingFileAndReturnImmediately() throws Exception {
 		when(context.getFile()).thenReturn("some missing file");
-		when(context.isIgnoreMissingFile()).thenReturn(true);
 
-		replacer.replace(context);
+		replacer.replace(context, true, false);
 		verify(fileUtils).fileExists("some missing file");
 		verifyZeroInteractions(tokenReplacer);
 	}
@@ -57,7 +56,7 @@ public class ReplacerTest {
 			throws MojoExecutionException, Exception {
 		when(context.getToken()).thenReturn(null);
 		when(context.getTokenFile()).thenReturn(null);
-		replacer.replace(context);
+		replacer.replace(context, false, false);
 
 		verifyZeroInteractions(tokenReplacer);
 	}
@@ -70,7 +69,7 @@ public class ReplacerTest {
 		when(context.getToken()).thenReturn(null);
 		when(context.getTokenFile()).thenReturn(file);
 
-		replacer.replace(context);
+		replacer.replace(context, false, false);
 		verify(tokenReplacer).replaceTokens(eq(TOKEN), eq(VALUE), anyBoolean(),
 				isA(FileStreamFactory.class));
 	}
@@ -83,7 +82,7 @@ public class ReplacerTest {
 		when(context.getValue()).thenReturn(null);
 		when(context.getValueFile()).thenReturn(file);
 
-		replacer.replace(context);
+		replacer.replace(context, false, false);
 		verify(tokenReplacer).replaceTokens(eq(TOKEN), eq(VALUE), anyBoolean(),
 				isA(FileStreamFactory.class));
 	}
