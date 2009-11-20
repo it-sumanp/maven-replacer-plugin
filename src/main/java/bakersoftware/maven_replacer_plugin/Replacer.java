@@ -18,12 +18,13 @@ public class Replacer {
 		this.tokenReplacer = tokenReplacer;
 	}
 
-	public void replace(ReplacerContext context) throws IOException {
+	public void replace(ReplacerContext context, boolean ignoreMissingFile, boolean regex)
+			throws IOException {
 		if (context.getToken() == null && context.getTokenFile() == null) {
 			throw new IllegalArgumentException("Token or token file required");
 		}
 
-		if (context.isIgnoreMissingFile() && !fileUtils.fileExists(context.getFile())) {
+		if (ignoreMissingFile && !fileUtils.fileExists(context.getFile())) {
 			log.info("Ignoring missing file");
 			return;
 		}
@@ -39,8 +40,7 @@ public class Replacer {
 		}
 		log.info("Replacing content in " + context.getFile());
 
-		tokenReplacer.replaceTokens(token, value, context.isRegex(), new FileStreamFactory(context,
-				fileUtils));
+		tokenReplacer.replaceTokens(token, value, regex, new FileStreamFactory(context, fileUtils));
 	}
 
 	public Log getLog() {
