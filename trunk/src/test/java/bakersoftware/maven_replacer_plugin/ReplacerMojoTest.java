@@ -101,8 +101,11 @@ public class ReplacerMojoTest {
 		when(context2.getValue()).thenReturn("other value");
 
 		List<ReplacerContext> contexts = asList(context1, context2);
-		when(tokenValueMapFactory.contextsForFile("tokenValueMap", replacerMojo.getLog(), null))
-				.thenReturn(contexts);
+		String outputFile = "outputFile";
+		replacerMojo.setOutputFile(outputFile);
+		when(
+				tokenValueMapFactory.contextsForFile("tokenValueMap", replacerMojo.getLog(), null,
+						outputFile)).thenReturn(contexts);
 
 		replacerMojo.execute();
 		verify(replacer).replace(argThat(new ContextMatcher(TOKEN, VALUE)), anyBoolean(), eq(true));

@@ -6,8 +6,8 @@ import bakersoftware.maven_replacer_plugin.file.FileParameterProvider;
 
 public class ReplacerContext implements FileParameterProvider {
 	private final Log log;
-	private final String file;
 
+	private String file;
 	private String outputFile;
 	private String token;
 	private String tokenFile;
@@ -65,5 +65,9 @@ public class ReplacerContext implements FileParameterProvider {
 
 	public String getValueFile() {
 		return valueFile;
+	}
+
+	public void setFile(String file) {
+		this.file = file;
 	}
 }

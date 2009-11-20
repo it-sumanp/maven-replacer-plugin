@@ -19,8 +19,8 @@ public class TokenValueMapFactory {
 		this.fileUtils = fileUtils;
 	}
 
-	public List<ReplacerContext> contextsForFile(String tokenValueMapFile, Log log, String file)
-			throws IOException {
+	public List<ReplacerContext> contextsForFile(String tokenValueMapFile, Log log, String file,
+			String outputFile) throws IOException {
 		String contents = fileUtils.readFile(tokenValueMapFile);
 
 		Properties properties = new Properties();
@@ -35,6 +35,7 @@ public class TokenValueMapFactory {
 			ReplacerContext context = new ReplacerContext(log, file);
 			context.setToken(String.valueOf(key));
 			context.setValue(properties.getProperty(String.valueOf(key)));
+			context.setOutputFile(outputFile);
 			contexts.add(context);
 		}
 		return contexts;

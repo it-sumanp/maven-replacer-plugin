@@ -32,7 +32,9 @@ public class TokenValueMapFactoryTest {
 		String file = "file";
 
 		when(fileUtils.readFile(tokenValueMapFile)).thenReturn(TOKEN_VALUE_MAP);
-		List<ReplacerContext> contexts = factory.contextsForFile(tokenValueMapFile, log, file);
+		String outputFile = "outputFile";
+		List<ReplacerContext> contexts = factory.contextsForFile(tokenValueMapFile, log, file,
+				outputFile);
 
 		assertEquals(2, contexts.size());
 		Collections.sort(contexts, new Comparator<ReplacerContext>() {
@@ -40,6 +42,8 @@ public class TokenValueMapFactoryTest {
 				return o1.getToken().compareTo(o2.getToken());
 			}
 		});
+		assertEquals(outputFile, contexts.get(0).getOutputFile());
+		assertEquals(outputFile, contexts.get(1).getOutputFile());
 		assertEquals(TOKEN1, contexts.get(0).getToken());
 		assertEquals(VALUE1, contexts.get(0).getValue());
 		assertEquals(TOKEN2, contexts.get(1).getToken());
