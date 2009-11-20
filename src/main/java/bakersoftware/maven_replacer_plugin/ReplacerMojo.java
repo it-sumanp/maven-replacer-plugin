@@ -114,7 +114,16 @@ public class ReplacerMojo extends AbstractMojo {
 				replacer.replace(context, ignoreMissingFile, regex);
 			} else {
 				List<ReplacerContext> contexts = tokenValueMapFactory.contextsForFile(
-						tokenValueMap, getLog(), file);
+						tokenValueMap, getLog(), file, outputFile);
+
+				// when there is an output file, contexts following need to
+				// reference the outputfile so that all contexts are replaced in
+				// the same file
+				if (outputFile != null && contexts.size() > 1) {
+					for (int i = 1; i < contexts.size(); i++) {
+						contexts.get(i).setFile(outputFile);
+					}
+				}
 				for (ReplacerContext context : contexts) {
 					replacer.replace(context, ignoreMissingFile, regex);
 				}
