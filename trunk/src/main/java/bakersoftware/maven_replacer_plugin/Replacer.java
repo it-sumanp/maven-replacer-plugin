@@ -21,7 +21,7 @@ public class Replacer {
 			String outputFile) throws IOException {
 		String content = fileUtils.readFile(file);
 		for (ReplacerContext context : contexts) {
-			if (context.getToken() == null) {
+			if (context.getToken() == null || context.getToken().trim().length() == 0) {
 				throw new IllegalArgumentException("Token or token file required");
 			}
 
