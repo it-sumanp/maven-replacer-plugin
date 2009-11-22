@@ -118,10 +118,8 @@ public class ReplacerMojo extends AbstractMojo {
 
 	private List<ReplacerContext> getContexts() throws IOException {
 		if (tokenValueMap == null) {
-			ReplacerContext context = new ReplacerContext();
-			context.setToken(token);
+			ReplacerContext context = new ReplacerContext(token, value);
 			context.setTokenFile(tokenFile);
-			context.setValue(value);
 			context.setValueFile(valueFile);
 			return Arrays.asList(context);
 		}
