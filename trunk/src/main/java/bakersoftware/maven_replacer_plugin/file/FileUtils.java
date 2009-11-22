@@ -6,8 +6,10 @@ import java.io.FileReader;
 import java.io.IOException;
 
 public class FileUtils {
-	public boolean fileExists(String filename) {
-		return new File(filename).exists();
+	private static final String LINE_SEPARATOR = System.getProperty("line.separator");
+
+	public boolean fileNotExists(String filename) {
+		return !new File(filename).exists();
 	}
 
 	public void ensureFolderStructureExists(String file) {
@@ -22,8 +24,7 @@ public class FileUtils {
 				parentPath.mkdirs();
 			}
 		} else {
-			throw new IllegalArgumentException("Parameter outputFile cannot be a directory: "
-					+ file);
+			throw new IllegalArgumentException("OutputFile cannot be a directory: " + file);
 		}
 	}
 
@@ -33,7 +34,7 @@ public class FileUtils {
 		try {
 			String line = null;
 			while ((line = input.readLine()) != null) {
-				contents.append(line).append(System.getProperty("line.separator"));
+				contents.append(line).append(LINE_SEPARATOR);
 			}
 		} finally {
 			input.close();

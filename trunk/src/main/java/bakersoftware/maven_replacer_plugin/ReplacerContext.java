@@ -1,73 +1,38 @@
 package bakersoftware.maven_replacer_plugin;
 
-import org.apache.maven.plugin.logging.Log;
+import java.io.IOException;
 
-import bakersoftware.maven_replacer_plugin.file.FileParameterProvider;
+import bakersoftware.maven_replacer_plugin.file.FileUtils;
 
-public class ReplacerContext implements FileParameterProvider {
-	private final Log log;
-
-	private String file;
-	private String outputFile;
+public class ReplacerContext {
 	private String token;
-	private String tokenFile;
 	private String value;
-	private String valueFile;
-
-	public ReplacerContext(Log log, String file) {
-		this.log = log;
-		this.file = file;
-	}
-
-	public void setOutputFile(String outputFile) {
-		this.outputFile = outputFile;
-	}
 
 	public void setToken(String token) {
 		this.token = token;
 	}
 
-	public void setTokenFile(String tokenFile) {
-		this.tokenFile = tokenFile;
+	public void setTokenFile(String tokenFile) throws IOException {
+		if (tokenFile != null) {
+			token = new FileUtils().readFile(tokenFile).trim();
+		}
 	}
 
 	public void setValue(String value) {
 		this.value = value;
 	}
 
-	public void setValueFile(String valueFile) {
-		this.valueFile = valueFile;
-	}
-
-	public String getFile() {
-		return file;
-	}
-
-	public Log getLog() {
-		return log;
-	}
-
-	public String getOutputFile() {
-		return outputFile;
+	public void setValueFile(String valueFile) throws IOException {
+		if (valueFile != null) {
+			value = new FileUtils().readFile(valueFile).trim();
+		}
 	}
 
 	public String getToken() {
 		return token;
 	}
 
-	public String getTokenFile() {
-		return tokenFile;
-	}
-
 	public String getValue() {
 		return value;
-	}
-
-	public String getValueFile() {
-		return valueFile;
-	}
-
-	public void setFile(String file) {
-		this.file = file;
 	}
 }

@@ -1,6 +1,7 @@
 package bakersoftware.maven_replacer_plugin;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 
 import org.apache.maven.plugin.AbstractMojo;
@@ -88,12 +89,13 @@ public class ReplacerMojo extends AbstractMojo {
 		super();
 		this.fileUtils = new FileUtils();
 		this.tokenReplacer = new TokenReplacer();
-		this.replacerFactory = new ReplacerFactory(getLog(), fileUtils, tokenReplacer);
+		this.replacerFactory = new ReplacerFactory(fileUtils, tokenReplacer);
 		this.tokenValueMapFactory = new TokenValueMapFactory(fileUtils);
 	}
 
 	public ReplacerMojo(FileUtils fileUtils, TokenReplacer tokenReplacer,
 			ReplacerFactory replacerFactory, TokenValueMapFactory tokenValueMapFactory) {
+		super();
 		this.fileUtils = fileUtils;
 		this.tokenReplacer = tokenReplacer;
 		this.replacerFactory = replacerFactory;
@@ -102,35 +104,40 @@ public class ReplacerMojo extends AbstractMojo {
 
 	public void execute() throws MojoExecutionException {
 		try {
-			Replacer replacer = replacerFactory.create();
-
-			if (tokenValueMap == null) {
-				ReplacerContext context = new ReplacerContext(getLog(), file);
-				context.setToken(token);
-				context.setTokenFile(tokenFile);
-				context.setValue(value);
-				context.setValueFile(valueFile);
-				context.setOutputFile(outputFile);
-				replacer.replace(context, ignoreMissingFile, regex);
-			} else {
-				List<ReplacerContext> contexts = tokenValueMapFactory.contextsForFile(
-						tokenValueMap, getLog(), file, outputFile);
-
-				// when there is an output file, contexts following need to
-				// reference the outputfile so that all contexts are replaced in
-				// the same file
-				if (outputFile != null && contexts.size() > 1) {
-					for (int i = 1; i < contexts.size(); i++) {
-						contexts.get(i).setFile(outputFile);
-					}
-				}
-				for (ReplacerContext context : contexts) {
-					replacer.replace(context, ignoreMissingFile, regex);
-				}
+			getLog().info("Replacing content in " + file);
+			if (ignoreMissingFile && fileUtils.fileNotExists(file)) {
+				getLog().info("Ignoring missing file");
+				return;
 			}
+
+			replacerFactory.create().replace(getContexts(), regex, file, getOutputFile());
 		} catch (IOException e) {
 			throw new MojoExecutionException(e.getMessage(), e);
 		}
+	}
+
+	private List<ReplacerContext> getContexts() throws IOException {
+		if (tokenValueMap == null) {
+			ReplacerContext context = new ReplacerContext();
+			context.setToken(token);
+			context.setTokenFile(tokenFile);
+			context.setValue(value);
+			context.setValueFile(valueFile);
+			return Arrays.asList(context);
+		}
+		return tokenValueMapFactory.contextsForFile(tokenValueMap);
+	}
+
+	private String getOutputFile() {
+		if (outputFile == null) {
+			return file;
+		}
+
+		getLog().info("Outputting to: " + outputFile);
+		if (fileUtils.fileNotExists(file)) {
+			fileUtils.ensureFolderStructureExists(outputFile);
+		}
+		return outputFile;
 	}
 
 	public void setRegex(boolean regex) {

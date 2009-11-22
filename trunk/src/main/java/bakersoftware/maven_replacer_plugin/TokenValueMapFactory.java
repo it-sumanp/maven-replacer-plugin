@@ -7,8 +7,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
-import org.apache.maven.plugin.logging.Log;
-
 import bakersoftware.maven_replacer_plugin.file.FileUtils;
 
 public class TokenValueMapFactory {
@@ -19,8 +17,7 @@ public class TokenValueMapFactory {
 		this.fileUtils = fileUtils;
 	}
 
-	public List<ReplacerContext> contextsForFile(String tokenValueMapFile, Log log, String file,
-			String outputFile) throws IOException {
+	public List<ReplacerContext> contextsForFile(String tokenValueMapFile) throws IOException {
 		String contents = fileUtils.readFile(tokenValueMapFile);
 
 		Properties properties = new Properties();
@@ -30,12 +27,12 @@ public class TokenValueMapFactory {
 		} finally {
 			inputStream.close();
 		}
+
 		List<ReplacerContext> contexts = new ArrayList<ReplacerContext>();
 		for (Object key : properties.keySet()) {
-			ReplacerContext context = new ReplacerContext(log, file);
+			ReplacerContext context = new ReplacerContext();
 			context.setToken(String.valueOf(key));
 			context.setValue(properties.getProperty(String.valueOf(key)));
-			context.setOutputFile(outputFile);
 			contexts.add(context);
 		}
 		return contexts;
