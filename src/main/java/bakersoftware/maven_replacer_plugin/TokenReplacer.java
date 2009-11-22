@@ -3,13 +3,11 @@ package bakersoftware.maven_replacer_plugin;
 public class TokenReplacer {
 	public String replaceContents(String contents, String token, String value, boolean isTokenRegex) {
 		String valueToReplaceWith = value == null ? "" : value;
-		final String result;
 		if (isTokenRegex) {
-			result = contents.replaceAll(token, valueToReplaceWith);
-		} else {
-			result = replaceNonRegex(contents, token, valueToReplaceWith);
+			return contents.replaceAll(token, valueToReplaceWith);
 		}
-		return result;
+
+		return replaceNonRegex(contents, token, valueToReplaceWith);
 	}
 
 	private String replaceNonRegex(String input, String token, String value) {
