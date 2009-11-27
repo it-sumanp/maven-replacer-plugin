@@ -16,18 +16,10 @@ public class ReplacerContext {
 		this.value = value;
 	}
 
-	public void setToken(String token) {
-		this.token = token;
-	}
-
 	public void setTokenFile(String tokenFile) throws IOException {
 		if (tokenFile != null) {
 			token = fileUtils.readFile(tokenFile).trim();
 		}
-	}
-
-	public void setValue(String value) {
-		this.value = value;
 	}
 
 	public void setValueFile(String valueFile) throws IOException {

@@ -36,4 +36,13 @@ public class TokenReplacerTest {
 		String results = replacer.replaceContents("some\ntoken", "t.k.n", null, true);
 		assertEquals("some\n", results);
 	}
+
+	@Test
+	public void shouldHandleEmptyContentsGracefully() {
+		String results = replacer.replaceContents("", "anything", "anything", true);
+		assertEquals("", results);
+
+		results = replacer.replaceContents("", "anything", "anything", false);
+		assertEquals("", results);
+	}
 }
