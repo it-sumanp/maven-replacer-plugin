@@ -25,7 +25,7 @@ public class TokenValueMapFactory {
 		for (Object key : properties.keySet()) {
 			String token = String.valueOf(key);
 			String value = properties.getProperty(token);
-			contexts.add(new ReplacerContext(token, value));
+			contexts.add(new ReplacerContext(fileUtils, token, value));
 		}
 		return contexts;
 	}
