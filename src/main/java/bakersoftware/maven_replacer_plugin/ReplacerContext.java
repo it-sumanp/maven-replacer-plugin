@@ -5,10 +5,13 @@ import java.io.IOException;
 import bakersoftware.maven_replacer_plugin.file.FileUtils;
 
 public class ReplacerContext {
+	private final FileUtils fileUtils;
+
 	private String token;
 	private String value;
 
-	public ReplacerContext(String token, String value) {
+	public ReplacerContext(FileUtils fileUtils, String token, String value) {
+		this.fileUtils = fileUtils;
 		this.token = token;
 		this.value = value;
 	}
@@ -19,7 +22,7 @@ public class ReplacerContext {
 
 	public void setTokenFile(String tokenFile) throws IOException {
 		if (tokenFile != null) {
-			token = new FileUtils().readFile(tokenFile).trim();
+			token = fileUtils.readFile(tokenFile).trim();
 		}
 	}
 
@@ -29,7 +32,7 @@ public class ReplacerContext {
 
 	public void setValueFile(String valueFile) throws IOException {
 		if (valueFile != null) {
-			value = new FileUtils().readFile(valueFile).trim();
+			value = fileUtils.readFile(valueFile).trim();
 		}
 	}
 
