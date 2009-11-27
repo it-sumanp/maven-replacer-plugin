@@ -33,4 +33,12 @@ public class Replacer {
 		writer.write(content);
 		writer.close();
 	}
+
+	public FileUtils getFileUtils() {
+		return fileUtils;
+	}
+
+	public TokenReplacer getTokenReplacer() {
+		return tokenReplacer;
+	}
 }
