@@ -8,6 +8,7 @@ import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 
 import bakersoftware.maven_replacer_plugin.file.FileUtils;
+import bakersoftware.maven_replacer_plugin.include.FileSelector;
 
 /**
  * Goal replaces token with value inside file
@@ -21,6 +22,7 @@ public class ReplacerMojo extends AbstractMojo {
 	private final TokenReplacer tokenReplacer;
 	private final ReplacerFactory replacerFactory;
 	private final TokenValueMapFactory tokenValueMapFactory;
+	private final FileSelector fileSelector;
 
 	/**
 	 * File to check and replace tokens
@@ -28,6 +30,20 @@ public class ReplacerMojo extends AbstractMojo {
 	 * @parameter expression=""
 	 */
 	private String file;
+
+	/**
+	 * List of included files pattern in ant format. Cannot use with outputFile.
+	 * 
+	 * @parameter expression=""
+	 */
+	private List<String> includes;
+
+	/**
+	 * List of excluded files pattern in ant format. Cannot use with outputFile.
+	 * 
+	 * @parameter expression=""
+	 */
+	private List<String> excludes;
 
 	/**
 	 * Token
@@ -91,29 +107,47 @@ public class ReplacerMojo extends AbstractMojo {
 		this.tokenReplacer = new TokenReplacer();
 		this.replacerFactory = new ReplacerFactory(fileUtils, tokenReplacer);
 		this.tokenValueMapFactory = new TokenValueMapFactory(fileUtils);
+		this.fileSelector = new FileSelector();
 	}
 
 	public ReplacerMojo(FileUtils fileUtils, TokenReplacer tokenReplacer,
-			ReplacerFactory replacerFactory, TokenValueMapFactory tokenValueMapFactory) {
+			ReplacerFactory replacerFactory, TokenValueMapFactory tokenValueMapFactory,
+			FileSelector fileSelector) {
 		super();
 		this.fileUtils = fileUtils;
 		this.tokenReplacer = tokenReplacer;
 		this.replacerFactory = replacerFactory;
 		this.tokenValueMapFactory = tokenValueMapFactory;
+		this.fileSelector = fileSelector;
 	}
 
 	public void execute() throws MojoExecutionException {
 		try {
-			getLog().info("Replacing content in " + file);
 			if (ignoreMissingFile && fileUtils.fileNotExists(file)) {
 				getLog().info("Ignoring missing file");
 				return;
 			}
 
-			replacerFactory.create().replace(getContexts(), regex, file, getOutputFile());
+			Replacer replacer = replacerFactory.create();
+			List<ReplacerContext> contexts = getContexts();
+
+			if (includes == null || includes.isEmpty()) {
+				replaceContents(replacer, contexts, file, getOutputFile(file));
+				return;
+			}
+
+			for (String file : fileSelector.listIncludes(includes, excludes)) {
+				replaceContents(replacer, contexts, file, getOutputFile(file));
+			}
 		} catch (IOException e) {
 			throw new MojoExecutionException(e.getMessage(), e);
 		}
+	}
+
+	private void replaceContents(Replacer replacer, List<ReplacerContext> contexts,
+			String inputFile, String outputFile) throws IOException {
+		getLog().info("Replacing content in " + inputFile);
+		replacer.replace(contexts, regex, inputFile, getOutputFile(inputFile));
 	}
 
 	private List<ReplacerContext> getContexts() throws IOException {
@@ -126,7 +160,7 @@ public class ReplacerMojo extends AbstractMojo {
 		return tokenValueMapFactory.contextsForFile(tokenValueMap);
 	}
 
-	private String getOutputFile() {
+	private String getOutputFile(String file) {
 		if (outputFile == null) {
 			return file;
 		}
