@@ -105,7 +105,7 @@ public class ReplacerMojo extends AbstractMojo {
 	
 	/**
 	 * List of regex flags. 
-	 * Must contain one of:
+	 * Must contain one or more of:
 	 * * CANON_EQ
 	 * * CASE_INSENSITIVE
 	 * * COMMENTS
