@@ -21,7 +21,7 @@ public class TokenValueMapFactory {
 	public List<ReplacerContext> contextsForFile(String tokenValueMapFile) throws IOException {
 		String contents = fileUtils.readFile(tokenValueMapFile);
 
-		Properties properties = readPropertyFile(contents);
+		Properties properties = readProperties(contents);
 		List<ReplacerContext> contexts = new ArrayList<ReplacerContext>();
 		for (Object key : properties.keySet()) {
 			String token = String.valueOf(key);
@@ -31,7 +31,7 @@ public class TokenValueMapFactory {
 		return contexts;
 	}
 
-	private Properties readPropertyFile(String contents) throws IOException {
+	private Properties readProperties(String contents) throws IOException {
 		Properties properties = new Properties();
 		InputStream inputStream = new ByteArrayInputStream(contents.getBytes());
 		try {

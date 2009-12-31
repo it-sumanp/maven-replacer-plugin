@@ -1,5 +1,6 @@
 package com.google.code.maven_replacer_plugin;
 
+import static org.junit.Assert.*;
 import static org.junit.Assert.assertEquals;
 
 import java.util.regex.Pattern;
@@ -54,5 +55,11 @@ public class TokenReplacerTest {
 
 		results = replacer.replaceNonRegex("", "anything", "anything");
 		assertEquals("", results);
+	}
+	
+	@Test
+	public void shouldHandleEmptyValueForNonRegex() throws Exception {
+		String results = replacer.replaceNonRegex("some token", "token", null);
+		assertEquals("some ", results);
 	}
 }
