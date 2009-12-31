@@ -23,6 +23,7 @@ public class ReplacerMojo extends AbstractMojo {
 	private final ReplacerFactory replacerFactory;
 	private final TokenValueMapFactory tokenValueMapFactory;
 	private final FileSelector fileSelector;
+	private final PatternFlagsFactory patternFlagsFactory;
 
 	/**
 	 * File to check and replace tokens
@@ -100,6 +101,22 @@ public class ReplacerMojo extends AbstractMojo {
 	 * @parameter expression=""
 	 */
 	private String tokenValueMap;
+	
+	/**
+	 * List of regex flags. 
+	 * Must contain one of:
+	 * * CANON_EQ
+	 * * CASE_INSENSITIVE
+	 * * COMMENTS
+	 * * DOTALL
+	 * * LITERAL
+	 * * MULTILINE
+	 * * UNICODE_CASE
+	 * * UNIX_LINES
+	 * 
+	 * @parameter expression=""
+	 */
+	private List<String> regexFlags;
 
 	public ReplacerMojo() {
 		super();
@@ -108,17 +125,19 @@ public class ReplacerMojo extends AbstractMojo {
 		this.replacerFactory = new ReplacerFactory(fileUtils, tokenReplacer);
 		this.tokenValueMapFactory = new TokenValueMapFactory(fileUtils);
 		this.fileSelector = new FileSelector();
+		this.patternFlagsFactory = new PatternFlagsFactory();
 	}
 
 	public ReplacerMojo(FileUtils fileUtils, TokenReplacer tokenReplacer,
 			ReplacerFactory replacerFactory, TokenValueMapFactory tokenValueMapFactory,
-			FileSelector fileSelector) {
+			FileSelector fileSelector, PatternFlagsFactory patternFlagsFactory) {
 		super();
 		this.fileUtils = fileUtils;
 		this.tokenReplacer = tokenReplacer;
 		this.replacerFactory = replacerFactory;
 		this.tokenValueMapFactory = tokenValueMapFactory;
 		this.fileSelector = fileSelector;
+		this.patternFlagsFactory = patternFlagsFactory;
 	}
 
 	public void execute() throws MojoExecutionException {
@@ -147,7 +166,8 @@ public class ReplacerMojo extends AbstractMojo {
 	private void replaceContents(Replacer replacer, List<ReplacerContext> contexts,
 			String inputFile, String outputFile) throws IOException {
 		getLog().info("Replacing content in " + inputFile);
-		replacer.replace(contexts, regex, inputFile, getOutputFile(inputFile));
+		replacer.replace(contexts, regex, inputFile, getOutputFile(inputFile), 
+				patternFlagsFactory.buildFlags(regexFlags));
 	}
 
 	private List<ReplacerContext> getContexts() throws IOException {
