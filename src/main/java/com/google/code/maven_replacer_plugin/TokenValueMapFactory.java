@@ -1,4 +1,4 @@
-package bakersoftware.maven_replacer_plugin;
+package com.google.code.maven_replacer_plugin;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -7,7 +7,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
-import bakersoftware.maven_replacer_plugin.file.FileUtils;
+import com.google.code.maven_replacer_plugin.file.FileUtils;
+
 
 public class TokenValueMapFactory {
 

@@ -1,4 +1,4 @@
-package bakersoftware.maven_replacer_plugin;
+package com.google.code.maven_replacer_plugin;
 
 import static java.util.Arrays.asList;
 import static org.junit.Assert.assertEquals;
@@ -12,6 +12,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
+
+import com.google.code.maven_replacer_plugin.PatternFlagsFactory;
 
 @RunWith(Parameterized.class)
 public class PatternFlagsFactoryTest {

@@ -1,4 +1,4 @@
-package bakersoftware.maven_replacer_plugin;
+package com.google.code.maven_replacer_plugin;
 
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -6,7 +6,8 @@ import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.util.List;
 
-import bakersoftware.maven_replacer_plugin.file.FileUtils;
+import com.google.code.maven_replacer_plugin.file.FileUtils;
+
 
 public class Replacer {
 	private final FileUtils fileUtils;

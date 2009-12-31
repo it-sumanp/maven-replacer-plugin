@@ -1,4 +1,4 @@
-package bakersoftware.maven_replacer_plugin.file;
+package com.google.code.maven_replacer_plugin.file;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -11,6 +11,8 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
+
+import com.google.code.maven_replacer_plugin.file.FileUtils;
 
 public class FileUtilsTest {
 	@Rule

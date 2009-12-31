@@ -1,4 +1,4 @@
-package bakersoftware.maven_replacer_plugin;
+package com.google.code.maven_replacer_plugin;
 
 import java.io.IOException;
 import java.util.Arrays;
@@ -7,8 +7,9 @@ import java.util.List;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 
-import bakersoftware.maven_replacer_plugin.file.FileUtils;
-import bakersoftware.maven_replacer_plugin.include.FileSelector;
+import com.google.code.maven_replacer_plugin.file.FileUtils;
+import com.google.code.maven_replacer_plugin.include.FileSelector;
+
 
 /**
  * Goal replaces token with value inside file

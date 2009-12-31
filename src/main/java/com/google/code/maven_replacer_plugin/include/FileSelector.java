@@ -1,4 +1,4 @@
-package bakersoftware.maven_replacer_plugin.include;
+package com.google.code.maven_replacer_plugin.include;
 
 import java.io.File;
 import java.util.ArrayList;
