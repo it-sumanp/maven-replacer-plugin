@@ -1,16 +1,17 @@
 package bakersoftware.maven_replacer_plugin;
 
-public class TokenReplacer {
-	public String replaceContents(String contents, String token, String value, boolean isTokenRegex) {
-		String valueToReplaceWith = value == null ? "" : value;
-		if (isTokenRegex) {
-			return contents.replaceAll(token, valueToReplaceWith);
-		}
+import java.util.regex.Pattern;
 
-		return replaceNonRegex(contents, token, valueToReplaceWith);
+public class TokenReplacer {
+	public String replaceRegex(String contents, String token, String value, int flags) {
+		String valueToReplaceWith = value == null ? "" : value;
+		
+		Pattern compiledPattern = Pattern.compile(token, flags);
+		return compiledPattern.matcher(contents).replaceAll(valueToReplaceWith);
 	}
 
-	private String replaceNonRegex(String input, String token, String value) {
+	public String replaceNonRegex(String input, String token, String value) {
+		String valueToReplaceWith = value == null ? "" : value;
 		if (input.length() == 0) {
 			return input;
 		}
@@ -20,7 +21,7 @@ public class TokenReplacer {
 		int end = 0;
 		while ((end = input.indexOf(token, start)) >= 0) {
 			buffer.append(input.substring(start, end));
-			buffer.append(value);
+			buffer.append(valueToReplaceWith);
 			start = end + token.length();
 		}
 		return buffer.append(input.substring(start)).toString();

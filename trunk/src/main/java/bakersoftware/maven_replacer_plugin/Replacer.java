@@ -18,15 +18,18 @@ public class Replacer {
 	}
 
 	public void replace(List<ReplacerContext> contexts, boolean regex, String file,
-			String outputFile) throws IOException {
+			String outputFile, int regexFlags) throws IOException {
 		String content = fileUtils.readFile(file);
 		for (ReplacerContext context : contexts) {
 			if (context.getToken() == null || context.getToken().trim().length() == 0) {
 				throw new IllegalArgumentException("Token or token file required");
 			}
 
-			content = tokenReplacer.replaceContents(content, context.getToken(),
-					context.getValue(), regex);
+			if (regex) {
+				content = tokenReplacer.replaceRegex(content, context.getToken(), context.getValue(), regexFlags);
+			} else {
+				content = tokenReplacer.replaceNonRegex(content, context.getToken(), context.getValue());
+			}
 		}
 
 		Writer writer = new OutputStreamWriter(new FileOutputStream(outputFile));
