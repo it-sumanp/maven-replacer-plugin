@@ -23,25 +23,31 @@ public class TokenReplacerTest {
 
 	@Test
 	public void shouldReplaceRegexTokenWithValue() throws Exception {
-		String results = replacer.replaceRegex("some token", "t.k.n", "value", Pattern.MULTILINE);
+		String results = replacer.replaceRegex("some token", "t.k.n", "value", -1);
 		assertEquals("some value", results);
 	}
 
 	@Test
 	public void shouldReplaceTokenWithEmptyValue() throws Exception {
-		String results = replacer.replaceRegex("some token", "t.k.n", null, Pattern.MULTILINE);
+		String results = replacer.replaceRegex("some token", "t.k.n", null, -1);
 		assertEquals("some ", results);
 	}
 
 	@Test
 	public void shouldReplaceTokenInMulipleLines() throws Exception {
-		String results = replacer.replaceRegex("some\ntoken", "t.k.n", null, Pattern.MULTILINE);
+		String results = replacer.replaceRegex("some\ntoken", "t.k.n", null, -1);
 		assertEquals("some\n", results);
+	}
+	
+	@Test
+	public void shouldReplaceTokenWithCaseInsensitivity() throws Exception {
+		String results = replacer.replaceRegex("test", "TEST", "value", Pattern.CASE_INSENSITIVE);
+		assertEquals("value", results);
 	}
 
 	@Test
 	public void shouldHandleEmptyContentsGracefully() {
-		String results = replacer.replaceRegex("", "anything", "anything", Pattern.MULTILINE);
+		String results = replacer.replaceRegex("", "anything", "anything", -1);
 		assertEquals("", results);
 
 		results = replacer.replaceNonRegex("", "anything", "anything");

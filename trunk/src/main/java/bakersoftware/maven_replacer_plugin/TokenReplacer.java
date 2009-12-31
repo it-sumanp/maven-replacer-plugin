@@ -6,7 +6,13 @@ public class TokenReplacer {
 	public String replaceRegex(String contents, String token, String value, int flags) {
 		String valueToReplaceWith = value == null ? "" : value;
 		
-		Pattern compiledPattern = Pattern.compile(token, flags);
+		final Pattern compiledPattern;
+		if (flags == PatternFlagsFactory.NO_FLAGS) {
+			compiledPattern = Pattern.compile(token);
+		} else {
+			compiledPattern = Pattern.compile(token, flags);
+		}
+		
 		return compiledPattern.matcher(contents).replaceAll(valueToReplaceWith);
 	}
 
