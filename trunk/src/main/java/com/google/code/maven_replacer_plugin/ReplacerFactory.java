@@ -1,6 +1,6 @@
-package bakersoftware.maven_replacer_plugin;
+package com.google.code.maven_replacer_plugin;
 
-import bakersoftware.maven_replacer_plugin.file.FileUtils;
+import com.google.code.maven_replacer_plugin.file.FileUtils;
 
 public class ReplacerFactory {
 	private final FileUtils fileUtils;

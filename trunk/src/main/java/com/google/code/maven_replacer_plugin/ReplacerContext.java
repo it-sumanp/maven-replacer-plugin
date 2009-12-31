@@ -1,8 +1,9 @@
-package bakersoftware.maven_replacer_plugin;
+package com.google.code.maven_replacer_plugin;
 
 import java.io.IOException;
 
-import bakersoftware.maven_replacer_plugin.file.FileUtils;
+import com.google.code.maven_replacer_plugin.file.FileUtils;
+
 
 public class ReplacerContext {
 	private final FileUtils fileUtils;

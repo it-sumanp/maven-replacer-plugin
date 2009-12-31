@@ -1,4 +1,4 @@
-package bakersoftware.maven_replacer_plugin.file;
+package com.google.code.maven_replacer_plugin.file;
 
 import java.io.BufferedReader;
 import java.io.File;

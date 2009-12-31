@@ -1,4 +1,4 @@
-package bakersoftware.maven_replacer_plugin;
+package com.google.code.maven_replacer_plugin;
 
 import static org.junit.Assert.assertEquals;
 
@@ -6,6 +6,8 @@ import java.util.regex.Pattern;
 
 import org.junit.Before;
 import org.junit.Test;
+
+import com.google.code.maven_replacer_plugin.TokenReplacer;
 
 public class TokenReplacerTest {
 	private TokenReplacer replacer;

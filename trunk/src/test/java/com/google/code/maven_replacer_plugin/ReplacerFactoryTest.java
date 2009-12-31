@@ -1,4 +1,4 @@
-package bakersoftware.maven_replacer_plugin;
+package com.google.code.maven_replacer_plugin;
 
 import static org.junit.Assert.*;
 
@@ -7,7 +7,11 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import bakersoftware.maven_replacer_plugin.file.FileUtils;
+import com.google.code.maven_replacer_plugin.Replacer;
+import com.google.code.maven_replacer_plugin.ReplacerFactory;
+import com.google.code.maven_replacer_plugin.TokenReplacer;
+import com.google.code.maven_replacer_plugin.file.FileUtils;
+
 
 @RunWith(MockitoJUnitRunner.class)
 public class ReplacerFactoryTest {
