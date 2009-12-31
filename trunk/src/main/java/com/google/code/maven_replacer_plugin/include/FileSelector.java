@@ -1,7 +1,6 @@
 package com.google.code.maven_replacer_plugin.include;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
