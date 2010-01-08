@@ -33,6 +33,7 @@ public class Replacer {
 			}
 		}
 
+		fileUtils.ensureFolderStructureExists(outputFile);
 		Writer writer = new OutputStreamWriter(new FileOutputStream(outputFile));
 		writer.write(content);
 		writer.close();
