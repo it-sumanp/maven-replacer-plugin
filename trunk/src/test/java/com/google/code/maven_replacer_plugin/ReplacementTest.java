@@ -9,12 +9,12 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import com.google.code.maven_replacer_plugin.ReplacerContext;
+import com.google.code.maven_replacer_plugin.Replacement;
 import com.google.code.maven_replacer_plugin.file.FileUtils;
 
 
 @RunWith(MockitoJUnitRunner.class)
-public class ReplacerContextTest {
+public class ReplacementTest {
 	private static final String FILE = "some file";
 	private static final String VALUE = "value";
 	private static final String TOKEN = "token";
@@ -23,7 +23,7 @@ public class ReplacerContextTest {
 
 	@Test
 	public void shouldReturnGivenParameters() throws Exception {
-		ReplacerContext context = new ReplacerContext(fileUtils, TOKEN, VALUE);
+		Replacement context = new Replacement(fileUtils, TOKEN, VALUE);
 		assertEquals(TOKEN, context.getToken());
 		assertEquals(VALUE, context.getValue());
 		verifyZeroInteractions(fileUtils);
@@ -33,7 +33,7 @@ public class ReplacerContextTest {
 	public void shouldUseTokenFromFileUtilsIfGivenTokenIsNull() throws Exception {
 		when(fileUtils.readFile(FILE)).thenReturn(TOKEN);
 
-		ReplacerContext context = new ReplacerContext(fileUtils, null, VALUE);
+		Replacement context = new Replacement(fileUtils, null, VALUE);
 		context.setTokenFile(FILE);
 		assertEquals(TOKEN, context.getToken());
 		assertEquals(VALUE, context.getValue());
@@ -43,7 +43,7 @@ public class ReplacerContextTest {
 	public void shouldUseValueFromFileUtilsIfGivenValueIsNull() throws Exception {
 		when(fileUtils.readFile(FILE)).thenReturn(VALUE);
 
-		ReplacerContext context = new ReplacerContext(fileUtils, TOKEN, null);
+		Replacement context = new Replacement(fileUtils, TOKEN, null);
 		context.setValueFile(FILE);
 		assertEquals(TOKEN, context.getToken());
 		assertEquals(VALUE, context.getValue());

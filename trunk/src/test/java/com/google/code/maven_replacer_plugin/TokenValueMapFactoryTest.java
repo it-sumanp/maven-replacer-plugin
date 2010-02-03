@@ -32,9 +32,9 @@ public class TokenValueMapFactoryTest {
 		String file = "some file";
 		when(fileUtils.readFile(file)).thenReturn("token1=value1\ntoken2=value2");
 		
-		List<ReplacerContext> contexts = factory.contextsForFile(file);
-		Collections.sort(contexts, new Comparator<ReplacerContext>() {
-			public int compare(ReplacerContext c1, ReplacerContext c2) {
+		List<Replacement> contexts = factory.contextsForFile(file);
+		Collections.sort(contexts, new Comparator<Replacement>() {
+			public int compare(Replacement c1, Replacement c2) {
 				return c1.getToken().compareTo(c2.getToken());
 			}
 		});

@@ -18,10 +18,10 @@ public class Replacer {
 		this.tokenReplacer = tokenReplacer;
 	}
 
-	public void replace(List<ReplacerContext> contexts, boolean regex, String file,
+	public void replace(List<Replacement> contexts, boolean regex, String file,
 			String outputFile, int regexFlags) throws IOException {
 		String content = fileUtils.readFile(file);
-		for (ReplacerContext context : contexts) {
+		for (Replacement context : contexts) {
 			if (context.getToken() == null || context.getToken().trim().length() == 0) {
 				throw new IllegalArgumentException("Token or token file required");
 			}
