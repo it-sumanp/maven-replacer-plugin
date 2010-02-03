@@ -18,15 +18,15 @@ public class TokenValueMapFactory {
 		this.fileUtils = fileUtils;
 	}
 
-	public List<ReplacerContext> contextsForFile(String tokenValueMapFile) throws IOException {
+	public List<Replacement> contextsForFile(String tokenValueMapFile) throws IOException {
 		String contents = fileUtils.readFile(tokenValueMapFile);
 
 		Properties properties = readProperties(contents);
-		List<ReplacerContext> contexts = new ArrayList<ReplacerContext>();
+		List<Replacement> contexts = new ArrayList<Replacement>();
 		for (Object key : properties.keySet()) {
 			String token = String.valueOf(key);
 			String value = properties.getProperty(token);
-			contexts.add(new ReplacerContext(fileUtils, token, value));
+			contexts.add(new Replacement(fileUtils, token, value));
 		}
 		return contexts;
 	}

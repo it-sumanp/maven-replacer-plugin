@@ -5,13 +5,17 @@ import java.io.IOException;
 import com.google.code.maven_replacer_plugin.file.FileUtils;
 
 
-public class ReplacerContext {
+public class Replacement {
 	private final FileUtils fileUtils;
 
 	private String token;
 	private String value;
+	
+	public Replacement() {
+		this.fileUtils = new FileUtils();
+	}
 
-	public ReplacerContext(FileUtils fileUtils, String token, String value) {
+	public Replacement(FileUtils fileUtils, String token, String value) {
 		this.fileUtils = fileUtils;
 		this.token = token;
 		this.value = value;
@@ -35,5 +39,13 @@ public class ReplacerContext {
 
 	public String getValue() {
 		return value;
+	}
+	
+	public void setToken(String token) {
+		this.token = token;
+	}
+
+	public void setValue(String value) {
+		this.value = value;
 	}
 }

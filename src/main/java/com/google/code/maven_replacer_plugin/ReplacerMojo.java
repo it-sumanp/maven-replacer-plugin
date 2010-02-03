@@ -118,6 +118,13 @@ public class ReplacerMojo extends AbstractMojo {
 	 * @parameter expression=""
 	 */
 	private List<String> regexFlags;
+	
+	/**
+	 * List of replacements with token/value pairs
+	 * 
+	 * @parameter expression=""
+	 */
+	private List<Replacement> replacements;
 
 	public ReplacerMojo() {
 		super();
@@ -149,7 +156,7 @@ public class ReplacerMojo extends AbstractMojo {
 			}
 
 			Replacer replacer = replacerFactory.create();
-			List<ReplacerContext> contexts = getContexts();
+			List<Replacement> contexts = getContexts();
 
 			if (includes == null || includes.isEmpty()) {
 				replaceContents(replacer, contexts, file, getOutputFile(file));
@@ -164,16 +171,20 @@ public class ReplacerMojo extends AbstractMojo {
 		}
 	}
 
-	private void replaceContents(Replacer replacer, List<ReplacerContext> contexts,
+	private void replaceContents(Replacer replacer, List<Replacement> contexts,
 			String inputFile, String outputFile) throws IOException {
 		getLog().info("Replacing content in " + inputFile);
 		replacer.replace(contexts, regex, inputFile, getOutputFile(inputFile), 
 				patternFlagsFactory.buildFlags(regexFlags));
 	}
 
-	private List<ReplacerContext> getContexts() throws IOException {
+	private List<Replacement> getContexts() throws IOException {
+		if (replacements != null) {
+			return replacements;
+		}
+		
 		if (tokenValueMap == null) {
-			ReplacerContext context = new ReplacerContext(fileUtils, token, value);
+			Replacement context = new Replacement(fileUtils, token, value);
 			context.setTokenFile(tokenFile);
 			context.setValueFile(valueFile);
 			return Arrays.asList(context);
