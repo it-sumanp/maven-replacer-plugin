@@ -1,13 +1,10 @@
 package com.google.code.maven_replacer_plugin.file;
 
-import java.io.BufferedReader;
 import java.io.File;
-import java.io.FileReader;
+import java.io.FileInputStream;
 import java.io.IOException;
 
 public class FileUtils {
-	private static final String LINE_SEPARATOR = System.getProperty("line.separator");
-
 	public boolean fileNotExists(String filename) {
 		return !new File(filename).exists();
 	}
@@ -30,16 +27,13 @@ public class FileUtils {
 
 	public String readFile(String file) throws IOException {
 		StringBuilder contents = new StringBuilder();
-		BufferedReader input = new BufferedReader(new FileReader(file));
-		try {
-			String line = null;
-			while ((line = input.readLine()) != null) {
-				contents.append(line).append(LINE_SEPARATOR);
-			}
-		} finally {
-			input.close();
+		FileInputStream fis = new FileInputStream(file);
+		
+		byte[] buffer = new byte[1024];
+		int len;
+		while ((len = fis.read(buffer)) != -1) {
+			contents.append(new String(buffer, 0, len));
 		}
-
-		return contents.toString().trim();
+		return contents.toString();
 	}
 }
