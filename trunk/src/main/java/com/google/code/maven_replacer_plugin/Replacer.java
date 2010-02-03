@@ -22,21 +22,25 @@ public class Replacer {
 			String outputFile, int regexFlags) throws IOException {
 		String content = fileUtils.readFile(file);
 		for (Replacement context : contexts) {
-			if (context.getToken() == null || context.getToken().trim().length() == 0) {
-				throw new IllegalArgumentException("Token or token file required");
-			}
-
-			if (regex) {
-				content = tokenReplacer.replaceRegex(content, context.getToken(), context.getValue(), regexFlags);
-			} else {
-				content = tokenReplacer.replaceNonRegex(content, context.getToken(), context.getValue());
-			}
+			content = replaceContent(regex, regexFlags, content, context);
 		}
 
 		fileUtils.ensureFolderStructureExists(outputFile);
 		Writer writer = new OutputStreamWriter(new FileOutputStream(outputFile));
 		writer.write(content);
 		writer.close();
+	}
+
+	private String replaceContent(boolean regex, int regexFlags, String content,
+			Replacement context) {
+		if (context.getToken() == null || context.getToken().trim().length() == 0) {
+			throw new IllegalArgumentException("Token or token file required");
+		}
+
+		if (regex) {
+			return tokenReplacer.replaceRegex(content, context.getToken(), context.getValue(), regexFlags);
+		}
+		return tokenReplacer.replaceNonRegex(content, context.getToken(), context.getValue());
 	}
 
 	public FileUtils getFileUtils() {
