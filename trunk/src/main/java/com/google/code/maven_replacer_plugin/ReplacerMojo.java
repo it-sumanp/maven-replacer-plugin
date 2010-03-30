@@ -1,6 +1,7 @@
 package com.google.code.maven_replacer_plugin;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -46,6 +47,20 @@ public class ReplacerMojo extends AbstractMojo {
 	 * @parameter expression=""
 	 */
 	private List<String> excludes;
+	
+	/**
+	 * Comma separated list of includes. This is split up and used the same way a array of includes would be.
+	 * 
+	 * @parameter expression=""
+	 */
+	private String filesToInclude;
+	
+	/**
+	 * Comma separated list of excludes. This is split up and used the same way a array of excludes would be.
+	 * 
+	 * @parameter expression=""
+	 */
+	private String filesToExclude;
 
 	/**
 	 * Token
@@ -157,17 +172,37 @@ public class ReplacerMojo extends AbstractMojo {
 
 			Replacer replacer = replacerFactory.create();
 			List<Replacement> contexts = getContexts();
-
+			
+			addIncludesFilesAndExcludedFiles();
+			
 			if (includes == null || includes.isEmpty()) {
 				replaceContents(replacer, contexts, file, getOutputFile(file));
 				return;
 			}
-
+			
 			for (String file : fileSelector.listIncludes(includes, excludes)) {
 				replaceContents(replacer, contexts, file, getOutputFile(file));
 			}
 		} catch (IOException e) {
 			throw new MojoExecutionException(e.getMessage(), e);
+		}
+	}
+
+	private void addIncludesFilesAndExcludedFiles() {
+		if (filesToInclude != null) {
+			String[] splitFiles = filesToInclude.split(",");
+			if (includes == null) {
+				includes = new ArrayList<String>();				
+			}
+			includes.addAll(Arrays.asList(splitFiles));
+		}
+		
+		if (filesToExclude != null) {
+			String[] splitFiles = filesToExclude.split(",");
+			if (excludes == null) {
+				excludes = new ArrayList<String>();				
+			}
+			excludes.addAll(Arrays.asList(splitFiles));
 		}
 	}
 
@@ -238,5 +273,13 @@ public class ReplacerMojo extends AbstractMojo {
 
 	public void setTokenValueMap(String tokenValueMap) {
 		this.tokenValueMap = tokenValueMap;
+	}
+
+	public void setFilesToInclude(String filesToInclude) {
+		this.filesToInclude = filesToInclude;
+	}
+
+	public void setFilesToExclude(String filesToExclude) {
+		this.filesToExclude = filesToExclude;
 	}
 }
