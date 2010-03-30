@@ -1,11 +1,10 @@
 package com.google.code.maven_replacer_plugin;
 
-import java.io.ByteArrayInputStream;
+import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
+import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Properties;
 
 import com.google.code.maven_replacer_plugin.file.FileUtils;
 
@@ -20,26 +19,22 @@ public class TokenValueMapFactory {
 
 	public List<Replacement> contextsForFile(String tokenValueMapFile) throws IOException {
 		String contents = fileUtils.readFile(tokenValueMapFile);
-
-		Properties properties = readProperties(contents);
+		BufferedReader reader = new BufferedReader(new StringReader(contents));
+		
+		String token = null;
 		List<Replacement> contexts = new ArrayList<Replacement>();
-		for (Object key : properties.keySet()) {
-			String token = String.valueOf(key);
-			String value = properties.getProperty(token);
+		while ((token = reader.readLine()) != null) {
+			token = token.trim();
+			if (token.length() == 0) {
+				continue;
+			}
+			String value = reader.readLine();
+			if (value == null) {
+				throw new IllegalArgumentException("No value for token: " + token + ". Make sure that " +
+						"tokens have values in pairs in the format: token (new line) value (new line) token (new line) value");
+			}
 			contexts.add(new Replacement(fileUtils, token, value));
 		}
 		return contexts;
 	}
-
-	private Properties readProperties(String contents) throws IOException {
-		Properties properties = new Properties();
-		InputStream inputStream = new ByteArrayInputStream(contents.getBytes());
-		try {
-			properties.load(inputStream);
-		} finally {
-			inputStream.close();
-		}
-		return properties;
-	}
-
 }
