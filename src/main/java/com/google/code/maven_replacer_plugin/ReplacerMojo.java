@@ -194,7 +194,7 @@ public class ReplacerMojo extends AbstractMojo {
 			if (includes == null) {
 				includes = new ArrayList<String>();				
 			}
-			includes.addAll(Arrays.asList(splitFiles));
+			addToList(Arrays.asList(splitFiles), includes);
 		}
 		
 		if (filesToExclude != null) {
@@ -202,7 +202,13 @@ public class ReplacerMojo extends AbstractMojo {
 			if (excludes == null) {
 				excludes = new ArrayList<String>();				
 			}
-			excludes.addAll(Arrays.asList(splitFiles));
+			addToList(Arrays.asList(splitFiles), excludes);
+		}
+	}
+
+	private void addToList(List<String> toAdds, List<String> destination) {
+		for (String toAdd : toAdds) {
+			destination.add(toAdd.trim());
 		}
 	}
 
