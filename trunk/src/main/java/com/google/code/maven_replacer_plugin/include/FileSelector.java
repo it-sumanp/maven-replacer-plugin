@@ -9,19 +9,20 @@ import org.apache.tools.ant.DirectoryScanner;
 
 public class FileSelector {
 
-	public List<String> listIncludes(List<String> includes, List<String> excludes) {
+	public List<String> listIncludes(String basedir, List<String> includes, List<String> excludes) {
 		if (includes == null || includes.isEmpty()) {
 			return Collections.emptyList();
 		}
 
 		DirectoryScanner directoryScanner = new DirectoryScanner();
 		directoryScanner.addDefaultExcludes();
-		directoryScanner.setBasedir(new File("."));
+		directoryScanner.setBasedir(new File(basedir));
 		directoryScanner.setIncludes(stringListToArray(includes));
 		directoryScanner.setExcludes(stringListToArray(excludes));
 
 		directoryScanner.scan();
-		return Arrays.asList(directoryScanner.getIncludedFiles());
+		List<String> filesFound = Arrays.asList(directoryScanner.getIncludedFiles());
+		return filesFound;
 	}
 
 	private String[] stringListToArray(List<String> stringList) {

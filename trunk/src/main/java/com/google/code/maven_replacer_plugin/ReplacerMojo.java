@@ -119,6 +119,13 @@ public class ReplacerMojo extends AbstractMojo {
 	private String tokenValueMap;
 	
 	/**
+	 * Optional base directory for each file to replace
+	 * 
+	 * @parameter expression="${basedir}"
+	 */
+	private String basedir;
+
+	/**
 	 * List of regex flags. 
 	 * Must contain one or more of:
 	 * * CANON_EQ
@@ -143,6 +150,7 @@ public class ReplacerMojo extends AbstractMojo {
 
 	public ReplacerMojo() {
 		super();
+		this.basedir = ".";
 		this.fileUtils = new FileUtils();
 		this.tokenReplacer = new TokenReplacer();
 		this.replacerFactory = new ReplacerFactory(fileUtils, tokenReplacer);
@@ -155,6 +163,7 @@ public class ReplacerMojo extends AbstractMojo {
 			ReplacerFactory replacerFactory, TokenValueMapFactory tokenValueMapFactory,
 			FileSelector fileSelector, PatternFlagsFactory patternFlagsFactory) {
 		super();
+		this.basedir = ".";
 		this.fileUtils = fileUtils;
 		this.tokenReplacer = tokenReplacer;
 		this.replacerFactory = replacerFactory;
@@ -180,12 +189,16 @@ public class ReplacerMojo extends AbstractMojo {
 				return;
 			}
 			
-			for (String file : fileSelector.listIncludes(includes, excludes)) {
+			for (String file : fileSelector.listIncludes(basedir, includes, excludes)) {
 				replaceContents(replacer, contexts, file, getOutputFile(file));
 			}
 		} catch (IOException e) {
 			throw new MojoExecutionException(e.getMessage(), e);
 		}
+	}
+
+	private String getFilename(String file) {
+		return basedir + '/' + file;
 	}
 
 	private void addIncludesFilesAndExcludedFiles() {
@@ -214,8 +227,8 @@ public class ReplacerMojo extends AbstractMojo {
 
 	private void replaceContents(Replacer replacer, List<Replacement> contexts,
 			String inputFile, String outputFile) throws IOException {
-		getLog().info("Replacing content in " + inputFile);
-		replacer.replace(contexts, regex, inputFile, getOutputFile(inputFile), 
+		getLog().info("Replacing content in " + getFilename(inputFile));
+		replacer.replace(contexts, regex, getFilename(inputFile), getOutputFile(getFilename(inputFile)), 
 				patternFlagsFactory.buildFlags(regexFlags));
 	}
 
@@ -238,11 +251,11 @@ public class ReplacerMojo extends AbstractMojo {
 			return file;
 		}
 
-		getLog().info("Outputting to: " + outputFile);
+		getLog().info("Outputting to: " + getFilename(outputFile));
 		if (fileUtils.fileNotExists(file)) {
-			fileUtils.ensureFolderStructureExists(outputFile);
+			fileUtils.ensureFolderStructureExists(getFilename(outputFile));
 		}
-		return outputFile;
+		return getFilename(outputFile);
 	}
 
 	public void setRegex(boolean regex) {
@@ -287,5 +300,9 @@ public class ReplacerMojo extends AbstractMojo {
 
 	public void setFilesToExclude(String filesToExclude) {
 		this.filesToExclude = filesToExclude;
+	}
+	
+	public void setBasedir(String baseDir) {
+		this.basedir = baseDir;
 	}
 }
