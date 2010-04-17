@@ -34,5 +34,10 @@ cd repo
 svn add *
 svn ci -m "Release"
 
+echo "Cleaning up"
+cd ..
+cd ..
+rm -fR release
+
 echo "Done."
 echo "Make sure you update central maven repo, and the website documentation" 
