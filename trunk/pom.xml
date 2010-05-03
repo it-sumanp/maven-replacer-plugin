@@ -13,7 +13,9 @@
 	</description>
 	<scm>
 		<url>https://maven-replacer-plugin.googlecode.com/svn/</url>
-	</scm>
+	    <connection>scm:svn:https://maven-replacer-plugin.googlecode.com/svn/</connection>
+    	<developerConnection>scm:svn:https://maven-replacer-plugin.googlecode.com/svn/</developerConnection>
+  	</scm>
 	<licenses>
 		<license>
 			<name>GNU Lesser General Public License</name>
@@ -21,7 +23,14 @@
 			<distribution>repo</distribution>
 		</license>
 	</licenses>
-
+    <distributionManagement>
+        <snapshotRepository>
+            <id>sonatype-nexus-snapshots</id>
+            <name>Sonatype Nexus Snapshots</name>
+            <url>http://oss.sonatype.org/content/repositories/snapshots</url>
+        </snapshotRepository>
+    </distributionManagement>
+    
 	<build>
 		<plugins>
 			<plugin>
