@@ -32,7 +32,7 @@
 		<repository>
 			<id>sonatype_oss</id>
 			<name>Sonatype OSS</name>
-			<url>http://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+			<url>http://oss.sonatype.org/service/local/staging/deploy/maven2</url>
 		</repository>
 	</distributionManagement>
 
