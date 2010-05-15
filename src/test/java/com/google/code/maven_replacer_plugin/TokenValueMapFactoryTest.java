@@ -1,12 +1,12 @@
 package com.google.code.maven_replacer_plugin;
 
-import java.io.IOException;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.mockito.Mockito.when;
+
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.when;
 
 import org.junit.Before;
 import org.junit.Test;
