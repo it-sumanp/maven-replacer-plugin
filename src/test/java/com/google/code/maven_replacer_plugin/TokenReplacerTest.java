@@ -8,6 +8,8 @@ import org.junit.Before;
 import org.junit.Test;
 
 public class TokenReplacerTest {
+	private static final int NO_FLAGS = -1;
+	
 	private TokenReplacer replacer;
 
 	@Before
@@ -23,20 +25,26 @@ public class TokenReplacerTest {
 
 	@Test
 	public void shouldReplaceRegexTokenWithValue() throws Exception {
-		String results = replacer.replaceRegex("some token", "t.k.n", "value", -1);
+		String results = replacer.replaceRegex("some token", "t.k.n", "value", NO_FLAGS);
 		assertEquals("some value", results);
 	}
 
 	@Test
 	public void shouldReplaceTokenWithEmptyValue() throws Exception {
-		String results = replacer.replaceRegex("some token", "t.k.n", null, -1);
+		String results = replacer.replaceRegex("some token", "t.k.n", null, NO_FLAGS);
 		assertEquals("some ", results);
 	}
 
 	@Test
 	public void shouldReplaceTokenInMulipleLines() throws Exception {
-		String results = replacer.replaceRegex("some\ntoken", "t.k.n", null, -1);
+		String results = replacer.replaceRegex("some\ntoken", "t.k.n", null, NO_FLAGS);
 		assertEquals("some\n", results);
+	}
+	
+	@Test
+	public void shouldReplaceTokenOnCompleteLine() throws Exception {
+		String results = replacer.replaceRegex("some\nreplace=token\nnext line", "^replace=.*$", "replace=value", Pattern.MULTILINE);
+		assertEquals("some\nreplace=value\nnext line", results);
 	}
 	
 	@Test
@@ -47,7 +55,7 @@ public class TokenReplacerTest {
 
 	@Test
 	public void shouldHandleEmptyContentsGracefully() {
-		String results = replacer.replaceRegex("", "anything", "anything", -1);
+		String results = replacer.replaceRegex("", "anything", "anything", NO_FLAGS);
 		assertEquals("", results);
 
 		results = replacer.replaceNonRegex("", "anything", "anything");
