@@ -185,12 +185,14 @@ public class ReplacerMojo extends AbstractMojo {
 			addIncludesFilesAndExcludedFiles();
 			
 			if (includes == null || includes.isEmpty()) {
-				replaceContents(replacer, contexts, file, getOutputFile(file));
+				getOutputFile(file);
+				replaceContents(replacer, contexts, file);
 				return;
 			}
 			
 			for (String file : fileSelector.listIncludes(basedir, includes, excludes)) {
-				replaceContents(replacer, contexts, file, getOutputFile(file));
+				getOutputFile(file);
+				replaceContents(replacer, contexts, file);
 			}
 		} catch (IOException e) {
 			throw new MojoExecutionException(e.getMessage(), e);
@@ -225,8 +227,7 @@ public class ReplacerMojo extends AbstractMojo {
 		}
 	}
 
-	private void replaceContents(Replacer replacer, List<Replacement> contexts,
-			String inputFile, String outputFile) throws IOException {
+	private void replaceContents(Replacer replacer, List<Replacement> contexts, String inputFile) throws IOException {
 		getLog().info("Replacing content in " + getFilename(inputFile));
 		replacer.replace(contexts, regex, getFilename(inputFile), getOutputFile(getFilename(inputFile)), 
 				patternFlagsFactory.buildFlags(regexFlags));

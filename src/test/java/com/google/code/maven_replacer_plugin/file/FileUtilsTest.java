@@ -6,13 +6,12 @@ import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 import java.io.FileWriter;
+import java.util.UUID;
 
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
-
-import com.google.code.maven_replacer_plugin.file.FileUtils;
 
 public class FileUtilsTest {
 	@Rule
@@ -34,7 +33,7 @@ public class FileUtilsTest {
 
 	@Test
 	public void shouldEnsureFileFolderExists() throws Exception {
-		String tempFile = System.getProperty("java.io.tmpdir") + "/newfolder/tempfile";
+		String tempFile = System.getProperty("java.io.tmpdir") + "/" + UUID.randomUUID() + "/tempfile";
 		fileUtils.ensureFolderStructureExists(tempFile);
 		new File(tempFile).createNewFile();
 		assertTrue(new File(tempFile).exists());
