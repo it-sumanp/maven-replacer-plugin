@@ -1,7 +1,6 @@
 package com.google.code.maven_replacer_plugin.file;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 
 public class FileUtils {
@@ -26,14 +25,6 @@ public class FileUtils {
 	}
 
 	public String readFile(String file) throws IOException {
-		StringBuilder contents = new StringBuilder();
-		FileInputStream fis = new FileInputStream(file);
-		
-		byte[] buffer = new byte[1024];
-		int len;
-		while ((len = fis.read(buffer)) != -1) {
-			contents.append(new String(buffer, 0, len));
-		}
-		return contents.toString();
+		return org.apache.commons.io.FileUtils.readFileToString(new File(file));
 	}
 }

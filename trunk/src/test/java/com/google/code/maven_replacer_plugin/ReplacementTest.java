@@ -9,7 +9,6 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import com.google.code.maven_replacer_plugin.Replacement;
 import com.google.code.maven_replacer_plugin.file.FileUtils;
 
 
@@ -46,6 +45,16 @@ public class ReplacementTest {
 		Replacement context = new Replacement(fileUtils, TOKEN, null);
 		context.setValueFile(FILE);
 		assertEquals(TOKEN, context.getToken());
+		assertEquals(VALUE, context.getValue());
+	}
+	
+	@Test
+	public void shouldSetAndGetSameValues() {
+		Replacement context = new Replacement();
+		
+		context.setToken(TOKEN);
+		assertEquals(TOKEN, context.getToken());
+		context.setValue(VALUE);
 		assertEquals(VALUE, context.getValue());
 	}
 }
