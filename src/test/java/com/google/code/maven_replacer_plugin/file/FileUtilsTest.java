@@ -41,7 +41,7 @@ public class FileUtilsTest {
 
 	@Test(expected = IllegalArgumentException.class)
 	public void shouldThrowIllegalArgumentExceptionIfFileIsDirectory() throws Exception {
-		String tempFile = System.getProperty("java.io.tmpdir") + "/newfolder/";
+		String tempFile = System.getProperty("java.io.tmpdir");
 		fileUtils.ensureFolderStructureExists(tempFile);
 		new File(tempFile).createNewFile();
 		assertTrue(new File(tempFile).exists());
