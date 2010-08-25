@@ -24,22 +24,20 @@ public class TokenValueMapFactoryTest {
 	private FileUtils fileUtils;
 
 	private TokenValueMapFactory factory;
+	private ReplacementComparator comparator;
 
 	@Before
 	public void setUp() {
 		factory = new TokenValueMapFactory(fileUtils);
+		comparator = new ReplacementComparator();
 	}
 
 	@Test
-	public void shouldReturnContextsFromFile() throws Exception {
-		when(fileUtils.readFile(FILENAME)).thenReturn("token1\nvalue1\ntoken2\nvalue2");
+	public void shouldReturnContextsFromFileAndIgnoreBlankLines() throws Exception {
+		when(fileUtils.readFile(FILENAME)).thenReturn("\n  \ntoken1\nvalue1\ntoken2\nvalue2\n\n");
 		
 		List<Replacement> contexts = factory.contextsForFile(FILENAME);
-		Collections.sort(contexts, new Comparator<Replacement>() {
-			public int compare(Replacement c1, Replacement c2) {
-				return c1.getToken().compareTo(c2.getToken());
-			}
-		});
+		Collections.sort(contexts, comparator);
 		assertNotNull(contexts);
 		assertEquals(2, contexts.size());
 		assertEquals("token1", contexts.get(0).getToken());
@@ -48,21 +46,29 @@ public class TokenValueMapFactoryTest {
 		assertEquals("value2", contexts.get(1).getValue());
 	}
 	
+	@Test (expected = IllegalArgumentException.class)
+	public void shouldThrowExceptionIfNoValueForToken() throws Exception {
+		when(fileUtils.readFile(FILENAME)).thenReturn("\ntoken2");
+		factory.contextsForFile(FILENAME);
+	}
+	
 	@Test
 	public void shouldReturnRegexContextsFromFile() throws Exception {
 		when(fileUtils.readFile(FILENAME)).thenReturn("\\=tok\\=en1\nvalue1\nto$ke..n2\nvalue2");
 		
 		List<Replacement> contexts = factory.contextsForFile(FILENAME);
-		Collections.sort(contexts, new Comparator<Replacement>() {
-			public int compare(Replacement c1, Replacement c2) {
-				return c1.getToken().compareTo(c2.getToken());
-			}
-		});
+		Collections.sort(contexts, comparator);
 		assertNotNull(contexts);
 		assertEquals(2, contexts.size());
 		assertEquals("\\=tok\\=en1", contexts.get(0).getToken());
 		assertEquals("value1", contexts.get(0).getValue());
 		assertEquals("to$ke..n2", contexts.get(1).getToken());
 		assertEquals("value2", contexts.get(1).getValue());
+	}
+	
+	private static class ReplacementComparator implements Comparator<Replacement> {
+		public int compare(Replacement c1, Replacement c2) {
+			return c1.getToken().compareTo(c2.getToken());
+		}
 	}
 }

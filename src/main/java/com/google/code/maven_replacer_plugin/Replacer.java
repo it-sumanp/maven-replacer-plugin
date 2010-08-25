@@ -1,9 +1,6 @@
 package com.google.code.maven_replacer_plugin;
 
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.io.Writer;
 import java.util.List;
 
 import com.google.code.maven_replacer_plugin.file.FileUtils;
@@ -25,14 +22,10 @@ public class Replacer {
 			content = replaceContent(regex, regexFlags, content, context);
 		}
 
-		fileUtils.ensureFolderStructureExists(outputFile);
-		Writer writer = new OutputStreamWriter(new FileOutputStream(outputFile));
-		writer.write(content);
-		writer.close();
+		fileUtils.writeToFile(outputFile, content);
 	}
 
-	private String replaceContent(boolean regex, int regexFlags, String content,
-			Replacement context) {
+	private String replaceContent(boolean regex, int regexFlags, String content, Replacement context) {
 		if (context.getToken() == null || context.getToken().trim().length() == 0) {
 			throw new IllegalArgumentException("Token or token file required");
 		}
