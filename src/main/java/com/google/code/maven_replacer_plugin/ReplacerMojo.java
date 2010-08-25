@@ -247,16 +247,14 @@ public class ReplacerMojo extends AbstractMojo {
 		return tokenValueMapFactory.contextsForFile(tokenValueMap);
 	}
 
-	private String getOutputFile(String file) {
+	private String getOutputFile(String defaultFilename) {
 		if (outputFile == null) {
-			return file;
+			return defaultFilename;
 		}
 
-		getLog().info("Outputting to: " + getFilename(outputFile));
-		if (fileUtils.fileNotExists(file)) {
-			fileUtils.ensureFolderStructureExists(getFilename(outputFile));
-		}
-		return getFilename(outputFile);
+		String outputFileName = getFilename(outputFile);
+		getLog().info("Outputting to: " + outputFileName);
+		return outputFileName;
 	}
 
 	public void setRegex(boolean regex) {
