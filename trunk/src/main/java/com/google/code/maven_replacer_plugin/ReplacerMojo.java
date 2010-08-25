@@ -306,4 +306,12 @@ public class ReplacerMojo extends AbstractMojo {
 	public void setBasedir(String baseDir) {
 		this.basedir = baseDir;
 	}
+
+	public void setReplacements(List<Replacement> replacements) {
+		this.replacements = replacements;
+	}
+
+	public void setRegexFlags(List<String> regexFlags) {
+		this.regexFlags = regexFlags;
+	}
 }

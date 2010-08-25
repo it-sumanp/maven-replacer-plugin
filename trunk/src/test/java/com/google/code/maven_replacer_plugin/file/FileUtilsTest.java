@@ -14,6 +14,8 @@ import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
 public class FileUtilsTest {
+	private static final String CONTENT = "content";
+
 	@Rule
 	public TemporaryFolder folder = new TemporaryFolder();
 
@@ -38,6 +40,11 @@ public class FileUtilsTest {
 		new File(tempFile).createNewFile();
 		assertTrue(new File(tempFile).exists());
 	}
+	
+	@Test
+	public void shouldNotDoAnythingIfRootDirectory() {
+		fileUtils.ensureFolderStructureExists("/");
+	}
 
 	@Test(expected = IllegalArgumentException.class)
 	public void shouldThrowIllegalArgumentExceptionIfFileIsDirectory() throws Exception {
@@ -45,6 +52,14 @@ public class FileUtilsTest {
 		fileUtils.ensureFolderStructureExists(tempFile);
 		new File(tempFile).createNewFile();
 		assertTrue(new File(tempFile).exists());
+	}
+	
+	@Test
+	public void shouldWriteToFileEnsuringFolderStructureExists() throws Exception {
+		String tempFile = System.getProperty("java.io.tmpdir") + "/" + UUID.randomUUID() + "/tempfile";
+		fileUtils.writeToFile(tempFile, CONTENT);
+		
+		assertEquals(CONTENT, org.apache.commons.io.FileUtils.readFileToString(new File(tempFile)));
 	}
 
 	@Test
