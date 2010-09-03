@@ -1,6 +1,9 @@
 package com.google.code.maven_replacer_plugin;
 
 
+import static java.util.Arrays.asList;
+import static junit.framework.Assert.assertSame;
+import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.argThat;
 import static org.mockito.Matchers.eq;
@@ -10,7 +13,6 @@ import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.List;
 
 import org.apache.maven.plugin.MojoExecutionException;
@@ -58,7 +60,7 @@ public class ReplacerMojoTest {
 		patternFlagsFactory = mock(PatternFlagsFactory.class);
 		log = mock(Log.class);
 		replacer = mock(Replacer.class);
-		regexFlags = Arrays.asList(REGEX_FLAG);
+		regexFlags = asList(REGEX_FLAG);
 		
 		when(replacerFactory.create()).thenReturn(replacer);
 		when(patternFlagsFactory.buildFlags(regexFlags)).thenReturn(REGEX_PATTERN_FLAGS);
@@ -75,8 +77,7 @@ public class ReplacerMojoTest {
 	@Test
 	public void shouldReplaceContentsInReplacements() throws Exception {
 		Replacement replacement = mock(Replacement.class);
-		List<Replacement> replacements = Arrays.asList(replacement);
-		
+		List<Replacement> replacements = asList(replacement);
 		
 		mojo.setRegexFlags(regexFlags);
 		mojo.setRegex(REGEX);
@@ -90,9 +91,47 @@ public class ReplacerMojoTest {
 	}
 	
 	@Test
+	public void shouldReplaceContentsInIncludeAndExcludes() throws Exception {
+		List<String> includes = asList("include");
+		List<String> excludes = asList("exclude");
+		when(fileSelector.listIncludes(BASE_DIR, includes, excludes)).thenReturn(asList(FILE));
+		
+		mojo.setIncludes(includes);
+		mojo.setExcludes(excludes);
+		mojo.setToken(TOKEN);
+		mojo.setValue(VALUE);
+		mojo.setBasedir(BASE_DIR);
+		mojo.execute();
+		
+		assertSame(mojo.getIncludes(), includes);
+		assertSame(mojo.getExcludes(), excludes);
+		verify(replacer).replace(argThat(new ReplacementMatcher(TOKEN, VALUE)), eq(REGEX), eq(BASE_DIR  + "/" + FILE), 
+				eq(BASE_DIR + "/" + FILE), anyInt());
+	}
+	
+	@Test
+	public void shouldReplaceContentsInFilesToIncludeAndExclude() throws Exception {
+		String includes = "include1, include2";
+		String excludes = "exclude1, exclude2";
+		when(fileSelector.listIncludes(BASE_DIR, asList("include1", "include2"), asList("exclude1", "exclude2"))).thenReturn(asList(FILE));
+
+		mojo.setFilesToInclude(includes);
+		mojo.setFilesToExclude(excludes);
+		mojo.setToken(TOKEN);
+		mojo.setValue(VALUE);
+		mojo.setBasedir(BASE_DIR);
+		mojo.execute();
+		
+		assertSame(mojo.getFilesToInclude(), includes);
+		assertSame(mojo.getFilesToExclude(), excludes);
+		verify(replacer).replace(argThat(new ReplacementMatcher(TOKEN, VALUE)), eq(REGEX), eq(BASE_DIR  + "/" + FILE), 
+				eq(BASE_DIR + "/" + FILE), anyInt());
+	}
+	
+	@Test
 	public void shouldReplaceContentsWithTokenValuesInMap() throws Exception {
 		Replacement replacement = mock(Replacement.class);
-		List<Replacement> replacements = Arrays.asList(replacement);
+		List<Replacement> replacements = asList(replacement);
 		
 		when(tokenValueMapFactory.contextsForFile(TOKEN_VALUE_MAP)).thenReturn(replacements);
 		
@@ -149,7 +188,7 @@ public class ReplacerMojoTest {
 	@Test
 	public void shouldReplaceContentsInReplacementsInSameFileWhenNoOutputFile() throws Exception {
 		Replacement replacement = mock(Replacement.class);
-		List<Replacement> replacements = Arrays.asList(replacement);
+		List<Replacement> replacements = asList(replacement);
 		
 		
 		mojo.setRegexFlags(regexFlags);
