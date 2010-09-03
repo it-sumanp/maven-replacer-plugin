@@ -312,4 +312,28 @@ public class ReplacerMojo extends AbstractMojo {
 	public void setRegexFlags(List<String> regexFlags) {
 		this.regexFlags = regexFlags;
 	}
+
+	public void setIncludes(List<String> includes) {
+		this.includes = includes;
+	}
+
+	public List<String> getIncludes() {
+		return includes;
+	}
+
+	public void setExcludes(List<String> excludes) {
+		this.excludes = excludes;
+	}
+
+	public List<String> getExcludes() {
+		return excludes;
+	}
+
+	public String getFilesToInclude() {
+		return filesToInclude;
+	}
+	
+	public String getFilesToExclude() {
+		return filesToExclude;
+	}
 }
