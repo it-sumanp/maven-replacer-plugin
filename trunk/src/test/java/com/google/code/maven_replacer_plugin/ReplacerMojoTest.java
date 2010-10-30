@@ -143,11 +143,11 @@ public class ReplacerMojoTest {
 	}
 	
 	@Test
-	public void shouldReplaceContentsWithTokenValuesInMap() throws Exception {
+	public void shouldReplaceContentsWithTokenValuesInMapWithComments() throws Exception {
 		Replacement replacement = mock(Replacement.class);
 		List<Replacement> replacements = asList(replacement);
 		
-		when(tokenValueMapFactory.contextsForFile(TOKEN_VALUE_MAP)).thenReturn(replacements);
+		when(tokenValueMapFactory.contextsForFile(TOKEN_VALUE_MAP, true)).thenReturn(replacements);
 		
 		mojo.setRegexFlags(regexFlags);
 		mojo.setRegex(REGEX);
@@ -155,6 +155,25 @@ public class ReplacerMojoTest {
 		mojo.setFile(FILE);
 		mojo.setOutputFile(OUTPUT_FILE);
 		mojo.setBasedir(BASE_DIR);
+		mojo.execute();
+		
+		verify(replacer).replace(replacements, REGEX, BASE_DIR  + "/" + FILE, BASE_DIR + "/" + OUTPUT_FILE, REGEX_PATTERN_FLAGS);
+	}
+	
+	@Test
+	public void shouldReplaceContentsWithTokenValuesInMapWithoutComments() throws Exception {
+		Replacement replacement = mock(Replacement.class);
+		List<Replacement> replacements = asList(replacement);
+		
+		when(tokenValueMapFactory.contextsForFile(TOKEN_VALUE_MAP, false)).thenReturn(replacements);
+		
+		mojo.setRegexFlags(regexFlags);
+		mojo.setRegex(REGEX);
+		mojo.setTokenValueMap(TOKEN_VALUE_MAP);
+		mojo.setFile(FILE);
+		mojo.setOutputFile(OUTPUT_FILE);
+		mojo.setBasedir(BASE_DIR);
+		mojo.setCommentsEnabled(false);
 		mojo.execute();
 		
 		verify(replacer).replace(replacements, REGEX, BASE_DIR  + "/" + FILE, BASE_DIR + "/" + OUTPUT_FILE, REGEX_PATTERN_FLAGS);

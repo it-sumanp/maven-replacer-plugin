@@ -155,6 +155,14 @@ public class ReplacerMojo extends AbstractMojo {
 	 * @parameter expression=""
 	 */
 	private List<Replacement> replacements;
+	
+	/**
+	 * Comments enabled in the tokenValueMapFile. Default is true.
+	 * Comment lines start with '#'
+	 * 
+	 * @parameter expression=""
+	 */
+	private boolean commentsEnabled = true;
 
 	public ReplacerMojo() {
 		super();
@@ -254,7 +262,7 @@ public class ReplacerMojo extends AbstractMojo {
 			context.setValueFile(valueFile);
 			return Arrays.asList(context);
 		}
-		return tokenValueMapFactory.contextsForFile(tokenValueMap);
+		return tokenValueMapFactory.contextsForFile(tokenValueMap, isCommentsEnabled());
 	}
 
 	private String getOutputFile(String defaultFilename) {
@@ -352,5 +360,13 @@ public class ReplacerMojo extends AbstractMojo {
 
 	public String getOutputDir() {
 		return outputDir;
+	}
+
+	public boolean isCommentsEnabled() {
+		return commentsEnabled;
+	}
+	
+	public void setCommentsEnabled(boolean commentsEnabled) {
+		this.commentsEnabled = commentsEnabled;
 	}
 }

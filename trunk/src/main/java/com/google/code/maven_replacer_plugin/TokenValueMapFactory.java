@@ -11,13 +11,15 @@ import com.google.code.maven_replacer_plugin.file.FileUtils;
 
 public class TokenValueMapFactory {
 
+	private static final String COMMENT_PREFIX = "#";
+
 	private final FileUtils fileUtils;
 
 	public TokenValueMapFactory(FileUtils fileUtils) {
 		this.fileUtils = fileUtils;
 	}
 
-	public List<Replacement> contextsForFile(String tokenValueMapFile) throws IOException {
+	public List<Replacement> contextsForFile(String tokenValueMapFile, boolean commentsEnabled) throws IOException {
 		String contents = fileUtils.readFile(tokenValueMapFile);
 		BufferedReader reader = new BufferedReader(new StringReader(contents));
 		
@@ -25,7 +27,7 @@ public class TokenValueMapFactory {
 		List<Replacement> contexts = new ArrayList<Replacement>();
 		while ((token = reader.readLine()) != null) {
 			token = token.trim();
-			if (token.length() == 0) {
+			if (ignoreLine(token, commentsEnabled)) {
 				continue;
 			}
 			String value = reader.readLine();
@@ -36,5 +38,9 @@ public class TokenValueMapFactory {
 			contexts.add(new Replacement(fileUtils, token, value));
 		}
 		return contexts;
+	}
+
+	private boolean ignoreLine(String line, boolean commentsEnabled) {
+		return line.length() == 0 || (commentsEnabled && line.startsWith(COMMENT_PREFIX));
 	}
 }
