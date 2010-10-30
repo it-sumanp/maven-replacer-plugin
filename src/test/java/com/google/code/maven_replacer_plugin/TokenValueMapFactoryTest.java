@@ -4,8 +4,6 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.when;
 
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
 import org.junit.Before;
@@ -19,25 +17,24 @@ import com.google.code.maven_replacer_plugin.file.FileUtils;
 @RunWith(MockitoJUnitRunner.class)
 public class TokenValueMapFactoryTest {
 	private static final String FILENAME = "some file";
+	private static final boolean COMMENTS_ENABLED = true;
+	private static final boolean COMMENTS_DISABLED = false;
 
 	@Mock
 	private FileUtils fileUtils;
 
 	private TokenValueMapFactory factory;
-	private ReplacementComparator comparator;
 
 	@Before
 	public void setUp() {
 		factory = new TokenValueMapFactory(fileUtils);
-		comparator = new ReplacementComparator();
 	}
 
 	@Test
-	public void shouldReturnContextsFromFileAndIgnoreBlankLines() throws Exception {
-		when(fileUtils.readFile(FILENAME)).thenReturn("\n  \ntoken1\nvalue1\ntoken2\nvalue2\n\n");
+	public void shouldReturnContextsFromFileAndIgnoreBlankLinesAndComments() throws Exception {
+		when(fileUtils.readFile(FILENAME)).thenReturn("\n  \ntoken1\nvalue1\ntoken2\nvalue2\n#some comment\n");
 		
-		List<Replacement> contexts = factory.contextsForFile(FILENAME);
-		Collections.sort(contexts, comparator);
+		List<Replacement> contexts = factory.contextsForFile(FILENAME, COMMENTS_ENABLED);
 		assertNotNull(contexts);
 		assertEquals(2, contexts.size());
 		assertEquals("token1", contexts.get(0).getToken());
@@ -46,29 +43,37 @@ public class TokenValueMapFactoryTest {
 		assertEquals("value2", contexts.get(1).getValue());
 	}
 	
+	@Test
+	public void shouldReturnContextsFromFileAndIgnoreBlankLinesUsingCommentLinesIfCommentsDisabled() throws Exception {
+		when(fileUtils.readFile(FILENAME)).thenReturn("\n  \ntoken1\nvalue1\ntoken2\nvalue2\n#some\n#comment\n");
+		
+		List<Replacement> contexts = factory.contextsForFile(FILENAME, COMMENTS_DISABLED);
+		assertNotNull(contexts);
+		assertEquals(3, contexts.size());
+		assertEquals("token1", contexts.get(0).getToken());
+		assertEquals("value1", contexts.get(0).getValue());
+		assertEquals("token2", contexts.get(1).getToken());
+		assertEquals("value2", contexts.get(1).getValue());
+		assertEquals("#some", contexts.get(2).getToken());
+		assertEquals("#comment", contexts.get(2).getValue());
+	}
+	
 	@Test (expected = IllegalArgumentException.class)
 	public void shouldThrowExceptionIfNoValueForToken() throws Exception {
-		when(fileUtils.readFile(FILENAME)).thenReturn("\ntoken2");
-		factory.contextsForFile(FILENAME);
+		when(fileUtils.readFile(FILENAME)).thenReturn("#comment\ntoken2");
+		factory.contextsForFile(FILENAME, COMMENTS_ENABLED);
 	}
 	
 	@Test
 	public void shouldReturnRegexContextsFromFile() throws Exception {
 		when(fileUtils.readFile(FILENAME)).thenReturn("\\=tok\\=en1\nvalue1\nto$ke..n2\nvalue2");
 		
-		List<Replacement> contexts = factory.contextsForFile(FILENAME);
-		Collections.sort(contexts, comparator);
+		List<Replacement> contexts = factory.contextsForFile(FILENAME, COMMENTS_ENABLED);
 		assertNotNull(contexts);
 		assertEquals(2, contexts.size());
 		assertEquals("\\=tok\\=en1", contexts.get(0).getToken());
 		assertEquals("value1", contexts.get(0).getValue());
 		assertEquals("to$ke..n2", contexts.get(1).getToken());
 		assertEquals("value2", contexts.get(1).getValue());
-	}
-	
-	private static class ReplacementComparator implements Comparator<Replacement> {
-		public int compare(Replacement c1, Replacement c2) {
-			return c1.getToken().compareTo(c2.getToken());
-		}
 	}
 }
