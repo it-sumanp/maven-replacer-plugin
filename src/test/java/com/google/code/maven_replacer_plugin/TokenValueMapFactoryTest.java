@@ -2,6 +2,7 @@ package com.google.code.maven_replacer_plugin;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.when;
 
 import java.util.List;
@@ -32,7 +33,7 @@ public class TokenValueMapFactoryTest {
 
 	@Test
 	public void shouldReturnContextsFromFileAndIgnoreBlankLinesAndComments() throws Exception {
-		when(fileUtils.readFile(FILENAME)).thenReturn("\n  \ntoken1\nvalue1\ntoken2\nvalue2\n#some comment\n");
+		when(fileUtils.readFile(FILENAME)).thenReturn("\n  \ntoken1=value1\ntoken2 = value2\n#some comment\n");
 		
 		List<Replacement> contexts = factory.contextsForFile(FILENAME, COMMENTS_ENABLED);
 		assertNotNull(contexts);
@@ -45,7 +46,7 @@ public class TokenValueMapFactoryTest {
 	
 	@Test
 	public void shouldReturnContextsFromFileAndIgnoreBlankLinesUsingCommentLinesIfCommentsDisabled() throws Exception {
-		when(fileUtils.readFile(FILENAME)).thenReturn("\n  \ntoken1\nvalue1\ntoken2\nvalue2\n#some\n#comment\n");
+		when(fileUtils.readFile(FILENAME)).thenReturn("\n  \ntoken1=value1\ntoken2=value2\n#some=#comment\n");
 		
 		List<Replacement> contexts = factory.contextsForFile(FILENAME, COMMENTS_DISABLED);
 		assertNotNull(contexts);
@@ -58,21 +59,23 @@ public class TokenValueMapFactoryTest {
 		assertEquals("#comment", contexts.get(2).getValue());
 	}
 	
-	@Test (expected = IllegalArgumentException.class)
-	public void shouldThrowExceptionIfNoValueForToken() throws Exception {
+	@Test
+	public void shouldIgnoreTokensWithNoSeparatedValue() throws Exception {
 		when(fileUtils.readFile(FILENAME)).thenReturn("#comment\ntoken2");
-		factory.contextsForFile(FILENAME, COMMENTS_ENABLED);
+		List<Replacement> contexts = factory.contextsForFile(FILENAME, COMMENTS_DISABLED);
+		assertNotNull(contexts);
+		assertTrue(contexts.isEmpty());
 	}
 	
 	@Test
 	public void shouldReturnRegexContextsFromFile() throws Exception {
-		when(fileUtils.readFile(FILENAME)).thenReturn("\\=tok\\=en1\nvalue1\nto$ke..n2\nvalue2");
+		when(fileUtils.readFile(FILENAME)).thenReturn("\\=tok\\=en1=val\\=ue1\nto$ke..n2=value2");
 		
 		List<Replacement> contexts = factory.contextsForFile(FILENAME, COMMENTS_ENABLED);
 		assertNotNull(contexts);
 		assertEquals(2, contexts.size());
 		assertEquals("\\=tok\\=en1", contexts.get(0).getToken());
-		assertEquals("value1", contexts.get(0).getValue());
+		assertEquals("val\\=ue1", contexts.get(0).getValue());
 		assertEquals("to$ke..n2", contexts.get(1).getToken());
 		assertEquals("value2", contexts.get(1).getValue());
 	}

@@ -112,7 +112,7 @@ public class ReplacerMojoIntegrationTest {
 	
 	@Test
 	public void shouldReplaceContentsWithTokenValuesInMap() throws Exception {
-		String tokenValueMapFilename = createTempFile(asList("#comment", TOKEN, VALUE));
+		String tokenValueMapFilename = createTempFile(asList("#comment", TOKEN + "=" + VALUE));
 		
 		mojo.setTokenValueMap(tokenValueMapFilename);
 		mojo.setFile(filenameAndPath);
