@@ -1,5 +1,6 @@
 package com.google.code.maven_replacer_plugin;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -110,6 +111,13 @@ public class ReplacerMojo extends AbstractMojo {
 	 * @parameter expression=""
 	 */
 	private String outputFile;
+	
+	/**
+	 * Output to another dir
+	 * 
+	 * @parameter expression=""
+	 */
+	private String outputDir = "";
 
 	/**
 	 * Map of tokens and respective values to replace with
@@ -185,13 +193,11 @@ public class ReplacerMojo extends AbstractMojo {
 			addIncludesFilesAndExcludedFiles();
 			
 			if (includes == null || includes.isEmpty()) {
-				getOutputFile(file);
 				replaceContents(replacer, contexts, file);
 				return;
 			}
 			
 			for (String file : fileSelector.listIncludes(basedir, includes, excludes)) {
-				getOutputFile(file);
 				replaceContents(replacer, contexts, file);
 			}
 		} catch (IOException e) {
@@ -228,9 +234,13 @@ public class ReplacerMojo extends AbstractMojo {
 	}
 
 	private void replaceContents(Replacer replacer, List<Replacement> contexts, String inputFile) throws IOException {
+		String outputFileName = getOutputFile(getFilename(inputFile));
+		if (outputDir.trim().length() > 0) {
+			outputFileName = getFilename(outputDir + File.separator + new File(outputFileName).getName());
+		}
 		getLog().info("Replacing content in " + getFilename(inputFile));
-		replacer.replace(contexts, regex, getFilename(inputFile), getOutputFile(getFilename(inputFile)), 
-				patternFlagsFactory.buildFlags(regexFlags));
+		getLog().info("Outputting to: " + outputFileName);
+		replacer.replace(contexts, regex, getFilename(inputFile), outputFileName, patternFlagsFactory.buildFlags(regexFlags));
 	}
 
 	private List<Replacement> getContexts() throws IOException {
@@ -253,7 +263,6 @@ public class ReplacerMojo extends AbstractMojo {
 		}
 
 		String outputFileName = getFilename(outputFile);
-		getLog().info("Outputting to: " + outputFileName);
 		return outputFileName;
 	}
 
@@ -335,5 +344,13 @@ public class ReplacerMojo extends AbstractMojo {
 	
 	public String getFilesToExclude() {
 		return filesToExclude;
+	}
+
+	public void setOutputDir(String outputDir) {
+		this.outputDir = outputDir;
+	}
+
+	public String getOutputDir() {
+		return outputDir;
 	}
 }
