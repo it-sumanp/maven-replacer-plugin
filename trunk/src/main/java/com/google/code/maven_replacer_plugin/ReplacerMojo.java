@@ -131,7 +131,7 @@ public class ReplacerMojo extends AbstractMojo {
 	 * 
 	 * @parameter expression="${basedir}"
 	 */
-	private String basedir;
+	private String basedir = ".";
 
 	/**
 	 * List of regex flags. 
@@ -166,7 +166,6 @@ public class ReplacerMojo extends AbstractMojo {
 
 	public ReplacerMojo() {
 		super();
-		this.basedir = ".";
 		this.fileUtils = new FileUtils();
 		this.tokenReplacer = new TokenReplacer();
 		this.replacerFactory = new ReplacerFactory(fileUtils, tokenReplacer);
@@ -179,7 +178,6 @@ public class ReplacerMojo extends AbstractMojo {
 			ReplacerFactory replacerFactory, TokenValueMapFactory tokenValueMapFactory,
 			FileSelector fileSelector, PatternFlagsFactory patternFlagsFactory) {
 		super();
-		this.basedir = ".";
 		this.fileUtils = fileUtils;
 		this.tokenReplacer = tokenReplacer;
 		this.replacerFactory = replacerFactory;
