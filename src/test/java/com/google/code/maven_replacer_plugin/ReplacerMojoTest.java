@@ -38,6 +38,7 @@ public class ReplacerMojoTest {
 	private static final String VALUE_FILE = "value file";
 	private static final String TOKEN = "token";
 	private static final String VALUE = "value";
+	private static final String OUTPUT_DIR = "output dir";
 	
 	private FileUtils fileUtils;
 	private TokenReplacer tokenReplacer;
@@ -110,6 +111,19 @@ public class ReplacerMojoTest {
 	}
 	
 	@Test
+	public void shouldReplaceContentsAndWriteToOutputDir() throws Exception {
+		mojo.setFile(FILE);
+		mojo.setToken(TOKEN);
+		mojo.setValue(VALUE);
+		mojo.setBasedir(BASE_DIR);
+		mojo.setOutputDir(OUTPUT_DIR);
+		
+		mojo.execute();
+		verify(replacer).replace(argThat(new ReplacementMatcher(TOKEN, VALUE)), eq(REGEX), eq(BASE_DIR  + "/" + FILE), 
+				eq(BASE_DIR + "/" + OUTPUT_DIR + "/" + FILE), anyInt());
+	}
+	
+	@Test
 	public void shouldReplaceContentsInFilesToIncludeAndExclude() throws Exception {
 		String includes = "include1, include2";
 		String excludes = "exclude1, exclude2";
@@ -148,8 +162,6 @@ public class ReplacerMojoTest {
 	
 	@Test
 	public void shouldReplaceContentsWithTokenAndValue() throws Exception {
-		
-		
 		mojo.setRegexFlags(regexFlags);
 		mojo.setRegex(REGEX);
 		mojo.setFile(FILE);
@@ -165,8 +177,6 @@ public class ReplacerMojoTest {
 	
 	@Test
 	public void shouldReplaceContentsWithTokenValuesInTokenAndValueFiles() throws Exception {
-		
-		
 		when(fileUtils.readFile(TOKEN_FILE)).thenReturn(TOKEN);
 		when(fileUtils.readFile(VALUE_FILE)).thenReturn(VALUE);
 		
@@ -189,7 +199,6 @@ public class ReplacerMojoTest {
 	public void shouldReplaceContentsInReplacementsInSameFileWhenNoOutputFile() throws Exception {
 		Replacement replacement = mock(Replacement.class);
 		List<Replacement> replacements = asList(replacement);
-		
 		
 		mojo.setRegexFlags(regexFlags);
 		mojo.setRegex(REGEX);
