@@ -15,9 +15,9 @@ import com.google.code.maven_replacer_plugin.include.FileSelector;
 
 /**
  * Goal replaces token with value inside file
- * 
+ *
  * @goal replace
- * 
+ *
  * @phase compile
  */
 public class ReplacerMojo extends AbstractMojo {
@@ -30,111 +30,111 @@ public class ReplacerMojo extends AbstractMojo {
 
 	/**
 	 * File to check and replace tokens
-	 * 
+	 *
 	 * @parameter expression=""
 	 */
 	private String file;
 
 	/**
 	 * List of included files pattern in ant format. Cannot use with outputFile.
-	 * 
+	 *
 	 * @parameter expression=""
 	 */
 	private List<String> includes;
 
 	/**
 	 * List of excluded files pattern in ant format. Cannot use with outputFile.
-	 * 
+	 *
 	 * @parameter expression=""
 	 */
 	private List<String> excludes;
-	
+
 	/**
 	 * Comma separated list of includes. This is split up and used the same way a array of includes would be.
-	 * 
+	 *
 	 * @parameter expression=""
 	 */
 	private String filesToInclude;
-	
+
 	/**
 	 * Comma separated list of excludes. This is split up and used the same way a array of excludes would be.
-	 * 
+	 *
 	 * @parameter expression=""
 	 */
 	private String filesToExclude;
 
 	/**
 	 * Token
-	 * 
+	 *
 	 * @parameter expression=""
 	 */
 	private String token;
 
 	/**
 	 * Token file
-	 * 
+	 *
 	 * @parameter expression=""
 	 */
 	private String tokenFile;
 
 	/**
 	 * Ignore missing files
-	 * 
+	 *
 	 * @parameter expression=""
 	 */
 	private boolean ignoreMissingFile;
 
 	/**
 	 * Value to replace token with
-	 * 
+	 *
 	 * @parameter expression=""
 	 */
 	private String value;
 
 	/**
 	 * Value file to read value to replace token with
-	 * 
+	 *
 	 * @parameter expression=""
 	 */
 	private String valueFile;
 
 	/**
 	 * Token uses regex
-	 * 
+	 *
 	 * @parameter expression=""
 	 */
 	private boolean regex = true;
 
 	/**
 	 * Output to another file
-	 * 
+	 *
 	 * @parameter expression=""
 	 */
 	private String outputFile;
-	
+
 	/**
 	 * Output to another dir
-	 * 
+	 *
 	 * @parameter expression=""
 	 */
 	private String outputDir = "";
 
 	/**
 	 * Map of tokens and respective values to replace with
-	 * 
+	 *
 	 * @parameter expression=""
 	 */
 	private String tokenValueMap;
-	
+
 	/**
 	 * Optional base directory for each file to replace
-	 * 
+	 *
 	 * @parameter expression="${basedir}"
 	 */
 	private String basedir = ".";
 
 	/**
-	 * List of regex flags. 
+	 * List of regex flags.
 	 * Must contain one or more of:
 	 * * CANON_EQ
 	 * * CASE_INSENSITIVE
@@ -144,22 +144,22 @@ public class ReplacerMojo extends AbstractMojo {
 	 * * MULTILINE
 	 * * UNICODE_CASE
 	 * * UNIX_LINES
-	 * 
+	 *
 	 * @parameter expression=""
 	 */
 	private List<String> regexFlags;
-	
+
 	/**
 	 * List of replacements with token/value pairs
-	 * 
+	 *
 	 * @parameter expression=""
 	 */
 	private List<Replacement> replacements;
-	
+
 	/**
 	 * Comments enabled in the tokenValueMapFile. Default is true.
 	 * Comment lines start with '#'
-	 * 
+	 *
 	 * @parameter expression=""
 	 */
 	private boolean commentsEnabled = true;
@@ -195,14 +195,14 @@ public class ReplacerMojo extends AbstractMojo {
 
 			Replacer replacer = replacerFactory.create();
 			List<Replacement> contexts = getContexts();
-			
+
 			addIncludesFilesAndExcludedFiles();
-			
+
 			if (includes == null || includes.isEmpty()) {
 				replaceContents(replacer, contexts, file);
 				return;
 			}
-			
+
 			for (String file : fileSelector.listIncludes(basedir, includes, excludes)) {
 				replaceContents(replacer, contexts, file);
 			}
@@ -212,22 +212,22 @@ public class ReplacerMojo extends AbstractMojo {
 	}
 
 	private String getFilename(String file) {
-		return basedir + '/' + file;
+		return basedir + File.separator + file;
 	}
 
 	private void addIncludesFilesAndExcludedFiles() {
 		if (filesToInclude != null) {
 			String[] splitFiles = filesToInclude.split(",");
 			if (includes == null) {
-				includes = new ArrayList<String>();				
+				includes = new ArrayList<String>();
 			}
 			addToList(Arrays.asList(splitFiles), includes);
 		}
-		
+
 		if (filesToExclude != null) {
 			String[] splitFiles = filesToExclude.split(",");
 			if (excludes == null) {
-				excludes = new ArrayList<String>();				
+				excludes = new ArrayList<String>();
 			}
 			addToList(Arrays.asList(splitFiles), excludes);
 		}
@@ -253,7 +253,7 @@ public class ReplacerMojo extends AbstractMojo {
 		if (replacements != null) {
 			return replacements;
 		}
-		
+
 		if (tokenValueMap == null) {
 			Replacement context = new Replacement(fileUtils, token, value);
 			context.setTokenFile(tokenFile);
@@ -315,7 +315,7 @@ public class ReplacerMojo extends AbstractMojo {
 	public void setFilesToExclude(String filesToExclude) {
 		this.filesToExclude = filesToExclude;
 	}
-	
+
 	public void setBasedir(String baseDir) {
 		this.basedir = baseDir;
 	}
@@ -347,7 +347,7 @@ public class ReplacerMojo extends AbstractMojo {
 	public String getFilesToInclude() {
 		return filesToInclude;
 	}
-	
+
 	public String getFilesToExclude() {
 		return filesToExclude;
 	}
@@ -356,14 +356,10 @@ public class ReplacerMojo extends AbstractMojo {
 		this.outputDir = outputDir;
 	}
 
-	public String getOutputDir() {
-		return outputDir;
-	}
-
 	public boolean isCommentsEnabled() {
 		return commentsEnabled;
 	}
-	
+
 	public void setCommentsEnabled(boolean commentsEnabled) {
 		this.commentsEnabled = commentsEnabled;
 	}

@@ -26,7 +26,7 @@ public class TokenValueMapFactory {
 	public List<Replacement> contextsForFile(String tokenValueMapFile, boolean commentsEnabled) throws IOException {
 		String contents = fileUtils.readFile(tokenValueMapFile);
 		BufferedReader reader = new BufferedReader(new StringReader(contents));
-		
+
 		String line = null;
 		List<Replacement> contexts = new ArrayList<Replacement>();
 		while ((line = reader.readLine()) != null) {
@@ -34,7 +34,7 @@ public class TokenValueMapFactory {
 			if (ignoreLine(line, commentsEnabled)) {
 				continue;
 			}
-			
+
 			StringBuilder token = new StringBuilder();
 			String value = "";
 			boolean settingToken = true;
@@ -42,7 +42,7 @@ public class TokenValueMapFactory {
 				if (i == 0 && line.charAt(0) == SEPARATOR) {
 					throw new IllegalArgumentException(getNoValueErrorMsgFor(line) + "1");
 				}
-				
+
 				if (settingToken && !isSeparatorAt(i, line)) {
 					token.append(line.charAt(i));
 				} else if (isSeparatorAt(i, line)) {
@@ -53,7 +53,7 @@ public class TokenValueMapFactory {
 					break;
 				}
 			}
-			
+
 			String tokenVal = token.toString().trim();
 			if (tokenVal.length() == 0 || settingToken) {
 				continue;
@@ -66,10 +66,6 @@ public class TokenValueMapFactory {
 
 	private boolean isSeparatorAt(int i, String line) {
 		return line.charAt(i) == SEPARATOR && line.charAt(i - 1) != SEPARATOR_ESCAPER;
-	}
-
-	private boolean isNotSeparatorCharAt(int i, String line) {
-		return line.charAt(i) != SEPARATOR || (i > 0 && line.charAt(i) == SEPARATOR && line.charAt(i - 1) == SEPARATOR_ESCAPER);
 	}
 
 	private String getNoValueErrorMsgFor(String line) {

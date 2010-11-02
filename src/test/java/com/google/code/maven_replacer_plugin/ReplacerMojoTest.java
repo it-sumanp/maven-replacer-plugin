@@ -14,6 +14,7 @@ import static org.mockito.Mockito.when;
 
 import java.io.IOException;
 import java.util.List;
+import java.io.File;
 
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.logging.Log;
@@ -39,7 +40,7 @@ public class ReplacerMojoTest {
 	private static final String TOKEN = "token";
 	private static final String VALUE = "value";
 	private static final String OUTPUT_DIR = "output dir";
-	
+
 	private FileUtils fileUtils;
 	private TokenReplacer tokenReplacer;
 	private ReplacerFactory replacerFactory;
@@ -62,11 +63,11 @@ public class ReplacerMojoTest {
 		log = mock(Log.class);
 		replacer = mock(Replacer.class);
 		regexFlags = asList(REGEX_FLAG);
-		
+
 		when(replacerFactory.create()).thenReturn(replacer);
 		when(patternFlagsFactory.buildFlags(regexFlags)).thenReturn(REGEX_PATTERN_FLAGS);
 
-		mojo = new ReplacerMojo(fileUtils, tokenReplacer, replacerFactory, tokenValueMapFactory, 
+		mojo = new ReplacerMojo(fileUtils, tokenReplacer, replacerFactory, tokenValueMapFactory,
 				fileSelector, patternFlagsFactory) {
 			@Override
 			public Log getLog() {
@@ -74,12 +75,12 @@ public class ReplacerMojoTest {
 			}
 		};
 	}
-	
+
 	@Test
 	public void shouldReplaceContentsInReplacements() throws Exception {
 		Replacement replacement = mock(Replacement.class);
 		List<Replacement> replacements = asList(replacement);
-		
+
 		mojo.setRegexFlags(regexFlags);
 		mojo.setRegex(REGEX);
 		mojo.setReplacements(replacements);
@@ -87,29 +88,30 @@ public class ReplacerMojoTest {
 		mojo.setOutputFile(OUTPUT_FILE);
 		mojo.setBasedir(BASE_DIR);
 		mojo.execute();
-		
-		verify(replacer).replace(replacements, REGEX, BASE_DIR  + "/" + FILE, BASE_DIR + "/" + OUTPUT_FILE, REGEX_PATTERN_FLAGS);
+
+		verify(replacer).replace(replacements, REGEX, BASE_DIR  + File.separator + FILE, BASE_DIR + File.separator + OUTPUT_FILE,
+			REGEX_PATTERN_FLAGS);
 	}
-	
+
 	@Test
 	public void shouldReplaceContentsInIncludeAndExcludes() throws Exception {
 		List<String> includes = asList("include");
 		List<String> excludes = asList("exclude");
 		when(fileSelector.listIncludes(BASE_DIR, includes, excludes)).thenReturn(asList(FILE));
-		
+
 		mojo.setIncludes(includes);
 		mojo.setExcludes(excludes);
 		mojo.setToken(TOKEN);
 		mojo.setValue(VALUE);
 		mojo.setBasedir(BASE_DIR);
 		mojo.execute();
-		
+
 		assertSame(mojo.getIncludes(), includes);
 		assertSame(mojo.getExcludes(), excludes);
-		verify(replacer).replace(argThat(new ReplacementMatcher(TOKEN, VALUE)), eq(REGEX), eq(BASE_DIR  + "/" + FILE), 
-				eq(BASE_DIR + "/" + FILE), anyInt());
+		verify(replacer).replace(argThat(new ReplacementMatcher(TOKEN, VALUE)), eq(REGEX), eq(BASE_DIR  + File.separator + FILE),
+			eq(BASE_DIR + File.separator + FILE), anyInt());
 	}
-	
+
 	@Test
 	public void shouldReplaceContentsAndWriteToOutputDir() throws Exception {
 		mojo.setFile(FILE);
@@ -117,12 +119,12 @@ public class ReplacerMojoTest {
 		mojo.setValue(VALUE);
 		mojo.setBasedir(BASE_DIR);
 		mojo.setOutputDir(OUTPUT_DIR);
-		
+
 		mojo.execute();
-		verify(replacer).replace(argThat(new ReplacementMatcher(TOKEN, VALUE)), eq(REGEX), eq(BASE_DIR  + "/" + FILE), 
-				eq(BASE_DIR + "/" + OUTPUT_DIR + "/" + FILE), anyInt());
+		verify(replacer).replace(argThat(new ReplacementMatcher(TOKEN, VALUE)), eq(REGEX), eq(BASE_DIR  + File.separator + FILE),
+			eq(BASE_DIR + File.separator + OUTPUT_DIR + File.separator + FILE), anyInt());
 	}
-	
+
 	@Test
 	public void shouldReplaceContentsInFilesToIncludeAndExclude() throws Exception {
 		String includes = "include1, include2";
@@ -135,20 +137,20 @@ public class ReplacerMojoTest {
 		mojo.setValue(VALUE);
 		mojo.setBasedir(BASE_DIR);
 		mojo.execute();
-		
+
 		assertSame(mojo.getFilesToInclude(), includes);
 		assertSame(mojo.getFilesToExclude(), excludes);
-		verify(replacer).replace(argThat(new ReplacementMatcher(TOKEN, VALUE)), eq(REGEX), eq(BASE_DIR  + "/" + FILE), 
-				eq(BASE_DIR + "/" + FILE), anyInt());
+		verify(replacer).replace(argThat(new ReplacementMatcher(TOKEN, VALUE)), eq(REGEX), eq(BASE_DIR  + File.separator + FILE),
+			eq(BASE_DIR + File.separator + FILE), anyInt());
 	}
-	
+
 	@Test
 	public void shouldReplaceContentsWithTokenValuesInMapWithComments() throws Exception {
 		Replacement replacement = mock(Replacement.class);
 		List<Replacement> replacements = asList(replacement);
-		
+
 		when(tokenValueMapFactory.contextsForFile(TOKEN_VALUE_MAP, true)).thenReturn(replacements);
-		
+
 		mojo.setRegexFlags(regexFlags);
 		mojo.setRegex(REGEX);
 		mojo.setTokenValueMap(TOKEN_VALUE_MAP);
@@ -156,17 +158,18 @@ public class ReplacerMojoTest {
 		mojo.setOutputFile(OUTPUT_FILE);
 		mojo.setBasedir(BASE_DIR);
 		mojo.execute();
-		
-		verify(replacer).replace(replacements, REGEX, BASE_DIR  + "/" + FILE, BASE_DIR + "/" + OUTPUT_FILE, REGEX_PATTERN_FLAGS);
+
+		verify(replacer).replace(replacements, REGEX, BASE_DIR  + File.separator + FILE, BASE_DIR + File.separator
+			+ OUTPUT_FILE, REGEX_PATTERN_FLAGS);
 	}
-	
+
 	@Test
 	public void shouldReplaceContentsWithTokenValuesInMapWithoutComments() throws Exception {
 		Replacement replacement = mock(Replacement.class);
 		List<Replacement> replacements = asList(replacement);
-		
+
 		when(tokenValueMapFactory.contextsForFile(TOKEN_VALUE_MAP, false)).thenReturn(replacements);
-		
+
 		mojo.setRegexFlags(regexFlags);
 		mojo.setRegex(REGEX);
 		mojo.setTokenValueMap(TOKEN_VALUE_MAP);
@@ -175,10 +178,11 @@ public class ReplacerMojoTest {
 		mojo.setBasedir(BASE_DIR);
 		mojo.setCommentsEnabled(false);
 		mojo.execute();
-		
-		verify(replacer).replace(replacements, REGEX, BASE_DIR  + "/" + FILE, BASE_DIR + "/" + OUTPUT_FILE, REGEX_PATTERN_FLAGS);
+
+		verify(replacer).replace(replacements, REGEX,
+			BASE_DIR  + File.separator + FILE, BASE_DIR + File.separator + OUTPUT_FILE, REGEX_PATTERN_FLAGS);
 	}
-	
+
 	@Test
 	public void shouldReplaceContentsWithTokenAndValue() throws Exception {
 		mojo.setRegexFlags(regexFlags);
@@ -189,16 +193,16 @@ public class ReplacerMojoTest {
 		mojo.setOutputFile(OUTPUT_FILE);
 		mojo.setBasedir(BASE_DIR);
 		mojo.execute();
-		
-		verify(replacer).replace(argThat(new ReplacementMatcher(TOKEN, VALUE)), eq(REGEX), eq(BASE_DIR  + "/" + FILE), 
-				eq(BASE_DIR + "/" + OUTPUT_FILE), eq(REGEX_PATTERN_FLAGS));
+
+		verify(replacer).replace(argThat(new ReplacementMatcher(TOKEN, VALUE)), eq(REGEX), eq(BASE_DIR  + File.separator + FILE),
+				eq(BASE_DIR + File.separator + OUTPUT_FILE), eq(REGEX_PATTERN_FLAGS));
 	}
-	
+
 	@Test
 	public void shouldReplaceContentsWithTokenValuesInTokenAndValueFiles() throws Exception {
 		when(fileUtils.readFile(TOKEN_FILE)).thenReturn(TOKEN);
 		when(fileUtils.readFile(VALUE_FILE)).thenReturn(VALUE);
-		
+
 		mojo.setRegexFlags(regexFlags);
 		mojo.setRegex(REGEX);
 		mojo.setFile(FILE);
@@ -207,34 +211,35 @@ public class ReplacerMojoTest {
 		mojo.setOutputFile(OUTPUT_FILE);
 		mojo.setBasedir(BASE_DIR);
 		mojo.execute();
-		
-		verify(replacer).replace(argThat(new ReplacementMatcher(TOKEN, VALUE)), eq(REGEX), eq(BASE_DIR  + "/" + FILE), 
-				eq(BASE_DIR + "/" + OUTPUT_FILE), eq(REGEX_PATTERN_FLAGS));
+
+		verify(replacer).replace(argThat(new ReplacementMatcher(TOKEN, VALUE)), eq(REGEX), eq(BASE_DIR  + File.separator + FILE),
+				eq(BASE_DIR + File.separator + OUTPUT_FILE), eq(REGEX_PATTERN_FLAGS));
 		verify(fileUtils).readFile(TOKEN_FILE);
 		verify(fileUtils).readFile(VALUE_FILE);
 	}
-	
+
 	@Test
 	public void shouldReplaceContentsInReplacementsInSameFileWhenNoOutputFile() throws Exception {
 		Replacement replacement = mock(Replacement.class);
 		List<Replacement> replacements = asList(replacement);
-		
+
 		mojo.setRegexFlags(regexFlags);
 		mojo.setRegex(REGEX);
 		mojo.setReplacements(replacements);
 		mojo.setFile(FILE);
 		mojo.setBasedir(BASE_DIR);
 		mojo.execute();
-		
-		verify(replacer).replace(replacements, REGEX, BASE_DIR  + "/" + FILE, BASE_DIR + "/" + FILE, REGEX_PATTERN_FLAGS);
+
+		verify(replacer).replace(replacements, REGEX, BASE_DIR  + File.separator + FILE, BASE_DIR + File.separator + FILE,
+			REGEX_PATTERN_FLAGS);
 	}
-	
+
 	@Test
 	public void shouldNotReplaceIfIgnoringMissingFilesAndFileNotExists() throws Exception {
 		when(fileUtils.fileNotExists(FILE)).thenReturn(true);
 		mojo.setFile(FILE);
 		mojo.setIgnoreMissingFile(true);
-		
+
 		mojo.execute();
 		verifyZeroInteractions(replacerFactory);
 		verify(log).info(anyString());
@@ -244,11 +249,11 @@ public class ReplacerMojoTest {
 	public void shouldCreateNewInstancesOfDepenenciesOnConstructor() {
 		new ReplacerMojo();
 	}
-	
+
 	@Test (expected = MojoExecutionException.class)
 	public void shouldRethrowIOExceptionsAsMojoExceptions() throws Exception {
 		when(fileUtils.readFile(anyString())).thenThrow(new IOException());
-		
+
 		mojo.setRegexFlags(regexFlags);
 		mojo.setRegex(REGEX);
 		mojo.setFile(FILE);
@@ -258,7 +263,7 @@ public class ReplacerMojoTest {
 		mojo.setBasedir(BASE_DIR);
 		mojo.execute();
 	}
-	
+
 	private static class ReplacementMatcher extends BaseMatcher<List<Replacement>> {
 		private final String token;
 		private final String value;
@@ -276,7 +281,7 @@ public class ReplacerMojoTest {
 
 		public void describeTo(Description arg0) {
 		}
-		
+
 	}
 }
 
