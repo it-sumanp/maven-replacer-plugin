@@ -12,9 +12,7 @@ import com.google.code.maven_replacer_plugin.file.FileUtils;
 public class TokenValueMapFactory {
 
 	private static final char SEPARATOR_ESCAPER = '\\';
-
 	private static final char SEPARATOR = '=';
-
 	private static final String COMMENT_PREFIX = "#";
 
 	private final FileUtils fileUtils;

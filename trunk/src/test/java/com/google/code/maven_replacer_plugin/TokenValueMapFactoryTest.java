@@ -5,8 +5,10 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.when;
 
+import java.io.IOException;
 import java.util.List;
 
+import org.apache.tools.ant.types.resources.comparators.Size;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -29,6 +31,17 @@ public class TokenValueMapFactoryTest {
 	@Before
 	public void setUp() {
 		factory = new TokenValueMapFactory(fileUtils);
+	}
+	
+	@Test
+	public void shouldReturnContextsFromFile() throws Exception {
+		when(fileUtils.readFile(FILENAME)).thenReturn("token=value");
+		
+		List<Replacement> contexts = factory.contextsForFile(FILENAME, COMMENTS_DISABLED);
+		assertNotNull(contexts);
+		assertEquals(1, contexts.size());
+		assertEquals("token", contexts.get(0).getToken());
+		assertEquals("value", contexts.get(0).getValue());
 	}
 
 	@Test
@@ -78,5 +91,17 @@ public class TokenValueMapFactoryTest {
 		assertEquals("val\\=ue1", contexts.get(0).getValue());
 		assertEquals("to$ke..n2", contexts.get(1).getToken());
 		assertEquals("value2", contexts.get(1).getValue());
+	}
+	
+	@Test (expected = IllegalArgumentException.class)
+	public void shouldThrowExceptionIfNoTokenForValue() throws Exception {
+		when(fileUtils.readFile(FILENAME)).thenReturn("=value");
+		factory.contextsForFile(FILENAME, COMMENTS_DISABLED);
+	}
+	
+	@Test
+	public void shouldSupportEmptyFileAndReturnNoReplacements() throws Exception {
+		when(fileUtils.readFile(FILENAME)).thenReturn("");
+		assertTrue(factory.contextsForFile(FILENAME, COMMENTS_DISABLED).isEmpty());
 	}
 }
