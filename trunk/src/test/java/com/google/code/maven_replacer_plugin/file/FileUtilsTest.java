@@ -72,4 +72,16 @@ public class FileUtilsTest {
 		String data = fileUtils.readFile(file.getAbsolutePath());
 		assertEquals("test", data);
 	}
+	
+	@Test
+	public void shouldReturnFilenameWhenJustFilenameParam() {
+		String result = fileUtils.createFullPath("tempFile");
+		assertEquals("tempFile", result);
+	}
+	
+	@Test
+	public void shouldBuildFullPathFromDirsAndFilename() {
+		String result = fileUtils.createFullPath("1", "2", "3", "tempFile");
+		assertEquals("1" + File.separator + "2" + File.separator + "3" + File.separator + "tempFile", result);
+	}
 }

@@ -18,7 +18,7 @@ import org.junit.Test;
 public class ReplacerMojoIntegrationTest {
 	private static final String TOKEN = "token";
 	private static final String VALUE = "value";
-	private static final String OUTPUT_DIR = "target/outputdir";
+	private static final String OUTPUT_DIR = "target/outputdir/";
 	
 	private ReplacerMojo mojo;
 	private String filenameAndPath;
@@ -67,15 +67,15 @@ public class ReplacerMojoIntegrationTest {
 	}
 	
 	@Test
-	public void shouldReplaceContentsAndWriteToOutputDir() throws Exception {
-		String filename = new File(filenameAndPath).getName();
+	public void shouldReplaceContentsAndWriteToOutputDirWithBaseDirAndPreservingAsDefault() throws Exception {
+		mojo.setBasedir(".");
 		mojo.setFile(filenameAndPath);
 		mojo.setToken(TOKEN);
 		mojo.setValue(VALUE);
 		mojo.setOutputDir(OUTPUT_DIR);
 		mojo.execute();
 		
-		String results = FileUtils.readFileToString(new File(OUTPUT_DIR + "/" + filename));
+		String results = FileUtils.readFileToString(new File("./" + OUTPUT_DIR + filenameAndPath));
 		assertThat(results, equalTo(VALUE));
 	}
 	
@@ -139,9 +139,32 @@ public class ReplacerMojoIntegrationTest {
 	}
 	
 	@Test
-	public void shouldReplaceContentsInIncludeButNotExcludes() throws Exception {
-		String include1 = createTempFile("prefix1", TOKEN);
-		String include2 = createTempFile("prefix2", TOKEN);
+	public void shouldReplaceContentsInIncludeButNotExcludesAndNotPreserveWhenDisabled() throws Exception {
+		String include1 = createTempFile("test/prefix1", TOKEN);
+		String include2 = createTempFile("test/prefix2", TOKEN);
+		String exclude = createTempFile(TOKEN);
+		List<String> includes = asList("target/**/prefix*");
+		List<String> excludes = asList(exclude);
+		
+		mojo.setPreserveDir(false);
+		mojo.setIncludes(includes);
+		mojo.setExcludes(excludes);
+		mojo.setToken(TOKEN);
+		mojo.setValue(VALUE);
+		mojo.execute();
+		
+		String include1Results = FileUtils.readFileToString(new File(include1));
+		assertThat(include1Results, equalTo(VALUE));
+		String include2Results = FileUtils.readFileToString(new File(include2));
+		assertThat(include2Results, equalTo(VALUE));
+		String excludeResults = FileUtils.readFileToString(new File(exclude));
+		assertThat(excludeResults, equalTo(TOKEN));
+	}
+	
+	@Test
+	public void shouldPreserveFilePathWhenUsingIncludesAndOutputDir() throws Exception {
+		String include1 = createTempFile("test/prefix1", TOKEN);
+		String include2 = createTempFile("test/prefix2", TOKEN);
 		String exclude = createTempFile(TOKEN);
 		List<String> includes = asList("target/**/prefix*");
 		List<String> excludes = asList(exclude);
@@ -189,16 +212,32 @@ public class ReplacerMojoIntegrationTest {
 		assertThat(results, equalTo(VALUE));
 	}
 	
+	@Test
+	public void shouldWriteToOutputDirBasedOnOutputBaseDir() throws Exception {
+		mojo.setOutputBasedir("target/outputBasedir");
+		mojo.setFile(filenameAndPath);
+		mojo.setToken(TOKEN);
+		mojo.setValue(VALUE);
+		mojo.setOutputDir(OUTPUT_DIR);
+		mojo.execute();
+		
+		String results = FileUtils.readFileToString(new File("target/outputBasedir/" + OUTPUT_DIR + filenameAndPath));
+		assertThat(results, equalTo(VALUE));
+	}
+	
 	private String createTempFile(String contents) throws IOException {
 		String filename = new Throwable().fillInStackTrace().getStackTrace()[1].getMethodName();
 		return createTempFile(filename, contents);
 	}
 	
 	private String createTempFile(String filename, String contents) throws IOException {
-		File file = new File("target/" + filename + new Random().nextInt());
+		com.google.code.maven_replacer_plugin.file.FileUtils utils = new com.google.code.maven_replacer_plugin.file.FileUtils();
+		String fullname = "target/" + filename + new Random().nextInt();
+		utils.ensureFolderStructureExists(fullname);
+		File file = new File(fullname);
 		FileUtils.writeStringToFile(file, contents);
 		file.deleteOnExit();
-		return "target/" + file.getName();
+		return fullname;
 	}
 	
 	private String createTempFile(List<String> contents) throws IOException {
