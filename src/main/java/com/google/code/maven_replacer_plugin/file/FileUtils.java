@@ -32,4 +32,15 @@ public class FileUtils {
 		ensureFolderStructureExists(outputFile);
 		org.apache.commons.io.FileUtils.writeStringToFile(new File(outputFile), content);
 	}
+	
+	public String createFullPath(String... dirsAndFilename) {
+		StringBuilder fullPath = new StringBuilder();
+		for (int i=0; i < dirsAndFilename.length - 1; i++) {
+			fullPath.append(dirsAndFilename[i]);
+			fullPath.append(File.separator);
+		}
+		fullPath.append(dirsAndFilename[dirsAndFilename.length - 1]);
+		
+		return fullPath.toString();
+	}
 }

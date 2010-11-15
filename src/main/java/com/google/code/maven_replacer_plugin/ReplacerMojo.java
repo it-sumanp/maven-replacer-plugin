@@ -27,6 +27,7 @@ public class ReplacerMojo extends AbstractMojo {
 	private final TokenValueMapFactory tokenValueMapFactory;
 	private final FileSelector fileSelector;
 	private final PatternFlagsFactory patternFlagsFactory;
+	private final OutputFilenameBuilder outputFilenameBuilder;
 
 	/**
 	 * File to check and replace tokens
@@ -117,7 +118,7 @@ public class ReplacerMojo extends AbstractMojo {
 	 *
 	 * @parameter expression=""
 	 */
-	private String outputDir = "";
+	private String outputDir;
 
 	/**
 	 * Map of tokens and respective values to replace with
@@ -163,6 +164,23 @@ public class ReplacerMojo extends AbstractMojo {
 	 * @parameter expression=""
 	 */
 	private boolean commentsEnabled = true;
+	
+	/**
+	 * Base directory (appended) to use for outputDir.
+	 * Having this existing but blank will cause the outputDir
+	 * to be based on the execution directory. 
+	 *
+	 * @parameter expression=""
+	 */
+	private String outputBasedir;
+	
+	/**
+	 * Parent directory is preserved when replacing files found from includes and 
+	 * being written to an outputDir. Default is true.
+	 *
+	 * @parameter expression=""
+	 */
+	private boolean preserveDir = true;
 
 	public ReplacerMojo() {
 		super();
@@ -172,11 +190,12 @@ public class ReplacerMojo extends AbstractMojo {
 		this.tokenValueMapFactory = new TokenValueMapFactory(fileUtils);
 		this.fileSelector = new FileSelector();
 		this.patternFlagsFactory = new PatternFlagsFactory();
+		this.outputFilenameBuilder = new OutputFilenameBuilder();
 	}
 
-	public ReplacerMojo(FileUtils fileUtils, TokenReplacer tokenReplacer,
-			ReplacerFactory replacerFactory, TokenValueMapFactory tokenValueMapFactory,
-			FileSelector fileSelector, PatternFlagsFactory patternFlagsFactory) {
+	public ReplacerMojo(FileUtils fileUtils, TokenReplacer tokenReplacer, ReplacerFactory replacerFactory, 
+			TokenValueMapFactory tokenValueMapFactory, FileSelector fileSelector, 
+			PatternFlagsFactory patternFlagsFactory, OutputFilenameBuilder outputFilenameBuilder) {
 		super();
 		this.fileUtils = fileUtils;
 		this.tokenReplacer = tokenReplacer;
@@ -184,6 +203,7 @@ public class ReplacerMojo extends AbstractMojo {
 		this.tokenValueMapFactory = tokenValueMapFactory;
 		this.fileSelector = fileSelector;
 		this.patternFlagsFactory = patternFlagsFactory;
+		this.outputFilenameBuilder = outputFilenameBuilder;
 	}
 
 	public void execute() throws MojoExecutionException {
@@ -211,7 +231,10 @@ public class ReplacerMojo extends AbstractMojo {
 		}
 	}
 
-	private String getFilename(String file) {
+	private String getBaseDirPrefixedFilename(String file) {
+		if (basedir == null || basedir.trim().length() == 0) {
+			return file;
+		}
 		return basedir + File.separator + file;
 	}
 
@@ -240,13 +263,10 @@ public class ReplacerMojo extends AbstractMojo {
 	}
 
 	private void replaceContents(Replacer replacer, List<Replacement> contexts, String inputFile) throws IOException {
-		String outputFileName = getOutputFile(getFilename(inputFile));
-		if (outputDir.trim().length() > 0) {
-			outputFileName = getFilename(outputDir + File.separator + new File(outputFileName).getName());
-		}
-		getLog().info("Replacing content in " + getFilename(inputFile));
+		String outputFileName = outputFilenameBuilder.buildFrom(inputFile, this);
+		getLog().info("Replacing content in " + getBaseDirPrefixedFilename(inputFile));
 		getLog().info("Outputting to: " + outputFileName);
-		replacer.replace(contexts, regex, getFilename(inputFile), outputFileName, patternFlagsFactory.buildFlags(regexFlags));
+		replacer.replace(contexts, regex, getBaseDirPrefixedFilename(inputFile), outputFileName, patternFlagsFactory.buildFlags(regexFlags));
 	}
 
 	private List<Replacement> getContexts() throws IOException {
@@ -263,21 +283,16 @@ public class ReplacerMojo extends AbstractMojo {
 		return tokenValueMapFactory.contextsForFile(tokenValueMap, isCommentsEnabled());
 	}
 
-	private String getOutputFile(String defaultFilename) {
-		if (outputFile == null) {
-			return defaultFilename;
-		}
-
-		String outputFileName = getFilename(outputFile);
-		return outputFileName;
-	}
-
 	public void setRegex(boolean regex) {
 		this.regex = regex;
 	}
 
 	public void setFile(String file) {
 		this.file = file;
+	}
+	
+	public String getFile() {
+		return file;
 	}
 
 	public void setToken(String token) {
@@ -362,5 +377,33 @@ public class ReplacerMojo extends AbstractMojo {
 
 	public void setCommentsEnabled(boolean commentsEnabled) {
 		this.commentsEnabled = commentsEnabled;
+	}
+
+	public void setOutputBasedir(String outputBasedir) {
+		this.outputBasedir = outputBasedir;
+	}
+	
+	public boolean isPreserveDir() {
+		return preserveDir;
+	}
+	
+	public void setPreserveDir(boolean preserveDir) {
+		this.preserveDir = preserveDir;
+	}
+
+	public String getBasedir() {
+		return basedir;
+	}
+
+	public String getOutputDir() {
+		return outputDir;
+	}
+
+	public String getOutputBasedir() {
+		return outputBasedir;
+	}
+
+	public String getOutputFile() {
+		return outputFile;
 	}
 }
