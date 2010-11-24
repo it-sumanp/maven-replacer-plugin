@@ -5,6 +5,9 @@ import java.io.IOException;
 
 public class FileUtils {
 	public boolean fileNotExists(String filename) {
+		if (filename == null || filename.trim().length() == 0) {
+			return true;
+		}
 		return !new File(filename).exists();
 	}
 

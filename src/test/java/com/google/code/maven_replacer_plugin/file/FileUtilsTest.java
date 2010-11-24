@@ -30,6 +30,8 @@ public class FileUtilsTest {
 	public void shouldDetermineIfFileExists() throws Exception {
 		File file = folder.newFile("tempfile");
 		assertTrue(fileUtils.fileNotExists("non existant"));
+		assertTrue(fileUtils.fileNotExists(null));
+		assertTrue(fileUtils.fileNotExists(""));
 		assertFalse(fileUtils.fileNotExists(file.getAbsolutePath()));
 	}
 
