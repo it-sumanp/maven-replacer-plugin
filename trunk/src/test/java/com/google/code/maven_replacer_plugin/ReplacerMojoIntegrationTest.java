@@ -90,6 +90,22 @@ public class ReplacerMojoIntegrationTest {
 		assertFalse(new File("bogus").exists());
 	}
 	
+	@Test
+	public void shouldNotReplaceIfIgnoringMissingFilesAndFileNotExistsInListOfFiles() throws Exception {
+		assertFalse(new File("bogus").exists());
+		String existing = createTempFile(TOKEN);
+		mojo.setFilesToInclude("bogus, " + existing);
+		mojo.setIgnoreMissingFile(true);
+		mojo.setToken(TOKEN);
+		mojo.setValue(VALUE);
+		
+		mojo.execute();
+		
+		assertFalse(new File("bogus").exists());
+		String results = FileUtils.readFileToString(new File(existing));
+		assertThat(results, equalTo(VALUE));
+	}
+	
 	@Test (expected = MojoExecutionException.class)
 	public void shouldRethrowIOExceptionsAsMojoExceptions() throws Exception {
 		mojo.setFile("bogus");

@@ -208,7 +208,7 @@ public class ReplacerMojo extends AbstractMojo {
 
 	public void execute() throws MojoExecutionException {
 		try {
-			if (ignoreMissingFile && fileUtils.fileNotExists(file)) {
+			if (checkFileExists()) {
 				getLog().info("Ignoring missing file");
 				return;
 			}
@@ -229,6 +229,10 @@ public class ReplacerMojo extends AbstractMojo {
 		} catch (IOException e) {
 			throw new MojoExecutionException(e.getMessage(), e);
 		}
+	}
+
+	private boolean checkFileExists() {
+		return ignoreMissingFile && file != null && fileUtils.fileNotExists(file);
 	}
 
 	private String getBaseDirPrefixedFilename(String file) {
