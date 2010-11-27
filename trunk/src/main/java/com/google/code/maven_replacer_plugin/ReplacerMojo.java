@@ -21,6 +21,8 @@ import com.google.code.maven_replacer_plugin.include.FileSelector;
  * @phase compile
  */
 public class ReplacerMojo extends AbstractMojo {
+	private static final String INVALID_IGNORE_MISSING_FILE_MESSAGE = "<ignoreMissingFile> only useable with <file>";
+	
 	private final FileUtils fileUtils;
 	private final TokenReplacer tokenReplacer;
 	private final ReplacerFactory replacerFactory;
@@ -231,8 +233,12 @@ public class ReplacerMojo extends AbstractMojo {
 		}
 	}
 
-	private boolean checkFileExists() {
-		return ignoreMissingFile && file != null && fileUtils.fileNotExists(file);
+	private boolean checkFileExists() throws MojoExecutionException {
+		if (ignoreMissingFile && file == null) {
+			getLog().error(INVALID_IGNORE_MISSING_FILE_MESSAGE);
+			throw new MojoExecutionException(INVALID_IGNORE_MISSING_FILE_MESSAGE);
+		}
+		return ignoreMissingFile && fileUtils.fileNotExists(getBaseDirPrefixedFilename(file));
 	}
 
 	private String getBaseDirPrefixedFilename(String file) {
