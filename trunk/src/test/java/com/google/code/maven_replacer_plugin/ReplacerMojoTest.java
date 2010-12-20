@@ -95,7 +95,8 @@ public class ReplacerMojoTest {
 		mojo.setOutputFile(OUTPUT_FILE);
 		mojo.setBasedir(BASE_DIR);
 		mojo.execute();
-
+		
+		assertSame(FILE, mojo.getFile());
 		verify(replacer).replace(replacements, REGEX, BASE_DIR + File.separator + FILE, OUTPUT_FILE, REGEX_PATTERN_FLAGS);
 		verify(summaryBuilder).add(BASE_DIR + File.separator + FILE, OUTPUT_FILE, log);
 		verify(summaryBuilder).print(log);
