@@ -291,7 +291,7 @@ public class ReplacerMojo extends AbstractMojo {
 
 	private void replaceContents(Replacer replacer, List<Replacement> contexts, String inputFile) throws IOException {
 		String outputFileName = outputFilenameBuilder.buildFrom(inputFile, this);
-		summaryBuilder.add(getBaseDirPrefixedFilename(inputFile), outputFileName);
+		summaryBuilder.add(getBaseDirPrefixedFilename(inputFile), outputFileName, getLog());
 		replacer.replace(contexts, regex, getBaseDirPrefixedFilename(inputFile), outputFileName, patternFlagsFactory.buildFlags(regexFlags));
 	}
 
