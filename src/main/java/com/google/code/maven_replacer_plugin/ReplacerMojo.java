@@ -30,6 +30,7 @@ public class ReplacerMojo extends AbstractMojo {
 	private final FileSelector fileSelector;
 	private final PatternFlagsFactory patternFlagsFactory;
 	private final OutputFilenameBuilder outputFilenameBuilder;
+	private final SummaryBuilder summaryBuilder;
 
 	/**
 	 * File to check and replace tokens
@@ -67,70 +68,71 @@ public class ReplacerMojo extends AbstractMojo {
 	private String filesToExclude;
 
 	/**
-	 * Token
+	 * Token to replace.
 	 *
 	 * @parameter expression=""
 	 */
 	private String token;
 
 	/**
-	 * Token file
+	 * Token file containing a token to be replaced in the target file/s.
 	 *
 	 * @parameter expression=""
 	 */
 	private String tokenFile;
 
 	/**
-	 * Ignore missing files
+	 * Ignore missing target file. Use only with file (not includes etc).
 	 *
 	 * @parameter expression=""
 	 */
 	private boolean ignoreMissingFile;
 
 	/**
-	 * Value to replace token with
+	 * Value to replace token with.
 	 *
 	 * @parameter expression=""
 	 */
 	private String value;
 
 	/**
-	 * Value file to read value to replace token with
+	 * Value file to read value to replace token with.
 	 *
 	 * @parameter expression=""
 	 */
 	private String valueFile;
 
 	/**
-	 * Token uses regex
+	 * Find the token with regex. Set to false when the token to be 
+	 * replaced contains regex characters.
 	 *
 	 * @parameter expression=""
 	 */
 	private boolean regex = true;
 
 	/**
-	 * Output to another file
+	 * Output to another file.
 	 *
 	 * @parameter expression=""
 	 */
 	private String outputFile;
 
 	/**
-	 * Output to another dir
+	 * Output to another dir.
 	 *
 	 * @parameter expression=""
 	 */
 	private String outputDir;
 
 	/**
-	 * Map of tokens and respective values to replace with
+	 * Map of tokens and respective values to replace with.
 	 *
 	 * @parameter expression=""
 	 */
 	private String tokenValueMap;
 
 	/**
-	 * Optional base directory for each file to replace
+	 * Optional base directory for each file to replace.
 	 *
 	 * @parameter expression="${basedir}"
 	 */
@@ -153,7 +155,7 @@ public class ReplacerMojo extends AbstractMojo {
 	private List<String> regexFlags;
 
 	/**
-	 * List of replacements with token/value pairs
+	 * List of replacements with token/value pairs.
 	 *
 	 * @parameter expression=""
 	 */
@@ -184,6 +186,14 @@ public class ReplacerMojo extends AbstractMojo {
 	 */
 	private boolean preserveDir = true;
 
+	/**
+	 * Print a summary of how many files were replaced in this execution. 
+	 * Default is false.
+	 *
+	 * @parameter expression=""
+	 */
+	private boolean quiet = false;
+
 	public ReplacerMojo() {
 		super();
 		this.fileUtils = new FileUtils();
@@ -193,11 +203,13 @@ public class ReplacerMojo extends AbstractMojo {
 		this.fileSelector = new FileSelector();
 		this.patternFlagsFactory = new PatternFlagsFactory();
 		this.outputFilenameBuilder = new OutputFilenameBuilder();
+		this.summaryBuilder = new SummaryBuilder();
 	}
 
 	public ReplacerMojo(FileUtils fileUtils, TokenReplacer tokenReplacer, ReplacerFactory replacerFactory, 
 			TokenValueMapFactory tokenValueMapFactory, FileSelector fileSelector, 
-			PatternFlagsFactory patternFlagsFactory, OutputFilenameBuilder outputFilenameBuilder) {
+			PatternFlagsFactory patternFlagsFactory, OutputFilenameBuilder outputFilenameBuilder,
+			SummaryBuilder summaryBuilder) {
 		super();
 		this.fileUtils = fileUtils;
 		this.tokenReplacer = tokenReplacer;
@@ -206,6 +218,7 @@ public class ReplacerMojo extends AbstractMojo {
 		this.fileSelector = fileSelector;
 		this.patternFlagsFactory = patternFlagsFactory;
 		this.outputFilenameBuilder = outputFilenameBuilder;
+		this.summaryBuilder = summaryBuilder;
 	}
 
 	public void execute() throws MojoExecutionException {
@@ -230,6 +243,10 @@ public class ReplacerMojo extends AbstractMojo {
 			}
 		} catch (IOException e) {
 			throw new MojoExecutionException(e.getMessage(), e);
+		} finally {
+			if (!quiet) {
+				summaryBuilder.print(getLog());
+			}
 		}
 	}
 
@@ -274,8 +291,7 @@ public class ReplacerMojo extends AbstractMojo {
 
 	private void replaceContents(Replacer replacer, List<Replacement> contexts, String inputFile) throws IOException {
 		String outputFileName = outputFilenameBuilder.buildFrom(inputFile, this);
-		getLog().info("Replacing content in " + getBaseDirPrefixedFilename(inputFile));
-		getLog().info("Outputting to: " + outputFileName);
+		summaryBuilder.add(getBaseDirPrefixedFilename(inputFile), outputFileName);
 		replacer.replace(contexts, regex, getBaseDirPrefixedFilename(inputFile), outputFileName, patternFlagsFactory.buildFlags(regexFlags));
 	}
 
@@ -415,5 +431,9 @@ public class ReplacerMojo extends AbstractMojo {
 
 	public String getOutputFile() {
 		return outputFile;
+	}
+
+	public void setQuiet(boolean quiet) {
+		this.quiet = quiet;
 	}
 }
