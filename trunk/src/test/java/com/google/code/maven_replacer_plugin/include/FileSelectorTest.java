@@ -6,7 +6,7 @@ import static org.junit.Assert.assertTrue;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.apache.commons.io.FileUtils;
@@ -28,25 +28,19 @@ public class FileSelectorTest {
 	public void shouldReturnMultipleFilesToInclude() {
 		List<String> files = selector.listIncludes("test", asList("include1", "file*"), asList("file3"));
 		assertEquals(3, files.size());
-		assertEquals("file1", files.get(0));
-		assertEquals("file2", files.get(1));
-		assertEquals("include1", files.get(2));
+		assertEquals(asList("file1", "file2", "include1"), files);
 	}
 	
 	@Test
 	public void shouldSupportNoExcludes() {
 		List<String> files = selector.listIncludes("test", asList("include1", "file*"), null);
-		assertEquals(4, files.size());
-		assertEquals("file1", files.get(0));
-		assertEquals("file2", files.get(1));
-		assertEquals("file3", files.get(2));
-		assertEquals("include1", files.get(3));
+		assertEquals(asList("file1", "file2", "file3", "include1"), files);
 	}
 	
 	@Test
 	public void shouldReturnEmptyListWhenEmptyIncludes() {
 		assertTrue(selector.listIncludes("test", null, asList("file3")).isEmpty());
-		assertTrue(selector.listIncludes("test", new ArrayList<String>(), asList("file3")).isEmpty());
+		assertTrue(selector.listIncludes("test", Collections.<String>emptyList(), asList("file3")).isEmpty());
 	}
 	
 	@Test
@@ -56,7 +50,6 @@ public class FileSelectorTest {
 		FileUtils.writeStringToFile(file, "test");
 		
 		List<String> files = selector.listIncludes(BACK_DIR_SYMBOL, asList(TEST_FILE), null);
-		assertEquals(1, files.size());
-		assertEquals(TEST_FILE, files.get(0));
+		assertEquals(asList(TEST_FILE), files);
 	}
 }
