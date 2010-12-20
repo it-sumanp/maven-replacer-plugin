@@ -4,6 +4,9 @@ import static java.util.Arrays.asList;
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertThat;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyZeroInteractions;
 
 import java.io.File;
 import java.io.IOException;
@@ -12,6 +15,7 @@ import java.util.Random;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugin.logging.Log;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -22,12 +26,18 @@ public class ReplacerMojoIntegrationTest {
 	
 	private ReplacerMojo mojo;
 	private String filenameAndPath;
+	private Log log;
 
 	@Before
 	public void setUp() throws Exception {
 		filenameAndPath = createTempFile(TOKEN);
+		log = mock(Log.class);
 		
-		mojo = new ReplacerMojo();
+		mojo = new ReplacerMojo() {
+			public Log getLog() {
+				return log;
+			}
+		};
 	}
 	
 	@Test
@@ -39,6 +49,20 @@ public class ReplacerMojoIntegrationTest {
 		
 		String results = FileUtils.readFileToString(new File(filenameAndPath));
 		assertThat(results, equalTo(VALUE));
+		verify(log).info("Replacement run on 1 file.");
+	}
+	
+	@Test
+	public void shouldReplaceContentsInFileButNotReportWhenQuiet() throws Exception {
+		mojo.setQuiet(true);
+		mojo.setFile(filenameAndPath);
+		mojo.setToken(TOKEN);
+		mojo.setValue(VALUE);
+		mojo.execute();
+		
+		String results = FileUtils.readFileToString(new File(filenameAndPath));
+		assertThat(results, equalTo(VALUE));
+		verifyZeroInteractions(log);
 	}
 	
 	@Test
@@ -53,6 +77,7 @@ public class ReplacerMojoIntegrationTest {
 		
 		String results = FileUtils.readFileToString(new File(filenameAndPath));
 		assertThat(results, equalTo(VALUE));
+		verify(log).info("Replacement run on 1 file.");
 	}
 	
 	@Test
@@ -64,6 +89,7 @@ public class ReplacerMojoIntegrationTest {
 		
 		String results = FileUtils.readFileToString(new File(filenameAndPath));
 		assertThat(results, equalTo(TOKEN + VALUE));
+		verify(log).info("Replacement run on 1 file.");
 	}
 	
 	@Test
@@ -77,6 +103,7 @@ public class ReplacerMojoIntegrationTest {
 		
 		String results = FileUtils.readFileToString(new File("./" + OUTPUT_DIR + filenameAndPath));
 		assertThat(results, equalTo(VALUE));
+		verify(log).info("Replacement run on 1 file.");
 	}
 	
 	@Test
@@ -88,12 +115,14 @@ public class ReplacerMojoIntegrationTest {
 		mojo.execute();
 		
 		assertFalse(new File("bogus").exists());
+		verify(log).info("Ignoring missing file");
 	}
 	
 	@Test (expected = MojoExecutionException.class)
 	public void shouldRethrowIOExceptionsAsMojoExceptions() throws Exception {
 		mojo.setFile("bogus");
 		mojo.execute();
+		verifyZeroInteractions(log);
 	}
 	
 	@Test

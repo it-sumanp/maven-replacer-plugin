@@ -9,6 +9,7 @@ import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.argThat;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
@@ -52,6 +53,7 @@ public class ReplacerMojoTest {
 	private List<String> regexFlags;
 	private Replacer replacer;
 	private OutputFilenameBuilder outputFilenameBuilder;
+	private SummaryBuilder summaryBuilder;
 
 	@Before
 	public void setUp() throws Exception {
@@ -65,12 +67,13 @@ public class ReplacerMojoTest {
 		replacer = mock(Replacer.class);
 		outputFilenameBuilder = mock(OutputFilenameBuilder.class);
 		regexFlags = asList(REGEX_FLAG);
+		summaryBuilder = mock(SummaryBuilder.class);
 
 		when(replacerFactory.create()).thenReturn(replacer);
 		when(patternFlagsFactory.buildFlags(regexFlags)).thenReturn(REGEX_PATTERN_FLAGS);
 
 		mojo = new ReplacerMojo(fileUtils, tokenReplacer, replacerFactory, tokenValueMapFactory,
-				fileSelector, patternFlagsFactory, outputFilenameBuilder) {
+				fileSelector, patternFlagsFactory, outputFilenameBuilder, summaryBuilder) {
 			@Override
 			public Log getLog() {
 				return log;
@@ -93,6 +96,27 @@ public class ReplacerMojoTest {
 		mojo.execute();
 
 		verify(replacer).replace(replacements, REGEX, BASE_DIR + File.separator + FILE, OUTPUT_FILE, REGEX_PATTERN_FLAGS);
+		verify(summaryBuilder).add(BASE_DIR + File.separator + FILE, OUTPUT_FILE);
+		verify(summaryBuilder).print(log);
+	}
+	
+	@Test
+	public void shouldReplaceContentsInReplacementsButNotPrintSummaryIfQuiet() throws Exception {
+		Replacement replacement = mock(Replacement.class);
+		List<Replacement> replacements = asList(replacement);
+
+		mojo.setQuiet(true);
+		mojo.setRegexFlags(regexFlags);
+		mojo.setRegex(REGEX);
+		mojo.setReplacements(replacements);
+		mojo.setFile(FILE);
+		mojo.setOutputFile(OUTPUT_FILE);
+		mojo.setBasedir(BASE_DIR);
+		mojo.execute();
+
+		verify(replacer).replace(replacements, REGEX, BASE_DIR + File.separator + FILE, OUTPUT_FILE, REGEX_PATTERN_FLAGS);
+		verify(summaryBuilder).add(BASE_DIR + File.separator + FILE, OUTPUT_FILE);
+		verify(summaryBuilder, never()).print(log);
 	}
 
 	@Test
@@ -182,7 +206,9 @@ public class ReplacerMojoTest {
 		mojo.execute();
 
 		verify(replacer).replace(argThat(replacementOf(TOKEN, VALUE)), eq(REGEX), eq(BASE_DIR  + File.separator + FILE),
-				eq(OUTPUT_FILE), eq(REGEX_PATTERN_FLAGS));
+			eq(OUTPUT_FILE), eq(REGEX_PATTERN_FLAGS));
+		verify(summaryBuilder).add(anyString(), anyString());
+		verify(summaryBuilder).print(log);
 	}
 
 	@Test
@@ -203,6 +229,8 @@ public class ReplacerMojoTest {
 				eq(OUTPUT_FILE), eq(REGEX_PATTERN_FLAGS));
 		verify(fileUtils).readFile(TOKEN_FILE);
 		verify(fileUtils).readFile(VALUE_FILE);
+		verify(summaryBuilder).add(BASE_DIR + File.separator + FILE, OUTPUT_FILE);
+		verify(summaryBuilder).print(log);
 	}
 
 	@Test
@@ -219,6 +247,8 @@ public class ReplacerMojoTest {
 
 		verify(replacer).replace(replacements, REGEX, BASE_DIR  + File.separator + FILE, OUTPUT_FILE,
 			REGEX_PATTERN_FLAGS);
+		verify(summaryBuilder).add(BASE_DIR + File.separator + FILE, OUTPUT_FILE);
+		verify(summaryBuilder).print(log);
 	}
 
 	@Test
@@ -231,6 +261,8 @@ public class ReplacerMojoTest {
 		mojo.execute();
 		verifyZeroInteractions(replacerFactory);
 		verify(log).info(anyString());
+		verify(summaryBuilder, never()).add(anyString(), anyString());
+		verify(summaryBuilder).print(log);
 	}
 	
 	@Test
@@ -242,6 +274,8 @@ public class ReplacerMojoTest {
 		} catch (MojoExecutionException e) {
 			verifyZeroInteractions(replacerFactory);
 			verify(log).error("<ignoreMissingFile> only useable with <file>");
+			verify(summaryBuilder, never()).add(anyString(), anyString());
+			verify(summaryBuilder).print(log);
 		}
 	}
 
