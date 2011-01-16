@@ -9,6 +9,7 @@ public class Delimiter {
 	private String end;
 	
 	public Delimiter() {
+		setDelimiter(null);
 	}
 	
 	public Delimiter(String delimiter) {

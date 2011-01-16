@@ -34,5 +34,6 @@ public class DelimiterTest {
 	public void shouldReturnEmptyOrNullIfTokenEmptyOrNull() {
 		assertThat(new Delimiter(null).apply(""), equalTo(""));
 		assertThat(new Delimiter(null).apply(null), equalTo(null));
+		assertThat(new Delimiter().apply(null), equalTo(null));
 	}
 }
