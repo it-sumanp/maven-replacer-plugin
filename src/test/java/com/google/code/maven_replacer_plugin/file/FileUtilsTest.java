@@ -63,16 +63,16 @@ public class FileUtilsTest {
 		
 		assertEquals(CONTENT, org.apache.commons.io.FileUtils.readFileToString(new File(tempFile)));
 	}
-
+	
 	@Test
-	public void shouldReadFile() throws Exception {
+	public void shouldReturnFileText() throws Exception {
 		File file = folder.newFile("tempfile");
 		FileWriter writer = new FileWriter(file);
-		writer.write("test");
+		writer.write("test\n123\\t456");
 		writer.close();
 
 		String data = fileUtils.readFile(file.getAbsolutePath());
-		assertEquals("test", data);
+		assertEquals("test\n123\\t456", data);
 	}
 	
 	@Test

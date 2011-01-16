@@ -17,6 +17,7 @@ import static org.mockito.Mockito.when;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.List;
 
 import org.apache.maven.plugin.MojoExecutionException;
@@ -136,7 +137,7 @@ public class ReplacerMojoTest {
 
 		assertSame(mojo.getIncludes(), includes);
 		assertSame(mojo.getExcludes(), excludes);
-		verify(replacer).replace(argThat(replacementOf(TOKEN, VALUE)), eq(REGEX), eq(BASE_DIR  + File.separator + FILE),
+		verify(replacer).replace(argThat(replacementOf(VALUE, false, TOKEN)), eq(REGEX), eq(BASE_DIR  + File.separator + FILE),
 			eq(OUTPUT_FILE), anyInt());
 	}
 
@@ -155,7 +156,7 @@ public class ReplacerMojoTest {
 
 		assertSame(mojo.getFilesToInclude(), includes);
 		assertSame(mojo.getFilesToExclude(), excludes);
-		verify(replacer).replace(argThat(replacementOf(TOKEN, VALUE)), eq(REGEX), eq(BASE_DIR + File.separator + FILE),
+		verify(replacer).replace(argThat(replacementOf(VALUE, false, TOKEN)), eq(REGEX), eq(BASE_DIR + File.separator + FILE),
 			eq(OUTPUT_FILE), anyInt());
 	}
 
@@ -164,7 +165,7 @@ public class ReplacerMojoTest {
 		Replacement replacement = mock(Replacement.class);
 		List<Replacement> replacements = asList(replacement);
 
-		when(tokenValueMapFactory.contextsForFile(TOKEN_VALUE_MAP, true)).thenReturn(replacements);
+		when(tokenValueMapFactory.contextsForFile(TOKEN_VALUE_MAP, true, false)).thenReturn(replacements);
 
 		mojo.setRegexFlags(regexFlags);
 		mojo.setRegex(REGEX);
@@ -182,7 +183,7 @@ public class ReplacerMojoTest {
 		Replacement replacement = mock(Replacement.class);
 		List<Replacement> replacements = asList(replacement);
 
-		when(tokenValueMapFactory.contextsForFile(TOKEN_VALUE_MAP, false)).thenReturn(replacements);
+		when(tokenValueMapFactory.contextsForFile(TOKEN_VALUE_MAP, false, false)).thenReturn(replacements);
 
 		mojo.setRegexFlags(regexFlags);
 		mojo.setRegex(REGEX);
@@ -197,6 +198,24 @@ public class ReplacerMojoTest {
 	}
 
 	@Test
+	public void shouldReplaceContentsWithTokenAndValueWithDelimiters() throws Exception {
+		mojo.setRegexFlags(regexFlags);
+		mojo.setRegex(REGEX);
+		mojo.setFile(FILE);
+		mojo.setToken(TOKEN);
+		mojo.setValue(VALUE);
+		mojo.setOutputFile(OUTPUT_FILE);
+		mojo.setBasedir(BASE_DIR);
+		mojo.setDelimiters(asList(new Delimiter("@"), new Delimiter("${*}")));
+		mojo.execute();
+
+		verify(replacer).replace(argThat(replacementOf(VALUE, false, "@" + TOKEN + "@", "${" + TOKEN + "}")), 
+				eq(REGEX), eq(BASE_DIR  + File.separator + FILE), eq(OUTPUT_FILE), eq(REGEX_PATTERN_FLAGS));
+		verify(summaryBuilder).add(BASE_DIR + File.separator + FILE, OUTPUT_FILE, log);
+		verify(summaryBuilder).print(log);
+	}
+	
+	@Test
 	public void shouldReplaceContentsWithTokenAndValue() throws Exception {
 		mojo.setRegexFlags(regexFlags);
 		mojo.setRegex(REGEX);
@@ -207,7 +226,25 @@ public class ReplacerMojoTest {
 		mojo.setBasedir(BASE_DIR);
 		mojo.execute();
 
-		verify(replacer).replace(argThat(replacementOf(TOKEN, VALUE)), eq(REGEX), eq(BASE_DIR  + File.separator + FILE),
+		verify(replacer).replace(argThat(replacementOf(VALUE, false, TOKEN)), eq(REGEX), eq(BASE_DIR  + File.separator + FILE),
+			eq(OUTPUT_FILE), eq(REGEX_PATTERN_FLAGS));
+		verify(summaryBuilder).add(BASE_DIR + File.separator + FILE, OUTPUT_FILE, log);
+		verify(summaryBuilder).print(log);
+	}
+	
+	@Test
+	public void shouldReplaceContentsWithTokenAndValueUnescaped() throws Exception {
+		mojo.setRegexFlags(regexFlags);
+		mojo.setRegex(REGEX);
+		mojo.setFile(FILE);
+		mojo.setToken(TOKEN);
+		mojo.setValue(VALUE);
+		mojo.setOutputFile(OUTPUT_FILE);
+		mojo.setBasedir(BASE_DIR);
+		mojo.setUnescape(true);
+		mojo.execute();
+
+		verify(replacer).replace(argThat(replacementOf(VALUE, true, TOKEN)), eq(REGEX), eq(BASE_DIR  + File.separator + FILE),
 			eq(OUTPUT_FILE), eq(REGEX_PATTERN_FLAGS));
 		verify(summaryBuilder).add(BASE_DIR + File.separator + FILE, OUTPUT_FILE, log);
 		verify(summaryBuilder).print(log);
@@ -227,7 +264,7 @@ public class ReplacerMojoTest {
 		mojo.setBasedir(BASE_DIR);
 		mojo.execute();
 
-		verify(replacer).replace(argThat(replacementOf(TOKEN, VALUE)), eq(REGEX), eq(BASE_DIR  + File.separator + FILE),
+		verify(replacer).replace(argThat(replacementOf(VALUE, false, TOKEN)), eq(REGEX), eq(BASE_DIR  + File.separator + FILE),
 				eq(OUTPUT_FILE), eq(REGEX_PATTERN_FLAGS));
 		verify(fileUtils).readFile(TOKEN_FILE);
 		verify(fileUtils).readFile(VALUE_FILE);
@@ -300,15 +337,24 @@ public class ReplacerMojoTest {
 		mojo.execute();
 	}
 	
-	private BaseMatcher<List<Replacement>> replacementOf(final String token, final String value) {
+	private BaseMatcher<List<Replacement>> replacementOf(final String value, final boolean unescape, final String... tokens) {
 		return new BaseMatcher<List<Replacement>>() {
 			@SuppressWarnings("unchecked")
 			public boolean matches(Object arg0) {
-				Replacement replacement = ((List<Replacement>) arg0).get(0);
-				return token.equals(replacement.getToken()) && value.equals(replacement.getValue());
+				for (int i=0; i < tokens.length; i++) {
+					Replacement replacement = ((List<Replacement>) arg0).get(i);
+					if (!(tokens[i].equals(replacement.getToken()) && value.equals(replacement.getValue())
+						&& unescape == replacement.isUnescape())) {
+						return false;
+					}
+				}
+				return true;
 			}
 
-			public void describeTo(Description arg0) {
+			public void describeTo(Description desc) {
+				desc.appendText("tokens=" + Arrays.asList(tokens) + " ");
+				desc.appendText("value=" + value + " ");
+				desc.appendText("unescape=" + unescape);
 			}
 		};
 	}

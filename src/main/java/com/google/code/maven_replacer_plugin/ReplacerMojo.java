@@ -194,6 +194,24 @@ public class ReplacerMojo extends AbstractMojo {
 	 */
 	private boolean quiet = false;
 
+	/**
+	 * Unescape tokens and values to Java format.
+	 * e.g. token\n is unescaped to token(carriage return).
+	 * Default is false.
+	 *
+	 * @parameter expression=""
+	 */
+	private boolean unescape;
+	
+	/**
+	 * List of delimiters.
+	 * e.g. "${*}" would match tokens as ${token}
+	 * and "@" would match tokens as @token@
+	 *
+	 * @parameter expression=""
+	 */
+	private List<Delimiter> delimiters = new ArrayList<Delimiter>();
+	
 	public ReplacerMojo() {
 		super();
 		this.fileUtils = new FileUtils();
@@ -229,7 +247,7 @@ public class ReplacerMojo extends AbstractMojo {
 			}
 
 			Replacer replacer = replacerFactory.create();
-			List<Replacement> contexts = getContexts();
+			List<Replacement> contexts = getDelimiterReplacements(getContexts());
 
 			addIncludesFilesAndExcludedFiles();
 
@@ -259,7 +277,7 @@ public class ReplacerMojo extends AbstractMojo {
 	}
 
 	private String getBaseDirPrefixedFilename(String file) {
-		if (basedir == null || basedir.trim().length() == 0) {
+		if (basedir == null || basedir.isEmpty()) {
 			return file;
 		}
 		return basedir + File.separator + file;
@@ -301,12 +319,27 @@ public class ReplacerMojo extends AbstractMojo {
 		}
 
 		if (tokenValueMap == null) {
-			Replacement context = new Replacement(fileUtils, token, value);
-			context.setTokenFile(tokenFile);
-			context.setValueFile(valueFile);
-			return Arrays.asList(context);
+			Replacement replacement = new Replacement(fileUtils, token, value, unescape);
+			replacement.setTokenFile(tokenFile);
+			replacement.setValueFile(valueFile);
+			return Arrays.asList(replacement);
 		}
-		return tokenValueMapFactory.contextsForFile(tokenValueMap, isCommentsEnabled());
+		
+		return tokenValueMapFactory.contextsForFile(tokenValueMap, isCommentsEnabled(), unescape);
+	}
+
+	private List<Replacement> getDelimiterReplacements(List<Replacement> replacements) {
+		if (replacements == null || delimiters == null || delimiters.isEmpty()) {
+			return replacements;
+		}
+		List<Replacement> newReplacements = new ArrayList<Replacement>();
+		for (Replacement replacement : replacements) {
+			for (Delimiter delimiter : delimiters) {
+				Replacement withDelimiter = new Replacement().from(replacement).withDelimiter(delimiter);
+				newReplacements.add(withDelimiter);
+			}
+		}
+		return newReplacements;
 	}
 
 	public void setRegex(boolean regex) {
@@ -435,5 +468,21 @@ public class ReplacerMojo extends AbstractMojo {
 
 	public void setQuiet(boolean quiet) {
 		this.quiet = quiet;
+	}
+
+	public void setDelimiters(List<Delimiter> delimiters) {
+		this.delimiters = delimiters;
+	}
+
+	public List<Delimiter> getDelimiters() {
+		return delimiters;
+	}
+
+	public void setUnescape(boolean unescape) {
+		this.unescape = unescape;
+	}
+	
+	public boolean isUnescape() {
+		return unescape;
 	}
 }

@@ -35,7 +35,7 @@ public class TokenValueMapFactoryTest {
 	public void shouldReturnContextsFromFile() throws Exception {
 		when(fileUtils.readFile(FILENAME)).thenReturn("token=value");
 		
-		List<Replacement> contexts = factory.contextsForFile(FILENAME, COMMENTS_DISABLED);
+		List<Replacement> contexts = factory.contextsForFile(FILENAME, COMMENTS_DISABLED, false);
 		assertNotNull(contexts);
 		assertEquals(1, contexts.size());
 		assertEquals("token", contexts.get(0).getToken());
@@ -46,7 +46,7 @@ public class TokenValueMapFactoryTest {
 	public void shouldReturnContextsFromFileAndIgnoreBlankLinesAndComments() throws Exception {
 		when(fileUtils.readFile(FILENAME)).thenReturn("\n  \ntoken1=value1\ntoken2 = value2\n#some comment\n");
 		
-		List<Replacement> contexts = factory.contextsForFile(FILENAME, COMMENTS_ENABLED);
+		List<Replacement> contexts = factory.contextsForFile(FILENAME, COMMENTS_ENABLED, false);
 		assertNotNull(contexts);
 		assertEquals(2, contexts.size());
 		assertEquals("token1", contexts.get(0).getToken());
@@ -59,7 +59,7 @@ public class TokenValueMapFactoryTest {
 	public void shouldReturnContextsFromFileAndIgnoreBlankLinesUsingCommentLinesIfCommentsDisabled() throws Exception {
 		when(fileUtils.readFile(FILENAME)).thenReturn("\n  \ntoken1=value1\ntoken2=value2\n#some=#comment\n");
 		
-		List<Replacement> contexts = factory.contextsForFile(FILENAME, COMMENTS_DISABLED);
+		List<Replacement> contexts = factory.contextsForFile(FILENAME, COMMENTS_DISABLED, false);
 		assertNotNull(contexts);
 		assertEquals(3, contexts.size());
 		assertEquals("token1", contexts.get(0).getToken());
@@ -73,7 +73,7 @@ public class TokenValueMapFactoryTest {
 	@Test
 	public void shouldIgnoreTokensWithNoSeparatedValue() throws Exception {
 		when(fileUtils.readFile(FILENAME)).thenReturn("#comment\ntoken2");
-		List<Replacement> contexts = factory.contextsForFile(FILENAME, COMMENTS_DISABLED);
+		List<Replacement> contexts = factory.contextsForFile(FILENAME, COMMENTS_DISABLED, false);
 		assertNotNull(contexts);
 		assertTrue(contexts.isEmpty());
 	}
@@ -82,7 +82,20 @@ public class TokenValueMapFactoryTest {
 	public void shouldReturnRegexContextsFromFile() throws Exception {
 		when(fileUtils.readFile(FILENAME)).thenReturn("\\=tok\\=en1=val\\=ue1\nto$ke..n2=value2");
 		
-		List<Replacement> contexts = factory.contextsForFile(FILENAME, COMMENTS_ENABLED);
+		List<Replacement> contexts = factory.contextsForFile(FILENAME, COMMENTS_ENABLED, false);
+		assertNotNull(contexts);
+		assertEquals(2, contexts.size());
+		assertEquals("\\=tok\\=en1", contexts.get(0).getToken());
+		assertEquals("val\\=ue1", contexts.get(0).getValue());
+		assertEquals("to$ke..n2", contexts.get(1).getToken());
+		assertEquals("value2", contexts.get(1).getValue());
+	}
+	
+	@Test
+	public void shouldReturnRegexContextsFromFileUnescaping() throws Exception {
+		when(fileUtils.readFile(FILENAME)).thenReturn("\\\\=tok\\\\=en1=val\\\\=ue1\nto$ke..n2=value2");
+		
+		List<Replacement> contexts = factory.contextsForFile(FILENAME, COMMENTS_ENABLED, true);
 		assertNotNull(contexts);
 		assertEquals(2, contexts.size());
 		assertEquals("\\=tok\\=en1", contexts.get(0).getToken());
@@ -94,12 +107,12 @@ public class TokenValueMapFactoryTest {
 	@Test (expected = IllegalArgumentException.class)
 	public void shouldThrowExceptionIfNoTokenForValue() throws Exception {
 		when(fileUtils.readFile(FILENAME)).thenReturn("=value");
-		factory.contextsForFile(FILENAME, COMMENTS_DISABLED);
+		factory.contextsForFile(FILENAME, COMMENTS_DISABLED, false);
 	}
 	
 	@Test
 	public void shouldSupportEmptyFileAndReturnNoReplacements() throws Exception {
 		when(fileUtils.readFile(FILENAME)).thenReturn("");
-		assertTrue(factory.contextsForFile(FILENAME, COMMENTS_DISABLED).isEmpty());
+		assertTrue(factory.contextsForFile(FILENAME, COMMENTS_DISABLED, false).isEmpty());
 	}
 }
