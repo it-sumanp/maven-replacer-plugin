@@ -81,9 +81,4 @@ public class Replacement {
 		this.delimiter = delimiter;
 		return this;
 	}
-	
-	@Override
-	public String toString() {
-		return "token=" + getToken() + ", value=" + getValue() + ", unescape=" + unescape;
-	}
 }
