@@ -3,6 +3,9 @@ package com.google.code.maven_replacer_plugin;
 
 import static java.util.Arrays.asList;
 import static junit.framework.Assert.assertSame;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyString;
@@ -199,6 +202,7 @@ public class ReplacerMojoTest {
 
 	@Test
 	public void shouldReplaceContentsWithTokenAndValueWithDelimiters() throws Exception {
+		List<Delimiter> delimiters = asList(new Delimiter("@"), new Delimiter("${*}"));
 		mojo.setRegexFlags(regexFlags);
 		mojo.setRegex(REGEX);
 		mojo.setFile(FILE);
@@ -206,9 +210,10 @@ public class ReplacerMojoTest {
 		mojo.setValue(VALUE);
 		mojo.setOutputFile(OUTPUT_FILE);
 		mojo.setBasedir(BASE_DIR);
-		mojo.setDelimiters(asList(new Delimiter("@"), new Delimiter("${*}")));
+		mojo.setDelimiters(delimiters);
 		mojo.execute();
 
+		assertThat(mojo.getDelimiters(), equalTo(delimiters));
 		verify(replacer).replace(argThat(replacementOf(VALUE, false, "@" + TOKEN + "@", "${" + TOKEN + "}")), 
 				eq(REGEX), eq(BASE_DIR  + File.separator + FILE), eq(OUTPUT_FILE), eq(REGEX_PATTERN_FLAGS));
 		verify(summaryBuilder).add(BASE_DIR + File.separator + FILE, OUTPUT_FILE, log);
@@ -244,6 +249,7 @@ public class ReplacerMojoTest {
 		mojo.setUnescape(true);
 		mojo.execute();
 
+		assertTrue(mojo.isUnescape());
 		verify(replacer).replace(argThat(replacementOf(VALUE, true, TOKEN)), eq(REGEX), eq(BASE_DIR  + File.separator + FILE),
 			eq(OUTPUT_FILE), eq(REGEX_PATTERN_FLAGS));
 		verify(summaryBuilder).add(BASE_DIR + File.separator + FILE, OUTPUT_FILE, log);
