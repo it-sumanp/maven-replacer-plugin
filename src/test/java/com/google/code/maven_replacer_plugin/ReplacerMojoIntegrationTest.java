@@ -55,6 +55,21 @@ public class ReplacerMojoIntegrationTest {
 	}
 	
 	@Test
+	public void shouldReplaceContentsInFileWithDelimiteredToken() throws Exception {
+		filenameAndPath = createTempFile("@" + TOKEN + "@ and ${" + TOKEN + "}");
+		mojo.setFile(filenameAndPath);
+		mojo.setRegex(false);
+		mojo.setToken(TOKEN);
+		mojo.setValue(VALUE);
+		mojo.setDelimiters(asList(new Delimiter("@"), new Delimiter("${*}")));
+		mojo.execute();
+		
+		String results = FileUtils.readFileToString(new File(filenameAndPath));
+		assertThat(results, equalTo(VALUE + " and " + VALUE));
+		verify(log).info("Replacement run on 1 file.");
+	}
+	
+	@Test
 	public void shouldReplaceContentsInFileButNotReportWhenQuiet() throws Exception {
 		mojo.setQuiet(true);
 		mojo.setFile(filenameAndPath);
@@ -75,11 +90,12 @@ public class ReplacerMojoIntegrationTest {
 		
 		mojo.setFile(filenameAndPath);
 		mojo.setToken("test\\n123\\t456");
-		mojo.setValue(VALUE);
+		mojo.setValue(VALUE + "\\n987");
+		mojo.setUnescape(true);
 		mojo.execute();
 		
 		String results = FileUtils.readFileToString(new File(filenameAndPath));
-		assertThat(results, equalTo(VALUE));
+		assertThat(results, equalTo(VALUE + "\n987"));
 		verify(log).info("Replacement run on 1 file.");
 	}
 	
@@ -174,6 +190,20 @@ public class ReplacerMojoIntegrationTest {
 	public void shouldReplaceContentsWithTokenValuesInMap() throws Exception {
 		String tokenValueMapFilename = createTempFile(asList("#comment", TOKEN + "=" + VALUE));
 		
+		mojo.setTokenValueMap(tokenValueMapFilename);
+		mojo.setFile(filenameAndPath);
+		mojo.execute();
+		
+		String results = FileUtils.readFileToString(new File(filenameAndPath));
+		assertThat(results, equalTo(VALUE));
+	}
+	
+	@Test
+	public void shouldReplaceContentsWithTokenValuesInDelimiteredMap() throws Exception {
+		filenameAndPath = createTempFile("@" + TOKEN + "@");
+		String tokenValueMapFilename = createTempFile(asList("#comment", TOKEN + "=" + VALUE));
+		
+		mojo.setDelimiters(asList(new Delimiter("@")));
 		mojo.setTokenValueMap(tokenValueMapFilename);
 		mojo.setFile(filenameAndPath);
 		mojo.execute();
