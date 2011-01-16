@@ -29,4 +29,10 @@ public class DelimiterTest {
 		String result = new Delimiter(VALUE_WITH_MIDDLE_START + "*" + VALUE_WITH_MIDDLE_END).apply(TOKEN);
 		assertThat(result, equalTo(VALUE_WITH_MIDDLE_START + TOKEN + VALUE_WITH_MIDDLE_END));
 	}
+	
+	@Test
+	public void shouldReturnEmptyOrNullIfTokenEmptyOrNull() {
+		assertThat(new Delimiter(null).apply(""), equalTo(""));
+		assertThat(new Delimiter(null).apply(null), equalTo(null));
+	}
 }
