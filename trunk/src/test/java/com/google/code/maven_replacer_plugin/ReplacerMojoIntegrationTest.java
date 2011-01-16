@@ -1,9 +1,9 @@
 package com.google.code.maven_replacer_plugin;
 
 import static java.util.Arrays.asList;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -67,6 +67,33 @@ public class ReplacerMojoIntegrationTest {
 		verify(log, never()).info(anyString());
 		verify(log).debug("Replacement run on ." + File.separator + filenameAndPath + 
 				" and writing to ." + File.separator + filenameAndPath);
+	}
+	
+	@Test
+	public void shouldReplaceContentsInFileWithTokenContainingEscapedChars() throws Exception {
+		filenameAndPath = createTempFile("test\n123\t456");
+		
+		mojo.setFile(filenameAndPath);
+		mojo.setToken("test\\n123\\t456");
+		mojo.setValue(VALUE);
+		mojo.execute();
+		
+		String results = FileUtils.readFileToString(new File(filenameAndPath));
+		assertThat(results, equalTo(VALUE));
+		verify(log).info("Replacement run on 1 file.");
+	}
+	
+	@Test
+	public void shouldReplaceAllNewLineChars() throws Exception {
+		filenameAndPath = createTempFile("test" + System.getProperty("line.separator") + "123");
+		
+		mojo.setFile(filenameAndPath);
+		mojo.setToken(System.getProperty("line.separator"));
+		mojo.execute();
+		
+		String results = FileUtils.readFileToString(new File(filenameAndPath));
+		assertThat(results, equalTo("test123"));
+		verify(log).info("Replacement run on 1 file.");
 	}
 	
 	@Test

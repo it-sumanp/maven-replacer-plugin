@@ -26,7 +26,7 @@ public class Replacer {
 	}
 
 	private String replaceContent(boolean regex, int regexFlags, String content, Replacement context) {
-		if (context.getToken() == null || context.getToken().trim().length() == 0) {
+		if (context.getToken() == null || context.getToken().length() == 0) {
 			throw new IllegalArgumentException("Token or token file required");
 		}
 

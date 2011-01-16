@@ -77,7 +77,7 @@ public class ReplacerTest {
 	@Test (expected = IllegalArgumentException.class)
 	public void shouldThrowExceptionIfEmptyToken() throws Exception {
 		Replacement context = mock(Replacement.class);
-		when(context.getToken()).thenReturn(" ");
+		when(context.getToken()).thenReturn("");
 		List<Replacement> contexts = Arrays.asList(context);
 		
 		replacer.replace(contexts, USE_REGEX, FILE, OUTPUT_FILE, REGEX_FLAGS);

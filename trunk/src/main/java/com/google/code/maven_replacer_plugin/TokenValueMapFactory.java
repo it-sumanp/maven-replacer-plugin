@@ -21,7 +21,8 @@ public class TokenValueMapFactory {
 		this.fileUtils = fileUtils;
 	}
 
-	public List<Replacement> contextsForFile(String tokenValueMapFile, boolean commentsEnabled) throws IOException {
+	public List<Replacement> contextsForFile(String tokenValueMapFile, boolean commentsEnabled, boolean unescape) 
+		throws IOException {
 		String contents = fileUtils.readFile(tokenValueMapFile);
 		BufferedReader reader = new BufferedReader(new StringReader(contents));
 
@@ -57,7 +58,7 @@ public class TokenValueMapFactory {
 				continue;
 			}
 			value = value.trim();
-			contexts.add(new Replacement(fileUtils, tokenVal, value));
+			contexts.add(new Replacement(fileUtils, tokenVal, value, unescape));
 		}
 		return contexts;
 	}
