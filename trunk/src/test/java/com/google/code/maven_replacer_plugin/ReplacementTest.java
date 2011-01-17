@@ -23,7 +23,7 @@ public class ReplacementTest {
 	@Mock
 	private FileUtils fileUtils;
 	@Mock
-	private Delimiter delimiter;
+	private DelimiterBuilder delimiter;
 
 	@Test
 	public void shouldReturnGivenParameters() throws Exception {

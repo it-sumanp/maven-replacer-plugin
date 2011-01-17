@@ -61,7 +61,7 @@ public class ReplacerMojoIntegrationTest {
 		mojo.setRegex(false);
 		mojo.setToken(TOKEN);
 		mojo.setValue(VALUE);
-		mojo.setDelimiters(asList(new Delimiter("@"), new Delimiter("${*}")));
+		mojo.setDelimiters(asList("@", "${*}"));
 		mojo.execute();
 		
 		String results = FileUtils.readFileToString(new File(filenameAndPath));
@@ -203,7 +203,7 @@ public class ReplacerMojoIntegrationTest {
 		filenameAndPath = createTempFile("@" + TOKEN + "@");
 		String tokenValueMapFilename = createTempFile(asList("#comment", TOKEN + "=" + VALUE));
 		
-		mojo.setDelimiters(asList(new Delimiter("@")));
+		mojo.setDelimiters(asList("@"));
 		mojo.setTokenValueMap(tokenValueMapFilename);
 		mojo.setFile(filenameAndPath);
 		mojo.execute();

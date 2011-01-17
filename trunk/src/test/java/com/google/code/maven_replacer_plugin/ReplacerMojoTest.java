@@ -202,7 +202,7 @@ public class ReplacerMojoTest {
 
 	@Test
 	public void shouldReplaceContentsWithTokenAndValueWithDelimiters() throws Exception {
-		List<Delimiter> delimiters = asList(new Delimiter("@"), new Delimiter("${*}"));
+		List<String> delimiters = asList("@", "${*}");
 		mojo.setRegexFlags(regexFlags);
 		mojo.setRegex(REGEX);
 		mojo.setFile(FILE);

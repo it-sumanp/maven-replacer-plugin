@@ -1,18 +1,14 @@
 package com.google.code.maven_replacer_plugin;
 
 
-public class Delimiter {
+public class DelimiterBuilder {
 	private static final String FORMAT = "%s%s%s";
 	
 	private String delimiter;
 	private String start;
 	private String end;
 	
-	public Delimiter() {
-		setDelimiter(null);
-	}
-	
-	public Delimiter(String delimiter) {
+	public DelimiterBuilder(String delimiter) {
 		setDelimiter(delimiter);
 	}
 

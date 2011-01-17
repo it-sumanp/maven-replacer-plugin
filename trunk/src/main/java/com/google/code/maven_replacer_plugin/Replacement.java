@@ -10,14 +10,14 @@ import com.google.code.maven_replacer_plugin.file.FileUtils;
 public class Replacement {
 	private final FileUtils fileUtils;
 	
-	private Delimiter delimiter;
+	private DelimiterBuilder delimiter;
 	private boolean unescape;
 	private String token;
 	private String value;
 	
 	public Replacement() {
 		this.fileUtils = new FileUtils();
-		this.delimiter = new Delimiter(null);
+		this.delimiter = new DelimiterBuilder(null);
 		this.unescape = false;
 	}
 
@@ -77,7 +77,7 @@ public class Replacement {
 				replacement.unescape);
 	}
 
-	public Replacement withDelimiter(Delimiter delimiter) {
+	public Replacement withDelimiter(DelimiterBuilder delimiter) {
 		this.delimiter = delimiter;
 		return this;
 	}

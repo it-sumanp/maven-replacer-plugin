@@ -210,7 +210,7 @@ public class ReplacerMojo extends AbstractMojo {
 	 *
 	 * @parameter expression=""
 	 */
-	private List<Delimiter> delimiters = new ArrayList<Delimiter>();
+	private List<String> delimiters = new ArrayList<String>();
 	
 	public ReplacerMojo() {
 		super();
@@ -334,12 +334,20 @@ public class ReplacerMojo extends AbstractMojo {
 		}
 		List<Replacement> newReplacements = new ArrayList<Replacement>();
 		for (Replacement replacement : replacements) {
-			for (Delimiter delimiter : delimiters) {
+			for (DelimiterBuilder delimiter : buildDelimiters()) {
 				Replacement withDelimiter = new Replacement().from(replacement).withDelimiter(delimiter);
 				newReplacements.add(withDelimiter);
 			}
 		}
 		return newReplacements;
+	}
+
+	private List<DelimiterBuilder> buildDelimiters() {
+		List<DelimiterBuilder> built = new ArrayList<DelimiterBuilder>();
+		for (String delimiter : delimiters) {
+			built.add(new DelimiterBuilder(delimiter));
+		}
+		return built;
 	}
 
 	public void setRegex(boolean regex) {
@@ -470,11 +478,11 @@ public class ReplacerMojo extends AbstractMojo {
 		this.quiet = quiet;
 	}
 
-	public void setDelimiters(List<Delimiter> delimiters) {
+	public void setDelimiters(List<String> delimiters) {
 		this.delimiters = delimiters;
 	}
 
-	public List<Delimiter> getDelimiters() {
+	public List<String> getDelimiters() {
 		return delimiters;
 	}
 
