@@ -6,34 +6,33 @@ import static org.hamcrest.Matchers.equalTo;
 import org.junit.Test;
 
 
-public class DelimiterTest {
-	private static final String VALUE_WITHOUT_MIDDLE = "abc";
-	private static final String VALUE_WITH_MIDDLE_START = "123";
-	private static final String VALUE_WITH_MIDDLE_END = "456";
+public class DelimiterBuilderTest {
+	private static final String VALUE_WITHOUT_MIDDLE = "@";
+	private static final String VALUE_WITH_MIDDLE_START = "${";
+	private static final String VALUE_WITH_MIDDLE_END = "}";
 	private static final String TOKEN = "token";
 
 	@Test
 	public void shouldReturnUnchangedTokenWhenNoValueGiven() {
-		assertThat(new Delimiter(null).apply(TOKEN), equalTo(TOKEN));
-		assertThat(new Delimiter("").apply(TOKEN), equalTo(TOKEN));
+		assertThat(new DelimiterBuilder(null).apply(TOKEN), equalTo(TOKEN));
+		assertThat(new DelimiterBuilder("").apply(TOKEN), equalTo(TOKEN));
 	}
 	
 	@Test
 	public void shouldReturnTokenWithValueAtStartAndEndWhenNoMiddle() {
-		String result = new Delimiter(VALUE_WITHOUT_MIDDLE).apply(TOKEN);
+		String result = new DelimiterBuilder(VALUE_WITHOUT_MIDDLE).apply(TOKEN);
 		assertThat(result, equalTo(VALUE_WITHOUT_MIDDLE + TOKEN + VALUE_WITHOUT_MIDDLE));
 	}
 	
 	@Test
 	public void shouldReturnTokenWithSplitValueAtStartAndEndWhenHasMiddleAsterix() {
-		String result = new Delimiter(VALUE_WITH_MIDDLE_START + "*" + VALUE_WITH_MIDDLE_END).apply(TOKEN);
+		String result = new DelimiterBuilder(VALUE_WITH_MIDDLE_START + "*" + VALUE_WITH_MIDDLE_END).apply(TOKEN);
 		assertThat(result, equalTo(VALUE_WITH_MIDDLE_START + TOKEN + VALUE_WITH_MIDDLE_END));
 	}
 	
 	@Test
 	public void shouldReturnEmptyOrNullIfTokenEmptyOrNull() {
-		assertThat(new Delimiter(null).apply(""), equalTo(""));
-		assertThat(new Delimiter(null).apply(null), equalTo(null));
-		assertThat(new Delimiter().apply(null), equalTo(null));
+		assertThat(new DelimiterBuilder(null).apply(""), equalTo(""));
+		assertThat(new DelimiterBuilder(null).apply(null), equalTo(null));
 	}
 }
