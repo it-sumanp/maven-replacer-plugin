@@ -25,7 +25,7 @@ public class ReplacerMojo extends AbstractMojo {
 	private static final String INVALID_IGNORE_MISSING_FILE_MESSAGE = "<ignoreMissingFile> only useable with <file>";
 	private static final String REGEX_PATTERN_WITH_DELIMITERS_MESSAGE = "Error: %s. " +
 		"Check that your delimiters do not contain regex characters. (e.g. '$')." +
-		". Either remove the regex characters from your delimiters or set <regex>false</regex>" +
+		"Either remove the regex characters from your delimiters or set <regex>false</regex>" +
 		" in your configuration.";
 	
 	private final FileUtils fileUtils;
