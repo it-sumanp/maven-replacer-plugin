@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.regex.PatternSyntaxException;
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -22,6 +23,10 @@ import com.google.code.maven_replacer_plugin.include.FileSelector;
  */
 public class ReplacerMojo extends AbstractMojo {
 	private static final String INVALID_IGNORE_MISSING_FILE_MESSAGE = "<ignoreMissingFile> only useable with <file>";
+	private static final String REGEX_PATTERN_WITH_DELIMITERS_MESSAGE = "Error: %s. " +
+		"Check that your delimiters do not contain regex characters. (e.g. '$')." +
+		". Either remove the regex characters from your delimiters or set <regex>false</regex>" +
+		" in your configuration.";
 	
 	private final FileUtils fileUtils;
 	private final TokenReplacer tokenReplacer;
@@ -309,8 +314,15 @@ public class ReplacerMojo extends AbstractMojo {
 
 	private void replaceContents(Replacer replacer, List<Replacement> contexts, String inputFile) throws IOException {
 		String outputFileName = outputFilenameBuilder.buildFrom(inputFile, this);
+		try {
+			replacer.replace(contexts, regex, getBaseDirPrefixedFilename(inputFile), outputFileName, patternFlagsFactory.buildFlags(regexFlags));
+		} catch (PatternSyntaxException e) {
+			if (delimiters != null && !delimiters.isEmpty()) {
+				getLog().error(String.format(REGEX_PATTERN_WITH_DELIMITERS_MESSAGE, e.getMessage()));
+				throw e;
+			}
+		}
 		summaryBuilder.add(getBaseDirPrefixedFilename(inputFile), outputFileName, getLog());
-		replacer.replace(contexts, regex, getBaseDirPrefixedFilename(inputFile), outputFileName, patternFlagsFactory.buildFlags(regexFlags));
 	}
 
 	private List<Replacement> getContexts() throws IOException {
