@@ -2,9 +2,11 @@ package com.google.code.maven_replacer_plugin;
 
 import static java.util.Arrays.asList;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertFalse;
 import static org.mockito.Matchers.anyString;
+import static org.mockito.Matchers.argThat;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -14,6 +16,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.Random;
+import java.util.regex.PatternSyntaxException;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.maven.plugin.MojoExecutionException;
@@ -67,6 +70,24 @@ public class ReplacerMojoIntegrationTest {
 		String results = FileUtils.readFileToString(new File(filenameAndPath));
 		assertThat(results, equalTo(VALUE + " and " + VALUE));
 		verify(log).info("Replacement run on 1 file.");
+	}
+	
+	@Test(expected = PatternSyntaxException.class)
+	public void shouldLogErrorWhenDelimitersHaveRegexAndRegexEnabled() throws Exception {
+		filenameAndPath = createTempFile("@" + TOKEN + "@ and ${" + TOKEN + "}");
+		mojo.setFile(filenameAndPath);
+		mojo.setToken(TOKEN);
+		mojo.setValue(VALUE);
+		mojo.setDelimiters(asList("@", "${*}"));
+		try {
+			mojo.execute();
+		} catch (PatternSyntaxException e) {
+			String results = FileUtils.readFileToString(new File(filenameAndPath));
+			assertThat(results, equalTo("@" + TOKEN + "@ and ${" + TOKEN + "}"));
+			verify(log).error(argThat(containsString("Error: Illegal repetition near index 0")));
+			verify(log).info("Replacement run on 0 file.");
+			throw e;
+		}
 	}
 	
 	@Test
