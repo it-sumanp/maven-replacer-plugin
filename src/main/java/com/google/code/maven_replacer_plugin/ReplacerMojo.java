@@ -282,7 +282,7 @@ public class ReplacerMojo extends AbstractMojo {
 	}
 
 	private String getBaseDirPrefixedFilename(String file) {
-		if (basedir == null || basedir.isEmpty()) {
+		if (basedir == null || basedir.length() == 0) {
 			return file;
 		}
 		return basedir + File.separator + file;
