@@ -39,7 +39,7 @@ public class DelimiterBuilder {
 	}
 
 	public String apply(String token) {
-		if (token == null || token.isEmpty()) {
+		if (token == null || token.length() == 0) {
 			return token;
 		}
 
