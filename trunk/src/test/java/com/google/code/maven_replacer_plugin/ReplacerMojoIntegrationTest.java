@@ -221,6 +221,18 @@ public class ReplacerMojoIntegrationTest {
 	}
 	
 	@Test
+	public void shouldReplaceContentsWithTokenValuesInInlineMap() throws Exception {
+		String variableTokenValueMap = TOKEN + "=" + VALUE;
+		
+		mojo.setVariableTokenValueMap(variableTokenValueMap);
+		mojo.setFile(filenameAndPath);
+		mojo.execute();
+		
+		String results = FileUtils.readFileToString(new File(filenameAndPath));
+		assertThat(results, equalTo(VALUE));
+	}
+	
+	@Test
 	public void shouldReplaceContentsWithTokenValuesInDelimiteredMap() throws Exception {
 		filenameAndPath = createTempFile("@" + TOKEN + "@");
 		String tokenValueMapFilename = createTempFile(asList("#comment", TOKEN + "=" + VALUE));

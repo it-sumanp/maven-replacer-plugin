@@ -217,6 +217,16 @@ public class ReplacerMojo extends AbstractMojo {
 	 */
 	private List<String> delimiters = new ArrayList<String>();
 	
+	/**
+	 * Variable tokenValueMap. Same as the tokenValueMap but 
+	 * can be an include configuration rather than an outside property file.
+	 * Comments are not supported.
+	 * Format is comma separated. e.g. token=value,token2=value2
+	 *
+	 * @parameter expression=""
+	 */
+	private String variableTokenValueMap;
+	
 	public ReplacerMojo() {
 		super();
 		this.fileUtils = new FileUtils();
@@ -329,7 +339,11 @@ public class ReplacerMojo extends AbstractMojo {
 		if (replacements != null) {
 			return replacements;
 		}
-
+		
+		if (variableTokenValueMap != null) {
+			return tokenValueMapFactory.contextsForVariable(variableTokenValueMap, isCommentsEnabled(), unescape);
+		}
+		
 		if (tokenValueMap == null) {
 			Replacement replacement = new Replacement(fileUtils, token, value, unescape);
 			replacement.setTokenFile(tokenFile);
@@ -504,5 +518,13 @@ public class ReplacerMojo extends AbstractMojo {
 	
 	public boolean isUnescape() {
 		return unescape;
+	}
+
+	public void setVariableTokenValueMap(String variableTokenValueMap) {
+		this.variableTokenValueMap = variableTokenValueMap;
+	}
+	
+	public String getVariableTokenValueMap() {
+		return variableTokenValueMap;
 	}
 }

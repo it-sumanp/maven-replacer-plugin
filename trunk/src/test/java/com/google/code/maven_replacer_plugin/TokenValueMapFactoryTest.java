@@ -1,12 +1,17 @@
 package com.google.code.maven_replacer_plugin;
 
+import static org.hamcrest.Matchers.hasItem;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.when;
 
 import java.util.List;
 
+import org.hamcrest.BaseMatcher;
+import org.hamcrest.Description;
+import org.hamcrest.Matcher;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -114,5 +119,25 @@ public class TokenValueMapFactoryTest {
 	public void shouldSupportEmptyFileAndReturnNoReplacements() throws Exception {
 		when(fileUtils.readFile(FILENAME)).thenReturn("");
 		assertTrue(factory.contextsForFile(FILENAME, COMMENTS_DISABLED, false).isEmpty());
+	}
+	
+	@Test
+	public void shouldReturnListOfContextsFromVariable() {
+		List<Replacement> contexts = factory.contextsForVariable("token1=value1,token2=value2", false, false);
+		assertThat(contexts, hasItem(contextWith("token1", "value1")));
+		assertThat(contexts, hasItem(contextWith("token2", "value2")));
+	}
+
+	private Matcher<Replacement> contextWith(final String token, final String value) {
+		return new BaseMatcher<Replacement>() {
+			public boolean matches(Object o) {
+				Replacement replacement = (Replacement)o;
+				return token.equals(replacement.getToken()) && value.equals(replacement.getValue());
+			}
+
+			public void describeTo(Description desc) {
+				desc.appendText("token=" + token + ", value=" + value);
+			}
+		};
 	}
 }
