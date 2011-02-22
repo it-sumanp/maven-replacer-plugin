@@ -22,7 +22,11 @@ public class OutputFilenameBuilder {
 		}
 		
 		if (mojo.getOutputFile() != null) {
-			return fileUtils.createFullPath(mojo.getBasedir(), mojo.getOutputFile());
+			if (mojo.getOutputFile().startsWith("/")) {
+				return fileUtils.createFullPath(mojo.getOutputFile());
+			} else {
+				return fileUtils.createFullPath(mojo.getBasedir(), mojo.getOutputFile());
+			}
 		}
 		return fileUtils.createFullPath(mojo.getBasedir(), inputFilename);
 	}
