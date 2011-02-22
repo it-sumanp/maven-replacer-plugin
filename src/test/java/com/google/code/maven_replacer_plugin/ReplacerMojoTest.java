@@ -295,6 +295,22 @@ public class ReplacerMojoTest {
 		verify(summaryBuilder).add(BASE_DIR + File.separator + FILE, OUTPUT_FILE, log);
 		verify(summaryBuilder).print(log);
 	}
+	
+	@Test
+	public void shouldReplaceContentsWithVariableTokenValueMap() throws Exception {
+		Replacement replacement = mock(Replacement.class);
+		List<Replacement> replacements = asList(replacement);
+
+		when(tokenValueMapFactory.contextsForVariable(TOKEN_VALUE_MAP, true, false)).thenReturn(replacements);
+		mojo.setVariableTokenValueMap(TOKEN_VALUE_MAP);
+		mojo.setFile(FILE);
+		mojo.setBasedir(BASE_DIR);
+		mojo.execute();
+
+		verify(replacer).replace(replacements, true, BASE_DIR  + File.separator + FILE, OUTPUT_FILE, 0);
+		verify(summaryBuilder).add(BASE_DIR + File.separator + FILE, OUTPUT_FILE, log);
+		verify(summaryBuilder).print(log);
+	}
 
 	@Test
 	public void shouldNotReplaceIfIgnoringMissingFilesAndFileNotExists() throws Exception {
