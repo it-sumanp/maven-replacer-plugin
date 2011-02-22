@@ -39,6 +39,7 @@ public class ReplacerMojoIntegrationTest {
 		log = mock(Log.class);
 		
 		mojo = new ReplacerMojo() {
+			@Override
 			public Log getLog() {
 				return log;
 			}
@@ -333,6 +334,18 @@ public class ReplacerMojoIntegrationTest {
 		mojo.execute();
 		
 		String results = FileUtils.readFileToString(new File("target/outputBasedir/" + OUTPUT_DIR + filenameAndPath));
+		assertThat(results, equalTo(VALUE));
+	}
+	
+	@Test
+	public void shouldWriteToFileOutsideBaseDir() throws Exception {
+		mojo.setFile(filenameAndPath);
+		mojo.setToken(TOKEN);
+		mojo.setValue(VALUE);
+		mojo.setOutputFile("/tmp/test");
+		mojo.execute();
+		
+		String results = FileUtils.readFileToString(new File("/tmp/test"));
 		assertThat(results, equalTo(VALUE));
 	}
 	

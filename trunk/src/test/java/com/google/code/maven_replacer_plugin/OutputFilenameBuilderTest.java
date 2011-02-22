@@ -78,4 +78,12 @@ public class OutputFilenameBuilderTest {
 		String output = builder.buildFrom(INPUT_FILE, mojo);
 		assertThat(output, equalTo(fileUtils.createFullPath(BASE_DIR, OUTPUT_FILE)));
 	}
+	
+	@Test
+	public void shouldReturnIgnoreBaseDirForOutputFileWhenStartsWithForwardSlash() {
+		when(mojo.getOutputFile()).thenReturn("/output");
+		
+		String output = builder.buildFrom(INPUT_FILE, mojo);
+		assertThat(output, equalTo("/output"));
+	}
 }
