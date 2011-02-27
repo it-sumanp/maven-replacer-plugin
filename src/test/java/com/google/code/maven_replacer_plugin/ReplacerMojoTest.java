@@ -307,6 +307,7 @@ public class ReplacerMojoTest {
 		mojo.setBasedir(BASE_DIR);
 		mojo.execute();
 
+		assertThat(mojo.getVariableTokenValueMap(), equalTo(TOKEN_VALUE_MAP));
 		verify(replacer).replace(replacements, true, BASE_DIR  + File.separator + FILE, OUTPUT_FILE, 0);
 		verify(summaryBuilder).add(BASE_DIR + File.separator + FILE, OUTPUT_FILE, log);
 		verify(summaryBuilder).print(log);
