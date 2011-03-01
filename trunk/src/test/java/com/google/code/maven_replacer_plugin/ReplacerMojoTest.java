@@ -107,6 +107,25 @@ public class ReplacerMojoTest {
 	}
 	
 	@Test
+	public void shouldReplaceContentsInLocalFile() throws Exception {
+		Replacement replacement = mock(Replacement.class);
+		List<Replacement> replacements = asList(replacement);
+
+		mojo.setRegexFlags(regexFlags);
+		mojo.setRegex(REGEX);
+		mojo.setReplacements(replacements);
+		mojo.setFile(FILE);
+		mojo.setOutputFile(OUTPUT_FILE);
+		mojo.setBasedir(null);
+		mojo.execute();
+		
+		assertSame(FILE, mojo.getFile());
+		verify(replacer).replace(replacements, REGEX, FILE, OUTPUT_FILE, REGEX_PATTERN_FLAGS);
+		verify(summaryBuilder).add(FILE, OUTPUT_FILE, log);
+		verify(summaryBuilder).print(log);
+	}
+	
+	@Test
 	public void shouldReplaceContentsInReplacementsButNotPrintSummaryIfQuiet() throws Exception {
 		Replacement replacement = mock(Replacement.class);
 		List<Replacement> replacements = asList(replacement);

@@ -1,8 +1,10 @@
 package com.google.code.maven_replacer_plugin.file;
 
+import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import java.io.File;
 import java.io.FileWriter;
@@ -85,5 +87,15 @@ public class FileUtilsTest {
 	public void shouldBuildFullPathFromDirsAndFilename() {
 		String result = fileUtils.createFullPath("1", "2", "3", "tempFile");
 		assertEquals("1" + File.separator + "2" + File.separator + "3" + File.separator + "tempFile", result);
+	}
+	
+	@Test
+	public void shouldThrowExceptionWhenCannotCreateDir() {
+		try {
+			fileUtils.ensureFolderStructureExists("a%*bc$:\\test");
+			fail("Should have thrown Error");
+		} catch (Error e) {
+			assertEquals(e.getMessage(), "Error creating directory.");
+		}
 	}
 }
