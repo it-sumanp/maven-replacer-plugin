@@ -1,5 +1,6 @@
 package com.google.code.maven_replacer_plugin;
 
+import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasItem;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -123,7 +124,8 @@ public class TokenValueMapFactoryTest {
 	
 	@Test
 	public void shouldReturnListOfContextsFromVariable() {
-		List<Replacement> contexts = factory.contextsForVariable("token1=value1,token2=value2", false, false);
+		List<Replacement> contexts = factory.contextsForVariable("#comment,token1=value1,token2=value2", true, false);
+		assertThat(contexts.size(), equalTo(2));
 		assertThat(contexts, hasItem(contextWith("token1", "value1")));
 		assertThat(contexts, hasItem(contextWith("token2", "value2")));
 	}
