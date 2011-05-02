@@ -1,6 +1,5 @@
 package com.google.code.maven_replacer_plugin.file;
 
-import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -92,7 +91,7 @@ public class FileUtilsTest {
 	@Test
 	public void shouldThrowExceptionWhenCannotCreateDir() {
 		try {
-			fileUtils.ensureFolderStructureExists("a%*bc$:\\test");
+			fileUtils.ensureFolderStructureExists("/f%e$d/a%*bc$:\\test");
 			fail("Should have thrown Error");
 		} catch (Error e) {
 			assertEquals(e.getMessage(), "Error creating directory.");
