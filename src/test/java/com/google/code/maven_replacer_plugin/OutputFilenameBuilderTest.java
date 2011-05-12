@@ -5,6 +5,8 @@ import static org.hamcrest.Matchers.equalTo;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import java.io.File;
+
 import org.junit.Before;
 import org.junit.Test;
 
@@ -81,9 +83,15 @@ public class OutputFilenameBuilderTest {
 	
 	@Test
 	public void shouldReturnIgnoreBaseDirForOutputFileWhenStartsWithAbsolutePath() {
-		when(mojo.getOutputFile()).thenReturn("/output");
-		
-		String output = builder.buildFrom(INPUT_FILE, mojo);
-		assertThat(output, equalTo("/output"));
+		String OS = System.getProperty("os.name").toLowerCase();
+		if (OS.indexOf("windows") < 0) {
+			when(mojo.getOutputFile()).thenReturn(File.separator + "output");
+			String output = builder.buildFrom(INPUT_FILE, mojo);
+			assertThat(output, equalTo(File.separator + "output"));
+		} else {
+			when(mojo.getOutputFile()).thenReturn("C:" + File.separator + "output");
+			String output = builder.buildFrom(INPUT_FILE, mojo);
+			assertThat(output, equalTo("C:" + File.separator + "output"));
+		}
 	}
 }
