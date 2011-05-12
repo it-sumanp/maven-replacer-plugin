@@ -14,7 +14,7 @@ public class OutputFilenameBuilder {
 
 	public String buildFrom(String inputFilename, ReplacerMojo mojo) {
 		if (mojo.getOutputDir() != null) {
-			String result = mojo.isPreserveDir() ? inputFilename : getJustFilename(inputFilename);
+			String result = mojo.isPreserveDir() ? inputFilename : stripPath(inputFilename);
 			if (mojo.getOutputBasedir() != null) {
 				return fileUtils.createFullPath(mojo.getOutputBasedir(), mojo.getOutputDir(), result);
 			}
@@ -22,16 +22,16 @@ public class OutputFilenameBuilder {
 		}
 		
 		if (mojo.getOutputFile() != null) {
-			if (mojo.getOutputFile().startsWith("/")) {
+			File outFile = new File(mojo.getOutputFile());
+			if (outFile.isAbsolute()) {
 				return fileUtils.createFullPath(mojo.getOutputFile());
-			} else {
-				return fileUtils.createFullPath(mojo.getBasedir(), mojo.getOutputFile());
 			}
+			return fileUtils.createFullPath(mojo.getBasedir(), mojo.getOutputFile());
 		}
 		return fileUtils.createFullPath(mojo.getBasedir(), inputFilename);
 	}
 
-	private String getJustFilename(String inputFilename) {
+	private String stripPath(String inputFilename) {
 		return new File(inputFilename).getName();
 	}
 

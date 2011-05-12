@@ -91,9 +91,9 @@ public class FileUtilsTest {
 	@Test
 	public void shouldThrowExceptionWhenCannotCreateDir() {
 		try {
-			fileUtils.ensureFolderStructureExists("/f%e$d/a%*bc$:\\test");
+			fileUtils.ensureFolderStructureExists("/f*\"%e$d/a%*bc$:\\te\"st");
 			fail("Should have thrown Error");
-		} catch (Error e) {
+		} catch (IllegalStateException e) {
 			assertEquals(e.getMessage(), "Error creating directory.");
 		}
 	}
