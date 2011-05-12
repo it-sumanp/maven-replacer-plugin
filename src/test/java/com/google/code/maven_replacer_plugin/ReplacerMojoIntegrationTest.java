@@ -351,13 +351,15 @@ public class ReplacerMojoIntegrationTest {
 	
 	@Test
 	public void shouldWriteToFileOutsideBaseDir() throws Exception {
+		String tmpFile = System.getProperty("user.home") + "/tmp/test";
+		
 		mojo.setFile(filenameAndPath);
 		mojo.setToken(TOKEN);
 		mojo.setValue(VALUE);
-		mojo.setOutputFile(System.getProperty("user.home") + "/tmp/test");
+		mojo.setOutputFile(tmpFile);
 		mojo.execute();
 		
-		String results = FileUtils.readFileToString(new File("/tmp/test"));
+		String results = FileUtils.readFileToString(new File(tmpFile));
 		assertThat(results, equalTo(VALUE));
 	}
 	
