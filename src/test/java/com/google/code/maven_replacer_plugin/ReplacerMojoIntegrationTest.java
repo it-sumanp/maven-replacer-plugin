@@ -354,7 +354,7 @@ public class ReplacerMojoIntegrationTest {
 		mojo.setFile(filenameAndPath);
 		mojo.setToken(TOKEN);
 		mojo.setValue(VALUE);
-		mojo.setOutputFile("/tmp/test");
+		mojo.setOutputFile(System.getProperty("user.home") + "/tmp/test");
 		mojo.execute();
 		
 		String results = FileUtils.readFileToString(new File("/tmp/test"));

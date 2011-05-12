@@ -80,7 +80,7 @@ public class OutputFilenameBuilderTest {
 	}
 	
 	@Test
-	public void shouldReturnIgnoreBaseDirForOutputFileWhenStartsWithForwardSlash() {
+	public void shouldReturnIgnoreBaseDirForOutputFileWhenStartsWithAbsolutePath() {
 		when(mojo.getOutputFile()).thenReturn("/output");
 		
 		String output = builder.buildFrom(INPUT_FILE, mojo);
