@@ -67,4 +67,10 @@ public class TokenReplacerTest {
 		String results = replacer.replaceNonRegex("some token", "token", null);
 		assertEquals("some ", results);
 	}
+	
+	@Test
+	public void shouldReplaceWithGroups() throws Exception {
+		String results = replacer.replaceRegex("test 123 number", "test (.*) number", "group $1 replaced", NO_FLAGS);
+		assertEquals("group 123 replaced", results);
+	}
 }
