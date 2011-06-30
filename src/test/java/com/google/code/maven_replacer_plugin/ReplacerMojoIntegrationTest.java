@@ -59,6 +59,20 @@ public class ReplacerMojoIntegrationTest {
 	}
 	
 	@Test
+	public void shouldReplaceContentsInFileWithBackreferences() throws Exception {
+		String tokenValueMap = createTempFile("test ([^;]*);=group $1 backreferenced");
+		
+		filenameAndPath = createTempFile("test 123;");
+		mojo.setFile(filenameAndPath);
+		mojo.setTokenValueMap(tokenValueMap);
+		mojo.execute();
+		
+		String results = FileUtils.readFileToString(new File(filenameAndPath));
+		assertThat(results, equalTo("group 123 backreferenced"));
+		verify(log).info("Replacement run on 1 file.");
+	}
+	
+	@Test
 	public void shouldReplaceContentsInFileWithDelimiteredToken() throws Exception {
 		filenameAndPath = createTempFile("@" + TOKEN + "@ and ${" + TOKEN + "}");
 		mojo.setFile(filenameAndPath);
