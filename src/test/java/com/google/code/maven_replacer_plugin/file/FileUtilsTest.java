@@ -1,5 +1,9 @@
 package com.google.code.maven_replacer_plugin.file;
 
+import static java.util.Arrays.asList;
+import static org.apache.commons.lang.StringUtils.join;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -61,8 +65,7 @@ public class FileUtilsTest {
 	public void shouldWriteToFileEnsuringFolderStructureExists() throws Exception {
 		String tempFile = System.getProperty("java.io.tmpdir") + "/" + UUID.randomUUID() + "/tempfile";
 		fileUtils.writeToFile(tempFile, CONTENT);
-		
-		assertEquals(CONTENT, org.apache.commons.io.FileUtils.readFileToString(new File(tempFile)));
+		assertThat(org.apache.commons.io.FileUtils.readFileToString(new File(tempFile)), equalTo(CONTENT));
 	}
 	
 	@Test
@@ -73,19 +76,19 @@ public class FileUtilsTest {
 		writer.close();
 
 		String data = fileUtils.readFile(file.getAbsolutePath());
-		assertEquals("test\n123\\t456", data);
+		assertThat(data, equalTo("test\n123\\t456"));
 	}
 	
 	@Test
 	public void shouldReturnFilenameWhenJustFilenameParam() {
 		String result = fileUtils.createFullPath("tempFile");
-		assertEquals("tempFile", result);
+		assertThat(result, equalTo("tempFile"));
 	}
 	
 	@Test
 	public void shouldBuildFullPathFromDirsAndFilename() {
 		String result = fileUtils.createFullPath("1", "2", "3", "tempFile");
-		assertEquals("1" + File.separator + "2" + File.separator + "3" + File.separator + "tempFile", result);
+		assertThat(result, equalTo(join(asList("1", "2", "3", "tempFile"), File.separator)));
 	}
 	
 	@Test

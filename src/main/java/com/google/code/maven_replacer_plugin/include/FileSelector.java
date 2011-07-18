@@ -21,8 +21,7 @@ public class FileSelector {
 		directoryScanner.setExcludes(stringListToArray(excludes));
 
 		directoryScanner.scan();
-		List<String> filesFound = Arrays.asList(directoryScanner.getIncludedFiles());
-		return filesFound;
+		return Arrays.asList(directoryScanner.getIncludedFiles());
 	}
 
 	private String[] stringListToArray(List<String> stringList) {

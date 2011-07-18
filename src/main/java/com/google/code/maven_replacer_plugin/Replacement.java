@@ -17,7 +17,6 @@ public class Replacement {
 	
 	public Replacement() {
 		this.fileUtils = new FileUtils();
-		this.delimiter = new DelimiterBuilder(null);
 		this.unescape = false;
 	}
 

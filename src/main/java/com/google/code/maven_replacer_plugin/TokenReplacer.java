@@ -1,11 +1,12 @@
 package com.google.code.maven_replacer_plugin;
 
+import static org.apache.commons.lang.StringUtils.defaultString;
+import static org.apache.commons.lang.StringUtils.isEmpty;
+
 import java.util.regex.Pattern;
 
 public class TokenReplacer {
 	public String replaceRegex(String contents, String token, String value, int flags) {
-		String valueToReplaceWith = value == null ? "" : value;
-		
 		final Pattern compiledPattern;
 		if (flags == PatternFlagsFactory.NO_FLAGS) {
 			compiledPattern = Pattern.compile(token);
@@ -13,12 +14,12 @@ public class TokenReplacer {
 			compiledPattern = Pattern.compile(token, flags);
 		}
 		
-		return compiledPattern.matcher(contents).replaceAll(valueToReplaceWith);
+		return compiledPattern.matcher(contents).replaceAll(defaultString(value));
 	}
 
 	public String replaceNonRegex(String input, String token, String value) {
-		String valueToReplaceWith = value == null ? "" : value;
-		if (input.length() == 0) {
+		String valueToReplaceWith = defaultString(value);
+		if (isEmpty(input)) {
 			return input;
 		}
 

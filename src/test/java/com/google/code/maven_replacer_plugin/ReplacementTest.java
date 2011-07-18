@@ -1,6 +1,7 @@
 package com.google.code.maven_replacer_plugin;
 
-import static org.junit.Assert.assertEquals;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 
@@ -26,10 +27,11 @@ public class ReplacementTest {
 	private DelimiterBuilder delimiter;
 
 	@Test
-	public void shouldReturnGivenParameters() throws Exception {
+	public void shouldReturnConstructorParameters() throws Exception {
 		Replacement context = new Replacement(fileUtils, TOKEN, VALUE, false);
-		assertEquals(TOKEN, context.getToken());
-		assertEquals(VALUE, context.getValue());
+		
+		assertThat(context.getToken(), equalTo(TOKEN));
+		assertThat(context.getValue(), equalTo(VALUE));
 		verifyZeroInteractions(fileUtils);
 	}
 	
@@ -38,16 +40,17 @@ public class ReplacementTest {
 		when(delimiter.apply(TOKEN)).thenReturn("new token");
 		Replacement context = new Replacement(fileUtils, TOKEN, VALUE, false).withDelimiter(delimiter);
 		
-		assertEquals("new token", context.getToken());
-		assertEquals(VALUE, context.getValue());
+		assertThat(context.getToken(), equalTo("new token"));
+		assertThat(context.getValue(), equalTo(VALUE));
 		verifyZeroInteractions(fileUtils);
 	}
 	
 	@Test
 	public void shouldUseEscapedTokensAndValues() {
 		Replacement context = new Replacement(fileUtils, UNESCAPED, UNESCAPED, true);
-		assertEquals(ESCAPED, context.getToken());
-		assertEquals(ESCAPED, context.getValue());
+		
+		assertThat(context.getToken(), equalTo(ESCAPED));
+		assertThat(context.getValue(), equalTo(ESCAPED));
 		verifyZeroInteractions(fileUtils);
 	}
 	
@@ -59,8 +62,8 @@ public class ReplacementTest {
 		context.setTokenFile(FILE);
 		context.setValueFile(FILE);
 		
-		assertEquals(ESCAPED, context.getToken());
-		assertEquals(ESCAPED, context.getValue());
+		assertThat(context.getToken(), equalTo(ESCAPED));
+		assertThat(context.getValue(), equalTo(ESCAPED));
 	}
 
 	@Test
@@ -69,8 +72,8 @@ public class ReplacementTest {
 
 		Replacement context = new Replacement(fileUtils, null, VALUE, false);
 		context.setTokenFile(FILE);
-		assertEquals(TOKEN, context.getToken());
-		assertEquals(VALUE, context.getValue());
+		assertThat(context.getToken(), equalTo(TOKEN));
+		assertThat(context.getValue(), equalTo(VALUE));
 	}
 
 	@Test
@@ -79,8 +82,8 @@ public class ReplacementTest {
 
 		Replacement context = new Replacement(fileUtils, TOKEN, null, false);
 		context.setValueFile(FILE);
-		assertEquals(TOKEN, context.getToken());
-		assertEquals(VALUE, context.getValue());
+		assertThat(context.getToken(), equalTo(TOKEN));
+		assertThat(context.getValue(), equalTo(VALUE));
 	}
 	
 	@Test
@@ -88,8 +91,8 @@ public class ReplacementTest {
 		Replacement context = new Replacement();
 		
 		context.setToken(TOKEN);
-		assertEquals(TOKEN, context.getToken());
 		context.setValue(VALUE);
-		assertEquals(VALUE, context.getValue());
+		assertThat(context.getToken(), equalTo(TOKEN));
+		assertThat(context.getValue(), equalTo(VALUE));
 	}
 }

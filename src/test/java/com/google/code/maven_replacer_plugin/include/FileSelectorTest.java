@@ -1,7 +1,9 @@
 package com.google.code.maven_replacer_plugin.include;
 
 import static java.util.Arrays.asList;
-import static org.junit.Assert.assertEquals;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertTrue;
 
 import java.io.File;
@@ -27,14 +29,14 @@ public class FileSelectorTest {
 	@Test
 	public void shouldReturnMultipleFilesToInclude() {
 		List<String> files = selector.listIncludes("test", asList("include1", "file*"), asList("file3"));
-		assertEquals(3, files.size());
-		assertEquals(asList("file1", "file2", "include1"), files);
+		assertThat(files.size(), is(3));
+		assertThat(files, equalTo(asList("file1", "file2", "include1")));
 	}
 	
 	@Test
 	public void shouldSupportNoExcludes() {
 		List<String> files = selector.listIncludes("test", asList("include1", "file*"), null);
-		assertEquals(asList("file1", "file2", "file3", "include1"), files);
+		assertThat(files, equalTo(asList("file1", "file2", "file3", "include1")));
 	}
 	
 	@Test
@@ -50,6 +52,6 @@ public class FileSelectorTest {
 		FileUtils.writeStringToFile(file, "test");
 		
 		List<String> files = selector.listIncludes(BACK_DIR_SYMBOL, asList(TEST_FILE), null);
-		assertEquals(asList(TEST_FILE), files);
+		assertThat(files, equalTo(asList(TEST_FILE)));
 	}
 }

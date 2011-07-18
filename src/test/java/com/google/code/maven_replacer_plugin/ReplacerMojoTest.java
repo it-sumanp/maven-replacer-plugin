@@ -187,7 +187,7 @@ public class ReplacerMojoTest {
 		Replacement replacement = mock(Replacement.class);
 		List<Replacement> replacements = asList(replacement);
 
-		when(tokenValueMapFactory.contextsForFile(TOKEN_VALUE_MAP, true, false)).thenReturn(replacements);
+		when(tokenValueMapFactory.contextsForFile(BASE_DIR  + File.separator + TOKEN_VALUE_MAP, true, false)).thenReturn(replacements);
 
 		mojo.setRegexFlags(regexFlags);
 		mojo.setRegex(REGEX);
@@ -205,7 +205,7 @@ public class ReplacerMojoTest {
 		Replacement replacement = mock(Replacement.class);
 		List<Replacement> replacements = asList(replacement);
 
-		when(tokenValueMapFactory.contextsForFile(TOKEN_VALUE_MAP, false, false)).thenReturn(replacements);
+		when(tokenValueMapFactory.contextsForFile(BASE_DIR  + File.separator + TOKEN_VALUE_MAP, false, false)).thenReturn(replacements);
 
 		mojo.setRegexFlags(regexFlags);
 		mojo.setRegex(REGEX);

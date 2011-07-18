@@ -1,5 +1,7 @@
 package com.google.code.maven_replacer_plugin;
 
+import static org.apache.commons.lang.StringUtils.isEmpty;
+
 import java.io.IOException;
 import java.util.List;
 
@@ -26,7 +28,7 @@ public class Replacer {
 	}
 
 	private String replaceContent(boolean regex, int regexFlags, String content, Replacement context) {
-		if (context.getToken() == null || context.getToken().length() == 0) {
+		if (isEmpty(context.getToken())) {
 			throw new IllegalArgumentException("Token or token file required");
 		}
 

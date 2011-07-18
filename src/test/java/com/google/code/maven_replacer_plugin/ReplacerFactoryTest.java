@@ -1,5 +1,6 @@
 package com.google.code.maven_replacer_plugin;
 
+import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.*;
 
 import org.junit.Test;
@@ -27,7 +28,7 @@ public class ReplacerFactoryTest {
 
 		Replacer replacer = factory.create();
 		assertNotNull(replacer);
-		assertSame(fileUtils, replacer.getFileUtils());
-		assertSame(tokenReplacer, replacer.getTokenReplacer());
+		assertThat(replacer.getFileUtils(), is(fileUtils));
+		assertThat(replacer.getTokenReplacer(), is(tokenReplacer));
 	}
 }
