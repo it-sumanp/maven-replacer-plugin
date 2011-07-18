@@ -1,23 +1,21 @@
 package com.google.code.maven_replacer_plugin;
 
+import static org.apache.commons.lang.StringUtils.defaultString;
+
 
 public class DelimiterBuilder {
 	private static final String FORMAT = "%s%s%s";
 	
-	private String delimiter;
-	private String start;
-	private String end;
+	private final String start;
+	private final String end;
 	
 	public DelimiterBuilder(String delimiter) {
-		setDelimiter(delimiter);
-	}
-
-	private void buildStartAndEnd() {
 		StringBuilder startBuilder = new StringBuilder();
 		StringBuilder endBuilder = new StringBuilder();
 		boolean buildingStart = true;
 		boolean hasMiddle = false;
-		for (char c : this.getDelimiter().toCharArray()) {
+		
+		for (char c : defaultString(delimiter).toCharArray()) {
 			if (c == '*') {
 				buildingStart = false;
 				hasMiddle = true;
@@ -30,6 +28,7 @@ public class DelimiterBuilder {
 				endBuilder.append(c);
 			}
 		}
+		
 		this.start = startBuilder.toString();
 		if (hasMiddle) { 
 			this.end = endBuilder.toString();
@@ -43,24 +42,6 @@ public class DelimiterBuilder {
 			return token;
 		}
 
-		buildStartAndEnd();
-		return String.format(FORMAT, getStart(), token, getEnd());
+		return String.format(FORMAT, start, token, end);
 	}
-	
-	private String getStart() {
-		return start;
-	}
-	
-	private String getEnd() {
-		return end;
-	}
-
-	public void setDelimiter(String delimiter) {
-		this.delimiter = delimiter == null ? "" : delimiter;
-	}
-
-	public String getDelimiter() {
-		return delimiter;
-	}
-
 }

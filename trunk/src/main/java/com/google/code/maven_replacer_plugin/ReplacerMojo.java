@@ -1,9 +1,12 @@
 package com.google.code.maven_replacer_plugin;
 
+import static org.apache.commons.lang.StringUtils.isEmpty;
+
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.regex.PatternSyntaxException;
 
@@ -266,7 +269,7 @@ public class ReplacerMojo extends AbstractMojo {
 
 			addIncludesFilesAndExcludedFiles();
 
-			if (includes == null || includes.isEmpty()) {
+			if (isEmptyCollection(includes)) {
 				replaceContents(replacer, contexts, file);
 				return;
 			}
@@ -292,7 +295,7 @@ public class ReplacerMojo extends AbstractMojo {
 	}
 
 	private String getBaseDirPrefixedFilename(String file) {
-		if (basedir == null || basedir.length() == 0) {
+		if (isEmpty(basedir)) {
 			return file;
 		}
 		return basedir + File.separator + file;
@@ -327,7 +330,7 @@ public class ReplacerMojo extends AbstractMojo {
 		try {
 			replacer.replace(contexts, regex, getBaseDirPrefixedFilename(inputFile), outputFileName, patternFlagsFactory.buildFlags(regexFlags));
 		} catch (PatternSyntaxException e) {
-			if (delimiters != null && !delimiters.isEmpty()) {
+			if (!isEmptyCollection(delimiters)) {
 				getLog().error(String.format(REGEX_PATTERN_WITH_DELIMITERS_MESSAGE, e.getMessage()));
 				throw e;
 			}
@@ -351,11 +354,11 @@ public class ReplacerMojo extends AbstractMojo {
 			return Arrays.asList(replacement);
 		}
 		
-		return tokenValueMapFactory.contextsForFile(tokenValueMap, isCommentsEnabled(), unescape);
+		return tokenValueMapFactory.contextsForFile(getBaseDirPrefixedFilename(tokenValueMap), isCommentsEnabled(), unescape);
 	}
 
 	private List<Replacement> getDelimiterReplacements(List<Replacement> replacements) {
-		if (replacements == null || delimiters == null || delimiters.isEmpty()) {
+		if (isEmptyCollection(replacements) || isEmptyCollection(delimiters)) {
 			return replacements;
 		}
 		List<Replacement> newReplacements = new ArrayList<Replacement>();
@@ -366,6 +369,10 @@ public class ReplacerMojo extends AbstractMojo {
 			}
 		}
 		return newReplacements;
+	}
+	
+	private boolean isEmptyCollection(Collection<?> c) {
+		return c == null || c.isEmpty();
 	}
 
 	private List<DelimiterBuilder> buildDelimiters() {

@@ -9,7 +9,6 @@ public class ReplacerFactory {
 	public ReplacerFactory(FileUtils fileUtils, TokenReplacer tokenReplacer) {
 		this.fileUtils = fileUtils;
 		this.tokenReplacer = tokenReplacer;
-
 	}
 
 	public Replacer create() {

@@ -2,8 +2,8 @@ package com.google.code.maven_replacer_plugin;
 
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.hasItem;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.notNullValue;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.when;
@@ -42,10 +42,10 @@ public class TokenValueMapFactoryTest {
 		when(fileUtils.readFile(FILENAME)).thenReturn("token=value");
 		
 		List<Replacement> contexts = factory.contextsForFile(FILENAME, COMMENTS_DISABLED, false);
-		assertNotNull(contexts);
-		assertEquals(1, contexts.size());
-		assertEquals("token", contexts.get(0).getToken());
-		assertEquals("value", contexts.get(0).getValue());
+		assertThat(contexts, notNullValue());
+		assertThat(contexts.size(), is(1));
+		assertThat(contexts.get(0).getToken(), equalTo("token"));
+		assertThat(contexts.get(0).getValue(), equalTo("value"));
 	}
 
 	@Test
@@ -53,12 +53,12 @@ public class TokenValueMapFactoryTest {
 		when(fileUtils.readFile(FILENAME)).thenReturn("\n  \ntoken1=value1\ntoken2 = value2\n#some comment\n");
 		
 		List<Replacement> contexts = factory.contextsForFile(FILENAME, COMMENTS_ENABLED, false);
-		assertNotNull(contexts);
-		assertEquals(2, contexts.size());
-		assertEquals("token1", contexts.get(0).getToken());
-		assertEquals("value1", contexts.get(0).getValue());
-		assertEquals("token2", contexts.get(1).getToken());
-		assertEquals("value2", contexts.get(1).getValue());
+		assertThat(contexts, notNullValue());
+		assertThat(contexts.size(), is(2));
+		assertThat(contexts.get(0).getToken(), equalTo("token1"));
+		assertThat(contexts.get(0).getValue(), equalTo("value1"));
+		assertThat(contexts.get(1).getToken(), equalTo("token2"));
+		assertThat(contexts.get(1).getValue(), equalTo("value2"));
 	}
 	
 	@Test
@@ -66,21 +66,21 @@ public class TokenValueMapFactoryTest {
 		when(fileUtils.readFile(FILENAME)).thenReturn("\n  \ntoken1=value1\ntoken2=value2\n#some=#comment\n");
 		
 		List<Replacement> contexts = factory.contextsForFile(FILENAME, COMMENTS_DISABLED, false);
-		assertNotNull(contexts);
-		assertEquals(3, contexts.size());
-		assertEquals("token1", contexts.get(0).getToken());
-		assertEquals("value1", contexts.get(0).getValue());
-		assertEquals("token2", contexts.get(1).getToken());
-		assertEquals("value2", contexts.get(1).getValue());
-		assertEquals("#some", contexts.get(2).getToken());
-		assertEquals("#comment", contexts.get(2).getValue());
+		assertThat(contexts, notNullValue());
+		assertThat(contexts.size(), is(3));
+		assertThat(contexts.get(0).getToken(), equalTo("token1"));
+		assertThat(contexts.get(0).getValue(), equalTo("value1"));
+		assertThat(contexts.get(1).getToken(), equalTo("token2"));
+		assertThat(contexts.get(1).getValue(), equalTo("value2"));
+		assertThat(contexts.get(2).getToken(), equalTo("#some"));
+		assertThat(contexts.get(2).getValue(), equalTo("#comment"));
 	}
 	
 	@Test
 	public void shouldIgnoreTokensWithNoSeparatedValue() throws Exception {
 		when(fileUtils.readFile(FILENAME)).thenReturn("#comment\ntoken2");
 		List<Replacement> contexts = factory.contextsForFile(FILENAME, COMMENTS_DISABLED, false);
-		assertNotNull(contexts);
+		assertThat(contexts, notNullValue());
 		assertTrue(contexts.isEmpty());
 	}
 	
@@ -89,12 +89,12 @@ public class TokenValueMapFactoryTest {
 		when(fileUtils.readFile(FILENAME)).thenReturn("\\=tok\\=en1=val\\=ue1\nto$ke..n2=value2");
 		
 		List<Replacement> contexts = factory.contextsForFile(FILENAME, COMMENTS_ENABLED, false);
-		assertNotNull(contexts);
-		assertEquals(2, contexts.size());
-		assertEquals("\\=tok\\=en1", contexts.get(0).getToken());
-		assertEquals("val\\=ue1", contexts.get(0).getValue());
-		assertEquals("to$ke..n2", contexts.get(1).getToken());
-		assertEquals("value2", contexts.get(1).getValue());
+		assertThat(contexts, notNullValue());
+		assertThat(contexts.size(), is(2));
+		assertThat(contexts.get(0).getToken(), equalTo("\\=tok\\=en1"));
+		assertThat(contexts.get(0).getValue(), equalTo("val\\=ue1"));
+		assertThat(contexts.get(1).getToken(), equalTo("to$ke..n2"));
+		assertThat(contexts.get(1).getValue(), equalTo("value2"));
 	}
 	
 	@Test
@@ -102,12 +102,12 @@ public class TokenValueMapFactoryTest {
 		when(fileUtils.readFile(FILENAME)).thenReturn("\\\\=tok\\\\=en1=val\\\\=ue1\nto$ke..n2=value2");
 		
 		List<Replacement> contexts = factory.contextsForFile(FILENAME, COMMENTS_ENABLED, true);
-		assertNotNull(contexts);
-		assertEquals(2, contexts.size());
-		assertEquals("\\=tok\\=en1", contexts.get(0).getToken());
-		assertEquals("val\\=ue1", contexts.get(0).getValue());
-		assertEquals("to$ke..n2", contexts.get(1).getToken());
-		assertEquals("value2", contexts.get(1).getValue());
+		assertThat(contexts, notNullValue());
+		assertThat(contexts.size(), is(2));
+		assertThat(contexts.get(0).getToken(), equalTo("\\=tok\\=en1"));
+		assertThat(contexts.get(0).getValue(), equalTo("val\\=ue1"));
+		assertThat(contexts.get(1).getToken(), equalTo("to$ke..n2"));
+		assertThat(contexts.get(1).getValue(), equalTo("value2"));
 	}
 	
 	@Test (expected = IllegalArgumentException.class)
@@ -119,13 +119,16 @@ public class TokenValueMapFactoryTest {
 	@Test
 	public void shouldSupportEmptyFileAndReturnNoReplacements() throws Exception {
 		when(fileUtils.readFile(FILENAME)).thenReturn("");
-		assertTrue(factory.contextsForFile(FILENAME, COMMENTS_DISABLED, false).isEmpty());
+		List<Replacement> contexts = factory.contextsForFile(FILENAME, COMMENTS_DISABLED, false);
+		assertThat(contexts, notNullValue());
+		assertTrue(contexts.isEmpty());
 	}
 	
 	@Test
 	public void shouldReturnListOfContextsFromVariable() {
 		List<Replacement> contexts = factory.contextsForVariable("#comment,token1=value1,token2=value2", true, false);
-		assertThat(contexts.size(), equalTo(2));
+		assertThat(contexts, notNullValue());
+		assertThat(contexts.size(), is(2));
 		assertThat(contexts, hasItem(contextWith("token1", "value1")));
 		assertThat(contexts, hasItem(contextWith("token2", "value2")));
 	}

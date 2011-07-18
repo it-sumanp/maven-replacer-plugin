@@ -83,8 +83,8 @@ public class OutputFilenameBuilderTest {
 	
 	@Test
 	public void shouldReturnIgnoreBaseDirForOutputFileWhenStartsWithAbsolutePath() {
-		String OS = System.getProperty("os.name").toLowerCase();
-		if (OS.indexOf("windows") < 0) {
+		String os = System.getProperty("os.name").toLowerCase();
+		if (os.indexOf("windows") < 0) {
 			when(mojo.getOutputFile()).thenReturn(File.separator + "output");
 			String output = builder.buildFrom(INPUT_FILE, mojo);
 			assertThat(output, equalTo(File.separator + "output"));

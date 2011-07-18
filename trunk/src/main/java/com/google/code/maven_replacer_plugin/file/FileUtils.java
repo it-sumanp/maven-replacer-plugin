@@ -1,14 +1,13 @@
 package com.google.code.maven_replacer_plugin.file;
 
+import static org.apache.commons.lang.StringUtils.isBlank;
+
 import java.io.File;
 import java.io.IOException;
 
 public class FileUtils {
 	public boolean fileNotExists(String filename) {
-		if (filename == null || filename.trim().length() == 0) {
-			return true;
-		}
-		return !new File(filename).exists();
+		return isBlank(filename) || !new File(filename).exists();
 	}
 
 	public void ensureFolderStructureExists(String file) {
