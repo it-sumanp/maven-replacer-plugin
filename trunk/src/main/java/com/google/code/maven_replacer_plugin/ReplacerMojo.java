@@ -23,6 +23,9 @@ import com.google.code.maven_replacer_plugin.include.FileSelector;
  * @goal replace
  *
  * @phase compile
+ * 
+ * @threadSafe false
+ * 
  */
 public class ReplacerMojo extends AbstractMojo {
 	private static final String INVALID_IGNORE_MISSING_FILE_MESSAGE = "<ignoreMissingFile> only useable with <file>";
