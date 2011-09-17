@@ -24,7 +24,7 @@ import com.google.code.maven_replacer_plugin.include.FileSelector;
  *
  * @phase compile
  * 
- * @threadSafe false
+ * @threadSafe
  * 
  */
 public class ReplacerMojo extends AbstractMojo {
