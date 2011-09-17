@@ -14,6 +14,7 @@ import static org.mockito.Matchers.eq;
 import static org.mockito.Matchers.isA;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
@@ -354,7 +355,7 @@ public class ReplacerMojoTest {
 			fail("Should have thrown exception");
 		} catch (MojoExecutionException e) {
 			verifyZeroInteractions(replacerFactory);
-			verify(log).error("<ignoreMissingFile> only useable with <file>");
+			verify(log, times(2)).error("<ignoreMissingFile> only useable with <file>");
 			verify(summaryBuilder, never()).add(anyString(), anyString(), isA(Log.class));
 			verify(summaryBuilder).print(log);
 		}
@@ -376,6 +377,18 @@ public class ReplacerMojoTest {
 		mojo.setValueFile(VALUE_FILE);
 		mojo.setOutputFile(OUTPUT_FILE);
 		mojo.setBasedir(BASE_DIR);
+		mojo.execute();
+	}
+	
+	@Test
+	public void shouldNotThrowExceptionWhenIgnoringErrors() throws Exception {
+		when(fileUtils.readFile(anyString())).thenThrow(new IOException());
+
+		mojo.setIgnoreErrors(true);
+		mojo.setFile(FILE);
+		mojo.setTokenFile(TOKEN_FILE);
+		mojo.setValueFile(VALUE_FILE);
+		mojo.setOutputFile(OUTPUT_FILE);
 		mojo.execute();
 	}
 	
