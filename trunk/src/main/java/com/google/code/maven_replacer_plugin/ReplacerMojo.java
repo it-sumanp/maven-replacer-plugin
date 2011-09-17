@@ -233,6 +233,15 @@ public class ReplacerMojo extends AbstractMojo {
 	 */
 	private String variableTokenValueMap;
 	
+	/**
+	 * Ignore any errors produced by this plugin such as 
+	 * files not being found and continue with the build.
+	 * Default is false.
+	 *
+	 * @parameter expression=""
+	 */
+	private boolean ignoreErrors;
+	
 	public ReplacerMojo() {
 		super();
 		this.fileUtils = new FileUtils();
@@ -280,8 +289,11 @@ public class ReplacerMojo extends AbstractMojo {
 			for (String file : fileSelector.listIncludes(basedir, includes, excludes)) {
 				replaceContents(replacer, contexts, file);
 			}
-		} catch (IOException e) {
-			throw new MojoExecutionException(e.getMessage(), e);
+		} catch (Exception e) {
+			getLog().error(e.getMessage());
+			if (!isIgnoreErrors()) {
+				throw new MojoExecutionException(e.getMessage(), e);
+			}
 		} finally {
 			if (!quiet) {
 				summaryBuilder.print(getLog());
@@ -536,5 +548,13 @@ public class ReplacerMojo extends AbstractMojo {
 	
 	public String getVariableTokenValueMap() {
 		return variableTokenValueMap;
+	}
+
+	public void setIgnoreErrors(boolean ignoreErrors) {
+		this.ignoreErrors = ignoreErrors;
+	}
+
+	public boolean isIgnoreErrors() {
+		return ignoreErrors;
 	}
 }

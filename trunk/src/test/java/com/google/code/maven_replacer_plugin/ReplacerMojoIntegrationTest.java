@@ -59,6 +59,33 @@ public class ReplacerMojoIntegrationTest {
 	}
 	
 	@Test
+	public void shouldIgnoreErrors() throws Exception {
+		mojo.setIgnoreErrors(true);
+		mojo.setFile("invalid");
+		mojo.setToken(TOKEN);
+		mojo.setValue(VALUE);
+		mojo.execute();
+		
+		String results = FileUtils.readFileToString(new File(filenameAndPath));
+		assertThat(results, equalTo(TOKEN));
+		verify(log).info("Replacement run on 0 file.");
+	}
+	
+	@Test
+	public void shouldIgnoreErrorsWithMissingTokenValueMapFile() throws Exception {
+		String tokenValueMap = "invalid";
+		
+		mojo.setIgnoreErrors(true);
+		mojo.setFile(filenameAndPath);
+		mojo.setTokenValueMap(tokenValueMap);
+		mojo.execute();
+		
+		String results = FileUtils.readFileToString(new File(filenameAndPath));
+		assertThat(results, equalTo(TOKEN));
+		verify(log).info("Replacement run on 0 file.");
+	}
+	
+	@Test
 	public void shouldReplaceContentsInFileWithBackreferences() throws Exception {
 		String tokenValueMap = createTempFile("test ([^;]*);=group $1 backreferenced");
 		
@@ -87,7 +114,7 @@ public class ReplacerMojoIntegrationTest {
 		verify(log).info("Replacement run on 1 file.");
 	}
 	
-	@Test(expected = PatternSyntaxException.class)
+	@Test(expected = MojoExecutionException.class)
 	public void shouldLogErrorWhenDelimitersHaveRegexAndRegexEnabled() throws Exception {
 		filenameAndPath = createTempFile("@" + TOKEN + "@ and ${" + TOKEN + "}");
 		mojo.setFile(filenameAndPath);
