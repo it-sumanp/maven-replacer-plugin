@@ -5,7 +5,7 @@ import static org.apache.commons.lang.StringUtils.isEmpty;
 
 import java.util.regex.Pattern;
 
-public class TokenReplacer {
+public class TokenReplacer implements Replacer {
 	public String replaceRegex(String contents, String token, String value, int flags) {
 		final Pattern compiledPattern;
 		if (flags == PatternFlagsFactory.NO_FLAGS) {

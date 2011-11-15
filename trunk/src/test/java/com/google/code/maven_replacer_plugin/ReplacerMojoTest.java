@@ -30,10 +30,14 @@ import org.hamcrest.BaseMatcher;
 import org.hamcrest.Description;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
 
 import com.google.code.maven_replacer_plugin.file.FileUtils;
 import com.google.code.maven_replacer_plugin.include.FileSelector;
 
+@RunWith(MockitoJUnitRunner.class)
 public class ReplacerMojoTest {
 
 	private static final String REGEX_FLAG = "regex flag";
@@ -48,37 +52,34 @@ public class ReplacerMojoTest {
 	private static final String TOKEN = "token";
 	private static final String VALUE = "value";
 
+	@Mock
 	private FileUtils fileUtils;
-	private TokenReplacer tokenReplacer;
+	@Mock
+	private ReplacementProcessor processor;
+	@Mock
 	private ReplacerFactory replacerFactory;
+	@Mock
 	private TokenValueMapFactory tokenValueMapFactory;
+	@Mock
 	private FileSelector fileSelector;
+	@Mock
 	private PatternFlagsFactory patternFlagsFactory;
-	private ReplacerMojo mojo;
+	@Mock
 	private Log log;
-	private List<String> regexFlags;
-	private Replacer replacer;
+	@Mock
 	private OutputFilenameBuilder outputFilenameBuilder;
+	@Mock
 	private SummaryBuilder summaryBuilder;
+	
+	private List<String> regexFlags;
+	private ReplacerMojo mojo;
 
 	@Before
 	public void setUp() throws Exception {
-		fileUtils = mock(FileUtils.class);
-		tokenReplacer = mock(TokenReplacer.class);
-		replacerFactory = mock(ReplacerFactory.class);
-		tokenValueMapFactory = mock(TokenValueMapFactory.class);
-		fileSelector = mock(FileSelector.class);
-		patternFlagsFactory = mock(PatternFlagsFactory.class);
-		log = mock(Log.class);
-		replacer = mock(Replacer.class);
-		outputFilenameBuilder = mock(OutputFilenameBuilder.class);
 		regexFlags = asList(REGEX_FLAG);
-		summaryBuilder = mock(SummaryBuilder.class);
-
-		when(replacerFactory.create()).thenReturn(replacer);
 		when(patternFlagsFactory.buildFlags(regexFlags)).thenReturn(REGEX_PATTERN_FLAGS);
 
-		mojo = new ReplacerMojo(fileUtils, tokenReplacer, replacerFactory, tokenValueMapFactory,
+		mojo = new ReplacerMojo(fileUtils, processor, replacerFactory, tokenValueMapFactory,
 				fileSelector, patternFlagsFactory, outputFilenameBuilder, summaryBuilder) {
 			@Override
 			public Log getLog() {
@@ -102,7 +103,7 @@ public class ReplacerMojoTest {
 		mojo.execute();
 		
 		assertSame(FILE, mojo.getFile());
-		verify(replacer).replace(replacements, REGEX, BASE_DIR + File.separator + FILE, OUTPUT_FILE, REGEX_PATTERN_FLAGS);
+		verify(processor).replace(replacements, REGEX, BASE_DIR + File.separator + FILE, OUTPUT_FILE, REGEX_PATTERN_FLAGS);
 		verify(summaryBuilder).add(BASE_DIR + File.separator + FILE, OUTPUT_FILE, log);
 		verify(summaryBuilder).print(log);
 	}
@@ -121,7 +122,7 @@ public class ReplacerMojoTest {
 		mojo.execute();
 		
 		assertSame(FILE, mojo.getFile());
-		verify(replacer).replace(replacements, REGEX, FILE, OUTPUT_FILE, REGEX_PATTERN_FLAGS);
+		verify(processor).replace(replacements, REGEX, FILE, OUTPUT_FILE, REGEX_PATTERN_FLAGS);
 		verify(summaryBuilder).add(FILE, OUTPUT_FILE, log);
 		verify(summaryBuilder).print(log);
 	}
@@ -140,7 +141,7 @@ public class ReplacerMojoTest {
 		mojo.setBasedir(BASE_DIR);
 		mojo.execute();
 
-		verify(replacer).replace(replacements, REGEX, BASE_DIR + File.separator + FILE, OUTPUT_FILE, REGEX_PATTERN_FLAGS);
+		verify(processor).replace(replacements, REGEX, BASE_DIR + File.separator + FILE, OUTPUT_FILE, REGEX_PATTERN_FLAGS);
 		verify(summaryBuilder).add(BASE_DIR + File.separator + FILE, OUTPUT_FILE, log);
 		verify(summaryBuilder, never()).print(log);
 	}
@@ -160,7 +161,7 @@ public class ReplacerMojoTest {
 
 		assertSame(mojo.getIncludes(), includes);
 		assertSame(mojo.getExcludes(), excludes);
-		verify(replacer).replace(argThat(replacementOf(VALUE, false, TOKEN)), eq(REGEX), eq(BASE_DIR  + File.separator + FILE),
+		verify(processor).replace(argThat(replacementOf(VALUE, false, TOKEN)), eq(REGEX), eq(BASE_DIR  + File.separator + FILE),
 			eq(OUTPUT_FILE), anyInt());
 	}
 
@@ -179,7 +180,7 @@ public class ReplacerMojoTest {
 
 		assertSame(mojo.getFilesToInclude(), includes);
 		assertSame(mojo.getFilesToExclude(), excludes);
-		verify(replacer).replace(argThat(replacementOf(VALUE, false, TOKEN)), eq(REGEX), eq(BASE_DIR + File.separator + FILE),
+		verify(processor).replace(argThat(replacementOf(VALUE, false, TOKEN)), eq(REGEX), eq(BASE_DIR + File.separator + FILE),
 			eq(OUTPUT_FILE), anyInt());
 	}
 
@@ -198,7 +199,8 @@ public class ReplacerMojoTest {
 		mojo.setBasedir(BASE_DIR);
 		mojo.execute();
 
-		verify(replacer).replace(replacements, REGEX, BASE_DIR  + File.separator + FILE, OUTPUT_FILE, REGEX_PATTERN_FLAGS);
+		verify(processor).replace(replacements, 
+				REGEX, BASE_DIR  + File.separator + FILE, OUTPUT_FILE, REGEX_PATTERN_FLAGS);
 	}
 
 	@Test
@@ -217,7 +219,8 @@ public class ReplacerMojoTest {
 		mojo.setCommentsEnabled(false);
 		mojo.execute();
 
-		verify(replacer).replace(replacements, REGEX, BASE_DIR  + File.separator + FILE, OUTPUT_FILE, REGEX_PATTERN_FLAGS);
+		verify(processor).replace(replacements, 
+				REGEX, BASE_DIR  + File.separator + FILE, OUTPUT_FILE, REGEX_PATTERN_FLAGS);
 	}
 
 	@Test
@@ -234,7 +237,7 @@ public class ReplacerMojoTest {
 		mojo.execute();
 
 		assertThat(mojo.getDelimiters(), equalTo(delimiters));
-		verify(replacer).replace(argThat(replacementOf(VALUE, false, "@" + TOKEN + "@", "${" + TOKEN + "}")), 
+		verify(processor).replace(argThat(replacementOf(VALUE, false, "@" + TOKEN + "@", "${" + TOKEN + "}")), 
 				eq(REGEX), eq(BASE_DIR  + File.separator + FILE), eq(OUTPUT_FILE), eq(REGEX_PATTERN_FLAGS));
 		verify(summaryBuilder).add(BASE_DIR + File.separator + FILE, OUTPUT_FILE, log);
 		verify(summaryBuilder).print(log);
@@ -251,7 +254,7 @@ public class ReplacerMojoTest {
 		mojo.setBasedir(BASE_DIR);
 		mojo.execute();
 
-		verify(replacer).replace(argThat(replacementOf(VALUE, false, TOKEN)), eq(REGEX), eq(BASE_DIR  + File.separator + FILE),
+		verify(processor).replace(argThat(replacementOf(VALUE, false, TOKEN)), eq(REGEX), eq(BASE_DIR  + File.separator + FILE),
 			eq(OUTPUT_FILE), eq(REGEX_PATTERN_FLAGS));
 		verify(summaryBuilder).add(BASE_DIR + File.separator + FILE, OUTPUT_FILE, log);
 		verify(summaryBuilder).print(log);
@@ -270,7 +273,7 @@ public class ReplacerMojoTest {
 		mojo.execute();
 
 		assertTrue(mojo.isUnescape());
-		verify(replacer).replace(argThat(replacementOf(VALUE, true, TOKEN)), eq(REGEX), eq(BASE_DIR  + File.separator + FILE),
+		verify(processor).replace(argThat(replacementOf(VALUE, true, TOKEN)), eq(REGEX), eq(BASE_DIR  + File.separator + FILE),
 			eq(OUTPUT_FILE), eq(REGEX_PATTERN_FLAGS));
 		verify(summaryBuilder).add(BASE_DIR + File.separator + FILE, OUTPUT_FILE, log);
 		verify(summaryBuilder).print(log);
@@ -290,7 +293,7 @@ public class ReplacerMojoTest {
 		mojo.setBasedir(BASE_DIR);
 		mojo.execute();
 
-		verify(replacer).replace(argThat(replacementOf(VALUE, false, TOKEN)), eq(REGEX), eq(BASE_DIR  + File.separator + FILE),
+		verify(processor).replace(argThat(replacementOf(VALUE, false, TOKEN)), eq(REGEX), eq(BASE_DIR  + File.separator + FILE),
 				eq(OUTPUT_FILE), eq(REGEX_PATTERN_FLAGS));
 		verify(fileUtils).readFile(TOKEN_FILE);
 		verify(fileUtils).readFile(VALUE_FILE);
@@ -310,7 +313,7 @@ public class ReplacerMojoTest {
 		mojo.setBasedir(BASE_DIR);
 		mojo.execute();
 
-		verify(replacer).replace(replacements, REGEX, BASE_DIR  + File.separator + FILE, OUTPUT_FILE,
+		verify(processor).replace(replacements, REGEX, BASE_DIR  + File.separator + FILE, OUTPUT_FILE,
 			REGEX_PATTERN_FLAGS);
 		verify(summaryBuilder).add(BASE_DIR + File.separator + FILE, OUTPUT_FILE, log);
 		verify(summaryBuilder).print(log);
@@ -328,7 +331,7 @@ public class ReplacerMojoTest {
 		mojo.execute();
 
 		assertThat(mojo.getVariableTokenValueMap(), equalTo(TOKEN_VALUE_MAP));
-		verify(replacer).replace(replacements, true, BASE_DIR  + File.separator + FILE, OUTPUT_FILE, 0);
+		verify(processor).replace(replacements, true, BASE_DIR  + File.separator + FILE, OUTPUT_FILE, 0);
 		verify(summaryBuilder).add(BASE_DIR + File.separator + FILE, OUTPUT_FILE, log);
 		verify(summaryBuilder).print(log);
 	}

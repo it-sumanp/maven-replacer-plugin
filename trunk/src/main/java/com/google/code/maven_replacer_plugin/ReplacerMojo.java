@@ -35,13 +35,13 @@ public class ReplacerMojo extends AbstractMojo {
 		" in your configuration.";
 	
 	private final FileUtils fileUtils;
-	private final TokenReplacer tokenReplacer;
 	private final ReplacerFactory replacerFactory;
 	private final TokenValueMapFactory tokenValueMapFactory;
 	private final FileSelector fileSelector;
 	private final PatternFlagsFactory patternFlagsFactory;
 	private final OutputFilenameBuilder outputFilenameBuilder;
 	private final SummaryBuilder summaryBuilder;
+	private final ReplacementProcessor processor;
 
 	/**
 	 * File to check and replace tokens
@@ -242,25 +242,27 @@ public class ReplacerMojo extends AbstractMojo {
 	 */
 	private boolean ignoreErrors;
 	
+	private String xpath;
+	
 	public ReplacerMojo() {
 		super();
 		this.fileUtils = new FileUtils();
-		this.tokenReplacer = new TokenReplacer();
-		this.replacerFactory = new ReplacerFactory(fileUtils, tokenReplacer);
+		this.replacerFactory = new ReplacerFactory();
 		this.tokenValueMapFactory = new TokenValueMapFactory(fileUtils);
 		this.fileSelector = new FileSelector();
 		this.patternFlagsFactory = new PatternFlagsFactory();
 		this.outputFilenameBuilder = new OutputFilenameBuilder();
 		this.summaryBuilder = new SummaryBuilder();
+		this.processor = new ReplacementProcessor(fileUtils, replacerFactory);
 	}
 
-	public ReplacerMojo(FileUtils fileUtils, TokenReplacer tokenReplacer, ReplacerFactory replacerFactory, 
+	public ReplacerMojo(FileUtils fileUtils, ReplacementProcessor processor, ReplacerFactory replacerFactory, 
 			TokenValueMapFactory tokenValueMapFactory, FileSelector fileSelector, 
 			PatternFlagsFactory patternFlagsFactory, OutputFilenameBuilder outputFilenameBuilder,
 			SummaryBuilder summaryBuilder) {
 		super();
 		this.fileUtils = fileUtils;
-		this.tokenReplacer = tokenReplacer;
+		this.processor = processor;
 		this.replacerFactory = replacerFactory;
 		this.tokenValueMapFactory = tokenValueMapFactory;
 		this.fileSelector = fileSelector;
@@ -276,18 +278,16 @@ public class ReplacerMojo extends AbstractMojo {
 				return;
 			}
 
-			Replacer replacer = replacerFactory.create();
 			List<Replacement> contexts = getDelimiterReplacements(getContexts());
-
 			addIncludesFilesAndExcludedFiles();
 
 			if (isEmptyCollection(includes)) {
-				replaceContents(replacer, contexts, file);
+				replaceContents(processor, contexts, file);
 				return;
 			}
 
 			for (String file : fileSelector.listIncludes(basedir, includes, excludes)) {
-				replaceContents(replacer, contexts, file);
+				replaceContents(processor, contexts, file);
 			}
 		} catch (Exception e) {
 			getLog().error(e.getMessage());
@@ -340,10 +340,10 @@ public class ReplacerMojo extends AbstractMojo {
 		}
 	}
 
-	private void replaceContents(Replacer replacer, List<Replacement> contexts, String inputFile) throws IOException {
+	private void replaceContents(ReplacementProcessor processor, List<Replacement> contexts, String inputFile) throws IOException {
 		String outputFileName = outputFilenameBuilder.buildFrom(inputFile, this);
 		try {
-			replacer.replace(contexts, regex, getBaseDirPrefixedFilename(inputFile), outputFileName, patternFlagsFactory.buildFlags(regexFlags));
+			processor.replace(contexts, regex, getBaseDirPrefixedFilename(inputFile), outputFileName, patternFlagsFactory.buildFlags(regexFlags));
 		} catch (PatternSyntaxException e) {
 			if (!isEmptyCollection(delimiters)) {
 				getLog().error(String.format(REGEX_PATTERN_WITH_DELIMITERS_MESSAGE, e.getMessage()));
@@ -556,5 +556,13 @@ public class ReplacerMojo extends AbstractMojo {
 
 	public boolean isIgnoreErrors() {
 		return ignoreErrors;
+	}
+
+	public void setXpath(String xpath) {
+		this.xpath = xpath;
+	}
+	
+	public String getXpath() {
+		return xpath;
 	}
 }
