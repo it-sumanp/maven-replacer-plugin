@@ -2,12 +2,10 @@ package com.google.code.maven_replacer_plugin;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 public class XPathReplacerTest {
@@ -25,7 +23,7 @@ public class XPathReplacerTest {
 	}
 
 	@Test
-	public void shouldReplaceNonRegexTokenWithValue() throws Exception {
+	public void shouldReplaceNodeStringLocatedByXpath() throws Exception {
 		when(replacement.getXpath()).thenReturn("//test");
 		when(replacement.getToken()).thenReturn("token");
 		when(replacement.getValue()).thenReturn("value");
@@ -35,11 +33,5 @@ public class XPathReplacerTest {
 		
 		String result = replacer.replace("<parent><test>token</test></parent>", replacement, false, NO_FLAGS);
 		assertThat(result, containsString("<parent><test>value</test></parent>"));
-	}
-
-	@Ignore
-	@Test
-	public void shouldReplaceRegexTokenWithValue() throws Exception {
-		
 	}
 }
