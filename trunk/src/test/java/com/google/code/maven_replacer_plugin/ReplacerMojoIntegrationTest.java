@@ -19,15 +19,18 @@ import java.util.Random;
 import java.util.regex.PatternSyntaxException;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.logging.Log;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 
 public class ReplacerMojoIntegrationTest {
 	private static final String TOKEN = "token";
 	private static final String VALUE = "value";
 	private static final String OUTPUT_DIR = "target/outputdir/";
+	private static final String XPATH_TEST_FILE = "xpath.xml";
 	
 	private ReplacerMojo mojo;
 	private String filenameAndPath;
@@ -53,6 +56,64 @@ public class ReplacerMojoIntegrationTest {
 		mojo.setValue(VALUE);
 		mojo.execute();
 		
+		String results = FileUtils.readFileToString(new File(filenameAndPath));
+		assertThat(results, equalTo(VALUE));
+		verify(log).info("Replacement run on 1 file.");
+	}
+	
+	@Ignore
+	@Test
+	public void shouldReplaceTokenLocatedByXPath() throws Exception {
+		String content = IOUtils.toString(getClass().getClassLoader().getResourceAsStream(XPATH_TEST_FILE));
+		filenameAndPath = createTempFile(content);
+
+		mojo.setFile(filenameAndPath);
+		mojo.setXpath("/people/person[firstname='Arthur' and lastname='Dent']");
+		mojo.setToken("(Authur)");
+		mojo.setValue("$ Philip");
+		mojo.execute();
+
+		String results = FileUtils.readFileToString(new File(filenameAndPath));
+		assertThat(results, equalTo(VALUE));
+		verify(log).info("Replacement run on 1 file.");
+	}
+	
+	@Ignore
+	@Test
+	public void shouldReplaceTokenLocatedByXPathWithinReplacements() throws Exception {
+		String content = IOUtils.toString(getClass().getClassLoader().getResourceAsStream(XPATH_TEST_FILE));
+		filenameAndPath = createTempFile(content);
+
+		Replacement replacement = new Replacement();
+		replacement.setToken("(Authur)");
+		replacement.setValue("$ Philip");
+		replacement.setXpath("/people/person[firstname='Arthur' and lastname='Dent']");
+
+		mojo.setFile(filenameAndPath);
+		mojo.setReplacements(asList(replacement));
+		mojo.execute();
+
+		String results = FileUtils.readFileToString(new File(filenameAndPath));
+		assertThat(results, equalTo(VALUE));
+		verify(log).info("Replacement run on 1 file.");
+	}
+	
+	@Ignore
+	@Test
+	public void shouldReplaceNonRegexTokenLocatedByXPathWithinReplacements() throws Exception {
+		String content = IOUtils.toString(getClass().getClassLoader().getResourceAsStream(XPATH_TEST_FILE));
+		filenameAndPath = createTempFile(content);
+
+		Replacement replacement = new Replacement();
+		replacement.setToken("Authur");
+		replacement.setValue("Philip");
+		replacement.setXpath("/people/person[firstname='Arthur' and lastname='Dent']");
+
+		mojo.setFile(filenameAndPath);
+		mojo.setRegex(false);
+		mojo.setReplacements(asList(replacement));
+		mojo.execute();
+
 		String results = FileUtils.readFileToString(new File(filenameAndPath));
 		assertThat(results, equalTo(VALUE));
 		verify(log).info("Replacement run on 1 file.");
