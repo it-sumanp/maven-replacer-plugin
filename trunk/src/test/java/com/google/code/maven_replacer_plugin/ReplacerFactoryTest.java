@@ -6,6 +6,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
+import static org.mockito.Mockito.when;
+import static org.junit.Assert.assertTrue;
 
 
 @RunWith(MockitoJUnitRunner.class)
@@ -14,10 +16,19 @@ public class ReplacerFactoryTest {
 	private Replacement replacement;
 
 	@Test
-	public void shouldReturnReplacerWithFileUtilsAndTokenReplacer() {
+	public void shouldReturnTokenReplacerWhenNotUsingXPath() {
 		ReplacerFactory factory = new ReplacerFactory();
 
 		Replacer replacer = factory.create(replacement);
-		assertNotNull(replacer);
+		assertTrue(replacer instanceof TokenReplacer);
+	}
+	
+	@Test
+	public void shouldReturnXPathReplacerWhenUsingXPath() {
+		ReplacerFactory factory = new ReplacerFactory();
+		when(replacement.getXpath()).thenReturn("some xpath");
+
+		Replacer replacer = factory.create(replacement);
+		assertTrue(replacer instanceof XPathReplacer);
 	}
 }
