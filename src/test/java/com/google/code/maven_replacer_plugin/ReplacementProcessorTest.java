@@ -2,8 +2,6 @@ package com.google.code.maven_replacer_plugin;
 
 
 import static java.util.Arrays.asList;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
@@ -17,7 +15,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 import com.google.code.maven_replacer_plugin.file.FileUtils;
 
 @RunWith(MockitoJUnitRunner.class)
-public class ReplacerTest {
+public class ReplacementProcessorTest {
 
 	private static final String FILE = "file";
 	private static final String OUTPUT_FILE = "outputFile";
@@ -32,34 +30,37 @@ public class ReplacerTest {
 	@Mock
 	private FileUtils fileUtils;
 	@Mock
-	private TokenReplacer tokenReplacer;
+	private Replacer replacer;
 	@Mock
 	private Replacement context;
+	@Mock
+	private ReplacerFactory replacerFactory;
 	
-	private Replacer replacer;
+	private ReplacementProcessor processor;
 
 	@Before
 	public void setUp() throws Exception {
 		when(fileUtils.readFile(FILE)).thenReturn(CONTENT);
 		when(context.getToken()).thenReturn(TOKEN);
 		when(context.getValue()).thenReturn(VALUE);
+		when(replacerFactory.create(context)).thenReturn(replacer);
 		
-		replacer = new Replacer(fileUtils, tokenReplacer);
+		processor = new ReplacementProcessor(fileUtils, replacerFactory);
 	}
 	
 	@Test
 	public void shouldWriteReplacedRegexTextToFile() throws Exception {
-		when(tokenReplacer.replaceRegex(CONTENT, TOKEN, VALUE, REGEX_FLAGS)).thenReturn(NEW_CONTENT);
+		when(replacer.replaceRegex(CONTENT, TOKEN, VALUE, REGEX_FLAGS)).thenReturn(NEW_CONTENT);
 		
-		replacer.replace(asList(context), USE_REGEX, FILE, OUTPUT_FILE, REGEX_FLAGS);
+		processor.replace(asList(context), USE_REGEX, FILE, OUTPUT_FILE, REGEX_FLAGS);
 		verify(fileUtils).writeToFile(OUTPUT_FILE, NEW_CONTENT);
 	}
 	
 	@Test
 	public void shouldWriteReplacedNonRegexTextToFile() throws Exception {
-		when(tokenReplacer.replaceNonRegex(CONTENT, TOKEN, VALUE)).thenReturn(NEW_CONTENT);
+		when(replacer.replaceNonRegex(CONTENT, TOKEN, VALUE)).thenReturn(NEW_CONTENT);
 		
-		replacer.replace(asList(context), NO_REGEX, FILE, OUTPUT_FILE, REGEX_FLAGS);
+		processor.replace(asList(context), NO_REGEX, FILE, OUTPUT_FILE, REGEX_FLAGS);
 		verify(fileUtils).writeToFile(OUTPUT_FILE, NEW_CONTENT);
 	}
 	
@@ -67,7 +68,7 @@ public class ReplacerTest {
 	public void shouldThrowExceptionIfNoToken() throws Exception {
 		when(context.getToken()).thenReturn(null);
 		
-		replacer.replace(asList(context), USE_REGEX, FILE, OUTPUT_FILE, REGEX_FLAGS);
+		processor.replace(asList(context), USE_REGEX, FILE, OUTPUT_FILE, REGEX_FLAGS);
 		verifyZeroInteractions(fileUtils);
 	}
 	
@@ -75,13 +76,7 @@ public class ReplacerTest {
 	public void shouldThrowExceptionIfEmptyToken() throws Exception {
 		when(context.getToken()).thenReturn("");
 		
-		replacer.replace(asList(context), USE_REGEX, FILE, OUTPUT_FILE, REGEX_FLAGS);
+		processor.replace(asList(context), USE_REGEX, FILE, OUTPUT_FILE, REGEX_FLAGS);
 		verifyZeroInteractions(fileUtils);
-	}
-
-	@Test
-	public void shouldReturnSameInstancesAsGivenInConstructor() {
-		assertThat(replacer.getFileUtils(), is(fileUtils));
-		assertThat(replacer.getTokenReplacer(), is(tokenReplacer));
 	}
 }

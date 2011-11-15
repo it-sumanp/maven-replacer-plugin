@@ -14,6 +14,8 @@ public class Replacement {
 	private boolean unescape;
 	private String token;
 	private String value;
+
+	private String xpath;
 	
 	public Replacement() {
 		this.fileUtils = new FileUtils();
@@ -79,5 +81,13 @@ public class Replacement {
 	public Replacement withDelimiter(DelimiterBuilder delimiter) {
 		this.delimiter = delimiter;
 		return this;
+	}
+
+	public void setXpath(String xpath) {
+		this.xpath = xpath;
+	}
+	
+	public String getXpath() {
+		return xpath;
 	}
 }
