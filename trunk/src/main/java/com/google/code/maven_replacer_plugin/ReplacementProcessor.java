@@ -32,9 +32,6 @@ public class ReplacementProcessor {
 		}
 
 		Replacer replacer = replacerFactory.create(context);
-		if (regex) {
-			return replacer.replaceRegex(content, context.getToken(), context.getValue(), regexFlags);
-		}
-		return replacer.replaceNonRegex(content, context.getToken(), context.getValue());
+		return replacer.replace(content, context, regex, regexFlags);
 	}
 }
