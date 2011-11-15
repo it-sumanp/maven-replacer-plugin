@@ -25,7 +25,7 @@ public class PatternFlagsFactory {
 				try {
 					return (Integer)f.get(null);
 				} catch (Exception e) {
-					e.printStackTrace();
+					throw new IllegalStateException("Could not access Pattern field: " + f.getName() + " - is this an unsupported JVM?");
 				}
 			}
 		}
