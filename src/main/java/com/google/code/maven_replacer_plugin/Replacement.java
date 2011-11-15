@@ -24,7 +24,7 @@ public class Replacement {
 
 	public Replacement(FileUtils fileUtils, String token, String value, boolean unescape) {
 		this.fileUtils = fileUtils;
-		this.setUnescape(unescape);
+		setUnescape(unescape);
 		setToken(token);
 		setValue(value);
 	}

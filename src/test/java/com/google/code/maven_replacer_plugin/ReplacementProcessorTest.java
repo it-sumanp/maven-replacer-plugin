@@ -50,7 +50,7 @@ public class ReplacementProcessorTest {
 	
 	@Test
 	public void shouldWriteReplacedRegexTextToFile() throws Exception {
-		when(replacer.replaceRegex(CONTENT, TOKEN, VALUE, REGEX_FLAGS)).thenReturn(NEW_CONTENT);
+		when(replacer.replace(CONTENT, context, true, REGEX_FLAGS)).thenReturn(NEW_CONTENT);
 		
 		processor.replace(asList(context), USE_REGEX, FILE, OUTPUT_FILE, REGEX_FLAGS);
 		verify(fileUtils).writeToFile(OUTPUT_FILE, NEW_CONTENT);
@@ -58,7 +58,7 @@ public class ReplacementProcessorTest {
 	
 	@Test
 	public void shouldWriteReplacedNonRegexTextToFile() throws Exception {
-		when(replacer.replaceNonRegex(CONTENT, TOKEN, VALUE)).thenReturn(NEW_CONTENT);
+		when(replacer.replace(CONTENT, context, false, REGEX_FLAGS)).thenReturn(NEW_CONTENT);
 		
 		processor.replace(asList(context), NO_REGEX, FILE, OUTPUT_FILE, REGEX_FLAGS);
 		verify(fileUtils).writeToFile(OUTPUT_FILE, NEW_CONTENT);
