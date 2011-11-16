@@ -80,7 +80,7 @@ public class TokenValueMapFactory {
 			return;
 		}
 		value = value.trim();
-		contexts.add(new Replacement(fileUtils, tokenVal, value, unescape));
+		contexts.add(new Replacement(fileUtils, tokenVal, value, unescape, null));
 	}
 
 	private boolean isSeparatorAt(int i, String line) {

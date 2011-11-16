@@ -363,7 +363,7 @@ public class ReplacerMojo extends AbstractMojo {
 		}
 		
 		if (tokenValueMap == null) {
-			Replacement replacement = new Replacement(fileUtils, token, value, unescape);
+			Replacement replacement = new Replacement(fileUtils, token, value, unescape, xpath);
 			replacement.setTokenFile(tokenFile);
 			replacement.setValueFile(valueFile);
 			return Arrays.asList(replacement);
@@ -379,7 +379,7 @@ public class ReplacerMojo extends AbstractMojo {
 		List<Replacement> newReplacements = new ArrayList<Replacement>();
 		for (Replacement replacement : replacements) {
 			for (DelimiterBuilder delimiter : buildDelimiters()) {
-				Replacement withDelimiter = new Replacement().from(replacement).withDelimiter(delimiter);
+				Replacement withDelimiter = Replacement.from(replacement).withDelimiter(delimiter);
 				newReplacements.add(withDelimiter);
 			}
 		}
