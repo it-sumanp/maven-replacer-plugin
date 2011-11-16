@@ -1,13 +1,12 @@
 package com.google.code.maven_replacer_plugin;
 
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.when;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-import static org.mockito.Mockito.when;
-import static org.junit.Assert.assertTrue;
 
 
 @RunWith(MockitoJUnitRunner.class)

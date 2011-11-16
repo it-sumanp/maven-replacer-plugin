@@ -24,6 +24,7 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 
+import org.apache.commons.lang.builder.EqualsBuilder;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.logging.Log;
 import org.hamcrest.BaseMatcher;
@@ -40,6 +41,7 @@ import com.google.code.maven_replacer_plugin.include.FileSelector;
 @RunWith(MockitoJUnitRunner.class)
 public class ReplacerMojoTest {
 
+	private static final String XPATH = "xpath";
 	private static final String REGEX_FLAG = "regex flag";
 	private static final String FILE = "file";
 	private static final boolean REGEX = true;
@@ -161,7 +163,7 @@ public class ReplacerMojoTest {
 
 		assertSame(mojo.getIncludes(), includes);
 		assertSame(mojo.getExcludes(), excludes);
-		verify(processor).replace(argThat(replacementOf(VALUE, false, TOKEN)), eq(REGEX), eq(BASE_DIR  + File.separator + FILE),
+		verify(processor).replace(argThat(replacementOf(null, VALUE, false, TOKEN)), eq(REGEX), eq(BASE_DIR  + File.separator + FILE),
 			eq(OUTPUT_FILE), anyInt());
 	}
 
@@ -180,7 +182,7 @@ public class ReplacerMojoTest {
 
 		assertSame(mojo.getFilesToInclude(), includes);
 		assertSame(mojo.getFilesToExclude(), excludes);
-		verify(processor).replace(argThat(replacementOf(VALUE, false, TOKEN)), eq(REGEX), eq(BASE_DIR + File.separator + FILE),
+		verify(processor).replace(argThat(replacementOf(null, VALUE, false, TOKEN)), eq(REGEX), eq(BASE_DIR + File.separator + FILE),
 			eq(OUTPUT_FILE), anyInt());
 	}
 
@@ -237,7 +239,7 @@ public class ReplacerMojoTest {
 		mojo.execute();
 
 		assertThat(mojo.getDelimiters(), equalTo(delimiters));
-		verify(processor).replace(argThat(replacementOf(VALUE, false, "@" + TOKEN + "@", "${" + TOKEN + "}")), 
+		verify(processor).replace(argThat(replacementOf(null, VALUE, false, "@" + TOKEN + "@", "${" + TOKEN + "}")), 
 				eq(REGEX), eq(BASE_DIR  + File.separator + FILE), eq(OUTPUT_FILE), eq(REGEX_PATTERN_FLAGS));
 		verify(summaryBuilder).add(BASE_DIR + File.separator + FILE, OUTPUT_FILE, log);
 		verify(summaryBuilder).print(log);
@@ -252,9 +254,10 @@ public class ReplacerMojoTest {
 		mojo.setValue(VALUE);
 		mojo.setOutputFile(OUTPUT_FILE);
 		mojo.setBasedir(BASE_DIR);
+		mojo.setXpath(XPATH);
 		mojo.execute();
 
-		verify(processor).replace(argThat(replacementOf(VALUE, false, TOKEN)), eq(REGEX), eq(BASE_DIR  + File.separator + FILE),
+		verify(processor).replace(argThat(replacementOf(XPATH, VALUE, false, TOKEN)), eq(REGEX), eq(BASE_DIR  + File.separator + FILE),
 			eq(OUTPUT_FILE), eq(REGEX_PATTERN_FLAGS));
 		verify(summaryBuilder).add(BASE_DIR + File.separator + FILE, OUTPUT_FILE, log);
 		verify(summaryBuilder).print(log);
@@ -273,7 +276,7 @@ public class ReplacerMojoTest {
 		mojo.execute();
 
 		assertTrue(mojo.isUnescape());
-		verify(processor).replace(argThat(replacementOf(VALUE, true, TOKEN)), eq(REGEX), eq(BASE_DIR  + File.separator + FILE),
+		verify(processor).replace(argThat(replacementOf(null, VALUE, true, TOKEN)), eq(REGEX), eq(BASE_DIR  + File.separator + FILE),
 			eq(OUTPUT_FILE), eq(REGEX_PATTERN_FLAGS));
 		verify(summaryBuilder).add(BASE_DIR + File.separator + FILE, OUTPUT_FILE, log);
 		verify(summaryBuilder).print(log);
@@ -293,7 +296,7 @@ public class ReplacerMojoTest {
 		mojo.setBasedir(BASE_DIR);
 		mojo.execute();
 
-		verify(processor).replace(argThat(replacementOf(VALUE, false, TOKEN)), eq(REGEX), eq(BASE_DIR  + File.separator + FILE),
+		verify(processor).replace(argThat(replacementOf(null, VALUE, false, TOKEN)), eq(REGEX), eq(BASE_DIR  + File.separator + FILE),
 				eq(OUTPUT_FILE), eq(REGEX_PATTERN_FLAGS));
 		verify(fileUtils).readFile(TOKEN_FILE);
 		verify(fileUtils).readFile(VALUE_FILE);
@@ -395,14 +398,22 @@ public class ReplacerMojoTest {
 		mojo.execute();
 	}
 	
-	private BaseMatcher<List<Replacement>> replacementOf(final String value, final boolean unescape, final String... tokens) {
+	private BaseMatcher<List<Replacement>> replacementOf(final String xpath, final String value, 
+			final boolean unescape, final String... tokens) {
 		return new BaseMatcher<List<Replacement>>() {
 			@SuppressWarnings("unchecked")
 			public boolean matches(Object arg0) {
+				List<Replacement> replacements = (List<Replacement>) arg0;
 				for (int i=0; i < tokens.length; i++) {
-					Replacement replacement = ((List<Replacement>) arg0).get(i);
-					if (!(tokens[i].equals(replacement.getToken()) && value.equals(replacement.getValue())
-						&& unescape == replacement.isUnescape())) {
+					Replacement replacement = replacements.get(i);
+					EqualsBuilder equalsBuilder = new EqualsBuilder();
+					equalsBuilder.append(tokens[i], replacement.getToken());
+					equalsBuilder.append(value, replacement.getValue());
+					equalsBuilder.append(unescape, replacement.isUnescape());
+					equalsBuilder.append(xpath, replacement.getXpath());
+					
+					boolean equals = equalsBuilder.isEquals();
+					if (!equals) {
 						return false;
 					}
 				}
@@ -410,9 +421,9 @@ public class ReplacerMojoTest {
 			}
 
 			public void describeTo(Description desc) {
-				desc.appendText("tokens=" + Arrays.asList(tokens) + " ");
-				desc.appendText("value=" + value + " ");
-				desc.appendText("unescape=" + unescape);
+				desc.appendText("tokens").appendValue(Arrays.asList(tokens));
+				desc.appendText("value").appendValue(value);
+				desc.appendText("unescape").appendValue(unescape);
 			}
 		};
 	}

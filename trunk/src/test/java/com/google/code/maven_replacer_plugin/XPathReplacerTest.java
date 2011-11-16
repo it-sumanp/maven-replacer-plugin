@@ -34,4 +34,33 @@ public class XPathReplacerTest {
 		String result = replacer.replace("<parent><test>token</test></parent>", replacement, false, NO_FLAGS);
 		assertThat(result, containsString("<parent><test>value</test></parent>"));
 	}
+	
+	@Test(expected = IllegalStateException.class)
+	public void shouldThrowExceptionWhenAttemptingToConstructWithoutTokenReplacer() throws Exception {
+		new XPathReplacer(null);
+	}
+	
+	@Test(expected = RuntimeException.class)
+	public void shouldThrowExceptionWhenTryingToReplaceParentNodeValue() throws Exception {
+		when(replacement.getXpath()).thenReturn("//test");
+		
+		try {
+			replacer.replace("<test>token</test>", replacement, false, NO_FLAGS);
+		} catch (Exception e) {
+			assertThat(e.getMessage(), containsString("Cannot replace a node's content"));
+			throw e;
+		}
+	}
+	
+	@Test(expected = RuntimeException.class)
+	public void shouldThrowExceptionWhenTryingToReplaceWithInvalidXPath() throws Exception {
+		when(replacement.getXpath()).thenReturn("invalid xpath");
+		
+		try {
+			replacer.replace("<test>token</test>", replacement, false, NO_FLAGS);
+		} catch (Exception e) {
+			assertThat(e.getMessage(), containsString("Extra illegal tokens: 'xpath'"));
+			throw e;
+		}
+	}
 }
