@@ -22,11 +22,12 @@ public class Replacement {
 		this.unescape = false;
 	}
 
-	public Replacement(FileUtils fileUtils, String token, String value, boolean unescape) {
+	public Replacement(FileUtils fileUtils, String token, String value, boolean unescape, String xpath) {
 		this.fileUtils = fileUtils;
 		setUnescape(unescape);
 		setToken(token);
 		setValue(value);
+		setXpath(xpath);
 	}
 
 	public void setTokenFile(String tokenFile) throws IOException {
@@ -73,9 +74,9 @@ public class Replacement {
 		return unescape;
 	}
 
-	public Replacement from(Replacement replacement) {
+	public static Replacement from(Replacement replacement) {
 		return new Replacement(replacement.fileUtils, replacement.token, replacement.value, 
-				replacement.unescape);
+				replacement.unescape, replacement.xpath);
 	}
 
 	public Replacement withDelimiter(DelimiterBuilder delimiter) {

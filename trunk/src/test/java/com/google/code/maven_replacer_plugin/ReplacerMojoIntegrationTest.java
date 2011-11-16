@@ -3,6 +3,7 @@ package com.google.code.maven_replacer_plugin;
 import static java.util.Arrays.asList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertFalse;
 import static org.mockito.Matchers.anyString;
@@ -31,6 +32,7 @@ public class ReplacerMojoIntegrationTest {
 	private static final String VALUE = "value";
 	private static final String OUTPUT_DIR = "target/outputdir/";
 	private static final String XPATH_TEST_FILE = "xpath.xml";
+	private static final String XPATH_EXPECTED_FILE = "xpath-replaced.xml";
 	
 	private ReplacerMojo mojo;
 	private String filenameAndPath;
@@ -98,24 +100,24 @@ public class ReplacerMojoIntegrationTest {
 		verify(log).info("Replacement run on 1 file.");
 	}
 	
-	@Ignore
 	@Test
 	public void shouldReplaceNonRegexTokenLocatedByXPathWithinReplacements() throws Exception {
-		String content = IOUtils.toString(getClass().getClassLoader().getResourceAsStream(XPATH_TEST_FILE));
+		String content = scrub(IOUtils.toString(getClass().getClassLoader().getResourceAsStream(XPATH_TEST_FILE)));
+		String expectedContent = scrub(IOUtils.toString(getClass().getClassLoader().getResourceAsStream(XPATH_EXPECTED_FILE)));
 		filenameAndPath = createTempFile(content);
 
 		Replacement replacement = new Replacement();
-		replacement.setToken("Authur");
-		replacement.setValue("Philip");
-		replacement.setXpath("/people/person[firstname='Arthur' and lastname='Dent']");
+		replacement.setToken(TOKEN);
+		replacement.setValue(VALUE);
+		replacement.setXpath("//person[firstname='" + TOKEN + "' and lastname='change me']");
 
 		mojo.setFile(filenameAndPath);
 		mojo.setRegex(false);
 		mojo.setReplacements(asList(replacement));
 		mojo.execute();
 
-		String results = FileUtils.readFileToString(new File(filenameAndPath));
-		assertThat(results, equalTo(VALUE));
+		String results = scrub(FileUtils.readFileToString(new File(filenameAndPath)));
+		assertThat(results, equalTo(expectedContent));
 		verify(log).info("Replacement run on 1 file.");
 	}
 	
@@ -486,5 +488,9 @@ public class ReplacerMojoIntegrationTest {
 		FileUtils.writeLines(file, contents);
 		file.deleteOnExit();
 		return "target/" + file.getName();
+	}
+	
+	private String scrub(String dirty) {
+		return dirty.replaceAll("\r", "").replaceAll("\n", "").replaceAll("\t", "");
 	}
 }

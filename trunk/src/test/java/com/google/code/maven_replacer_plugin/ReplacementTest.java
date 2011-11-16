@@ -29,7 +29,7 @@ public class ReplacementTest {
 
 	@Test
 	public void shouldReturnConstructorParameters() throws Exception {
-		Replacement context = new Replacement(fileUtils, TOKEN, VALUE, false);
+		Replacement context = new Replacement(fileUtils, TOKEN, VALUE, false, null);
 		
 		assertThat(context.getToken(), equalTo(TOKEN));
 		assertThat(context.getValue(), equalTo(VALUE));
@@ -39,7 +39,7 @@ public class ReplacementTest {
 	@Test
 	public void shouldApplyToTokenDelimeterIfExists() throws Exception {
 		when(delimiter.apply(TOKEN)).thenReturn("new token");
-		Replacement context = new Replacement(fileUtils, TOKEN, VALUE, false).withDelimiter(delimiter);
+		Replacement context = new Replacement(fileUtils, TOKEN, VALUE, false, null).withDelimiter(delimiter);
 		
 		assertThat(context.getToken(), equalTo("new token"));
 		assertThat(context.getValue(), equalTo(VALUE));
@@ -48,7 +48,7 @@ public class ReplacementTest {
 	
 	@Test
 	public void shouldUseEscapedTokensAndValues() {
-		Replacement context = new Replacement(fileUtils, UNESCAPED, UNESCAPED, true);
+		Replacement context = new Replacement(fileUtils, UNESCAPED, UNESCAPED, true, null);
 		
 		assertThat(context.getToken(), equalTo(ESCAPED));
 		assertThat(context.getValue(), equalTo(ESCAPED));
@@ -59,7 +59,7 @@ public class ReplacementTest {
 	public void shouldUseEscapedTokensAndValuesFromFiles() throws Exception {
 		when(fileUtils.readFile(FILE)).thenReturn(UNESCAPED);
 
-		Replacement context = new Replacement(fileUtils, null, null, true);
+		Replacement context = new Replacement(fileUtils, null, null, true, null);
 		context.setTokenFile(FILE);
 		context.setValueFile(FILE);
 		
@@ -71,7 +71,7 @@ public class ReplacementTest {
 	public void shouldUseTokenFromFileUtilsIfGiven() throws Exception {
 		when(fileUtils.readFile(FILE)).thenReturn(TOKEN);
 
-		Replacement context = new Replacement(fileUtils, null, VALUE, false);
+		Replacement context = new Replacement(fileUtils, null, VALUE, false, null);
 		context.setTokenFile(FILE);
 		assertThat(context.getToken(), equalTo(TOKEN));
 		assertThat(context.getValue(), equalTo(VALUE));
@@ -81,7 +81,7 @@ public class ReplacementTest {
 	public void shouldUseValueFromFileUtilsIfGiven() throws Exception {
 		when(fileUtils.readFile(FILE)).thenReturn(VALUE);
 
-		Replacement context = new Replacement(fileUtils, TOKEN, null, false);
+		Replacement context = new Replacement(fileUtils, TOKEN, null, false, null);
 		context.setValueFile(FILE);
 		assertThat(context.getToken(), equalTo(TOKEN));
 		assertThat(context.getValue(), equalTo(VALUE));
@@ -97,5 +97,16 @@ public class ReplacementTest {
 		assertThat(context.getToken(), equalTo(TOKEN));
 		assertThat(context.getValue(), equalTo(VALUE));
 		assertThat(context.getXpath(), equalTo(XPATH));
+	}
+	
+	@Test
+	public void shouldReturnCopyOfReplacementInFrom() {
+		Replacement context = new Replacement(fileUtils, TOKEN, VALUE, true, XPATH);
+		Replacement copy = Replacement.from(context);
+		
+		assertThat(copy.getToken(), equalTo(TOKEN));
+		assertThat(copy.getValue(), equalTo(VALUE));
+		assertThat(copy.isUnescape(), equalTo(true));
+		assertThat(copy.getXpath(), equalTo(XPATH));
 	}
 }
