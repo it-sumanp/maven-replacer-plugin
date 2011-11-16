@@ -3,7 +3,6 @@ package com.google.code.maven_replacer_plugin;
 import static java.util.Arrays.asList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
-import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertFalse;
 import static org.mockito.Matchers.anyString;
@@ -24,24 +23,38 @@ import org.apache.commons.io.IOUtils;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.logging.Log;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 public class ReplacerMojoIntegrationTest {
+	private static final String EXPECTED_XPATH = scrub(
+		"<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
+		"<people>" +
+		"<person>" +
+		"<firstname>value</firstname>" +
+		"<lastname>change me</lastname>" +
+		"<occupation>please</occupation>" +
+		"</person>" +
+		"<person>" +
+		"<firstname>token</firstname>" +
+		"<lastname>dont change me</lastname>" +
+		"<occupation>please</occupation>" +
+		"</person>" +
+		"</people>");
 	private static final String TOKEN = "token";
 	private static final String VALUE = "value";
 	private static final String OUTPUT_DIR = "target/outputdir/";
 	private static final String XPATH_TEST_FILE = "xpath.xml";
-	private static final String XPATH_EXPECTED_FILE = "xpath-replaced.xml";
 	
 	private ReplacerMojo mojo;
 	private String filenameAndPath;
 	private Log log;
+	private String xml;
 
 	@Before
 	public void setUp() throws Exception {
 		filenameAndPath = createTempFile(TOKEN);
 		log = mock(Log.class);
+		xml = scrub(IOUtils.toString(getClass().getClassLoader().getResourceAsStream(XPATH_TEST_FILE)));
 		
 		mojo = new ReplacerMojo() {
 			@Override
@@ -64,38 +77,24 @@ public class ReplacerMojoIntegrationTest {
 	}
 	
 	@Test
-	public void shouldReplaceTokenLocatedByXPath() throws Exception {
-		String content = scrub(IOUtils.toString(getClass().getClassLoader().getResourceAsStream(XPATH_TEST_FILE)));
-		filenameAndPath = createTempFile(content);
+	public void shouldReplaceRegexTokenLocatedByXPath() throws Exception {
+		filenameAndPath = createTempFile(xml);
 
 		mojo.setFile(filenameAndPath);
 		mojo.setXpath("//person[firstname='" + TOKEN + "' and lastname='change me']");
-		mojo.setToken("(" + TOKEN + ")");
-		mojo.setValue("$1 " + VALUE);
+		mojo.setToken("(t.K.n)");
+		mojo.setValue(VALUE);
+		mojo.setRegexFlags(asList("CASE_INSENSITIVE"));
 		mojo.execute();
 
 		String results = scrub(FileUtils.readFileToString(new File(filenameAndPath)));
-		assertThat(results, equalTo(
-				"<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
-				"<people>" +
-				"<person>" +
-				"<firstname>token value</firstname>" +
-				"<lastname>change me</lastname>" +
-				"<occupation>please</occupation>" +
-				"</person>" +
-				"<person>" +
-				"<firstname>token</firstname>" +
-				"<lastname>dont change me</lastname>" +
-				"<occupation>please</occupation>" +
-				"</person>" +
-				"</people>"));
+		assertThat(results, equalTo(EXPECTED_XPATH));
 		verify(log).info("Replacement run on 1 file.");
 	}
 	
 	@Test
 	public void shouldReplaceNonRegexTokenLocatedByXPath() throws Exception {
-		String content = scrub(IOUtils.toString(getClass().getClassLoader().getResourceAsStream(XPATH_TEST_FILE)));
-		filenameAndPath = createTempFile(content);
+		filenameAndPath = createTempFile(xml);
 
 		mojo.setFile(filenameAndPath);
 		mojo.setXpath("//person[firstname='" + TOKEN + "' and lastname='change me']");
@@ -105,28 +104,13 @@ public class ReplacerMojoIntegrationTest {
 		mojo.execute();
 
 		String results = scrub(FileUtils.readFileToString(new File(filenameAndPath)));
-		assertThat(results, equalTo(
-				"<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
-				"<people>" +
-				"<person>" +
-				"<firstname>value</firstname>" +
-				"<lastname>change me</lastname>" +
-				"<occupation>please</occupation>" +
-				"</person>" +
-				"<person>" +
-				"<firstname>token</firstname>" +
-				"<lastname>dont change me</lastname>" +
-				"<occupation>please</occupation>" +
-				"</person>" +
-				"</people>"));
+		assertThat(results, equalTo(EXPECTED_XPATH));
 		verify(log).info("Replacement run on 1 file.");
 	}
 	
 	@Test
 	public void shouldReplaceNonRegexTokenLocatedByXPathWithinReplacements() throws Exception {
-		String content = scrub(IOUtils.toString(getClass().getClassLoader().getResourceAsStream(XPATH_TEST_FILE)));
-		String expectedContent = scrub(IOUtils.toString(getClass().getClassLoader().getResourceAsStream(XPATH_EXPECTED_FILE)));
-		filenameAndPath = createTempFile(content);
+		filenameAndPath = createTempFile(xml);
 
 		Replacement replacement = new Replacement();
 		replacement.setToken(TOKEN);
@@ -139,8 +123,24 @@ public class ReplacerMojoIntegrationTest {
 		mojo.execute();
 
 		String results = scrub(FileUtils.readFileToString(new File(filenameAndPath)));
-		assertThat(results, equalTo(expectedContent));
+		assertThat(results, equalTo(EXPECTED_XPATH));
 		verify(log).info("Replacement run on 1 file.");
+	}
+	
+	@Test
+	public void shouldIgnoreErrorsInXPath() throws Exception {
+		filenameAndPath = createTempFile(xml);
+		mojo.setIgnoreErrors(true);
+		mojo.setFile(filenameAndPath);
+		mojo.setXpath("some bad xpath");
+		mojo.setToken(TOKEN);
+		mojo.setValue(VALUE);
+		mojo.execute();
+		
+		String results = FileUtils.readFileToString(new File(filenameAndPath));
+		assertThat(results, equalTo(xml));
+		verify(log).error(argThat(containsString("Extra illegal tokens: 'bad', 'xpath'")));
+		verify(log).info("Replacement run on 0 file.");
 	}
 	
 	@Test
@@ -512,7 +512,7 @@ public class ReplacerMojoIntegrationTest {
 		return "target/" + file.getName();
 	}
 	
-	private String scrub(String dirty) {
+	private static String scrub(String dirty) {
 		return dirty.replaceAll("\r", "").replaceAll("\n", "").replaceAll("\t", "");
 	}
 }

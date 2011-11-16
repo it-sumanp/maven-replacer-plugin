@@ -242,6 +242,13 @@ public class ReplacerMojo extends AbstractMojo {
 	 */
 	private boolean ignoreErrors;
 	
+	/**
+	 * X-Path expression for locating node's whose content you wish to replace.
+	 * This is useful if you have the same token appearing in many nodes but 
+	 * wish to only replace the contents of one or more of them.
+	 *
+	 * @parameter expression=""
+	 */
 	private String xpath;
 	
 	public ReplacerMojo() {
@@ -278,7 +285,7 @@ public class ReplacerMojo extends AbstractMojo {
 				return;
 			}
 
-			List<Replacement> contexts = getDelimiterReplacements(getContexts());
+			List<Replacement> contexts = getDelimiterReplacements(buildContexts());
 			addIncludesFilesAndExcludedFiles();
 
 			if (isEmptyCollection(includes)) {
@@ -353,7 +360,7 @@ public class ReplacerMojo extends AbstractMojo {
 		summaryBuilder.add(getBaseDirPrefixedFilename(inputFile), outputFileName, getLog());
 	}
 
-	private List<Replacement> getContexts() throws IOException {
+	private List<Replacement> buildContexts() throws IOException {
 		if (replacements != null) {
 			return replacements;
 		}
@@ -373,9 +380,10 @@ public class ReplacerMojo extends AbstractMojo {
 	}
 
 	private List<Replacement> getDelimiterReplacements(List<Replacement> replacements) {
-		if (isEmptyCollection(replacements) || isEmptyCollection(delimiters)) {
+		if (isEmptyCollection(delimiters)) {
 			return replacements;
 		}
+		
 		List<Replacement> newReplacements = new ArrayList<Replacement>();
 		for (Replacement replacement : replacements) {
 			for (DelimiterBuilder delimiter : buildDelimiters()) {
@@ -560,9 +568,5 @@ public class ReplacerMojo extends AbstractMojo {
 
 	public void setXpath(String xpath) {
 		this.xpath = xpath;
-	}
-	
-	public String getXpath() {
-		return xpath;
 	}
 }
