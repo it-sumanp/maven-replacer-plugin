@@ -18,8 +18,9 @@ public class ReplacementTest {
 	private static final String UNESCAPED = "test\\n123\\t456";
 	private static final String ESCAPED = "test\n123\t456";
 	private static final String FILE = "some file";
-	private static final String VALUE = "value";
 	private static final String TOKEN = "token";
+	private static final String VALUE = "value";
+	private static final String XPATH = "xpath";
 	
 	@Mock
 	private FileUtils fileUtils;
@@ -92,7 +93,9 @@ public class ReplacementTest {
 		
 		context.setToken(TOKEN);
 		context.setValue(VALUE);
+		context.setXpath(XPATH);
 		assertThat(context.getToken(), equalTo(TOKEN));
 		assertThat(context.getValue(), equalTo(VALUE));
+		assertThat(context.getXpath(), equalTo(XPATH));
 	}
 }
