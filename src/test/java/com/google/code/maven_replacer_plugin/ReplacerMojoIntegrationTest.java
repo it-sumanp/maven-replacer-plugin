@@ -63,40 +63,62 @@ public class ReplacerMojoIntegrationTest {
 		verify(log).info("Replacement run on 1 file.");
 	}
 	
-	@Ignore
 	@Test
 	public void shouldReplaceTokenLocatedByXPath() throws Exception {
-		String content = IOUtils.toString(getClass().getClassLoader().getResourceAsStream(XPATH_TEST_FILE));
+		String content = scrub(IOUtils.toString(getClass().getClassLoader().getResourceAsStream(XPATH_TEST_FILE)));
 		filenameAndPath = createTempFile(content);
 
 		mojo.setFile(filenameAndPath);
-		mojo.setXpath("/people/person[firstname='Arthur' and lastname='Dent']");
-		mojo.setToken("(Authur)");
-		mojo.setValue("$ Philip");
+		mojo.setXpath("//person[firstname='" + TOKEN + "' and lastname='change me']");
+		mojo.setToken("(" + TOKEN + ")");
+		mojo.setValue("$1 " + VALUE);
 		mojo.execute();
 
-		String results = FileUtils.readFileToString(new File(filenameAndPath));
-		assertThat(results, equalTo(VALUE));
+		String results = scrub(FileUtils.readFileToString(new File(filenameAndPath)));
+		assertThat(results, equalTo(
+				"<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
+				"<people>" +
+				"<person>" +
+				"<firstname>token value</firstname>" +
+				"<lastname>change me</lastname>" +
+				"<occupation>please</occupation>" +
+				"</person>" +
+				"<person>" +
+				"<firstname>token</firstname>" +
+				"<lastname>dont change me</lastname>" +
+				"<occupation>please</occupation>" +
+				"</person>" +
+				"</people>"));
 		verify(log).info("Replacement run on 1 file.");
 	}
 	
-	@Ignore
 	@Test
-	public void shouldReplaceTokenLocatedByXPathWithinReplacements() throws Exception {
-		String content = IOUtils.toString(getClass().getClassLoader().getResourceAsStream(XPATH_TEST_FILE));
+	public void shouldReplaceNonRegexTokenLocatedByXPath() throws Exception {
+		String content = scrub(IOUtils.toString(getClass().getClassLoader().getResourceAsStream(XPATH_TEST_FILE)));
 		filenameAndPath = createTempFile(content);
 
-		Replacement replacement = new Replacement();
-		replacement.setToken("(Authur)");
-		replacement.setValue("$ Philip");
-		replacement.setXpath("/people/person[firstname='Arthur' and lastname='Dent']");
-
 		mojo.setFile(filenameAndPath);
-		mojo.setReplacements(asList(replacement));
+		mojo.setXpath("//person[firstname='" + TOKEN + "' and lastname='change me']");
+		mojo.setToken(TOKEN);
+		mojo.setValue(VALUE);
+		mojo.setRegex(false);
 		mojo.execute();
 
-		String results = FileUtils.readFileToString(new File(filenameAndPath));
-		assertThat(results, equalTo(VALUE));
+		String results = scrub(FileUtils.readFileToString(new File(filenameAndPath)));
+		assertThat(results, equalTo(
+				"<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
+				"<people>" +
+				"<person>" +
+				"<firstname>value</firstname>" +
+				"<lastname>change me</lastname>" +
+				"<occupation>please</occupation>" +
+				"</person>" +
+				"<person>" +
+				"<firstname>token</firstname>" +
+				"<lastname>dont change me</lastname>" +
+				"<occupation>please</occupation>" +
+				"</person>" +
+				"</people>"));
 		verify(log).info("Replacement run on 1 file.");
 	}
 	
