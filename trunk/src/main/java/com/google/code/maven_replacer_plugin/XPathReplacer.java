@@ -42,8 +42,7 @@ public class XPathReplacer implements Replacer {
 			this.docBuilder = DocumentBuilderFactory.newInstance().newDocumentBuilder();
 			this.transformer = TransformerFactory.newInstance().newTransformer();
 		} catch (Exception e) {
-			String cause = e.getMessage() != null ? e.getMessage() : e.getCause().getMessage();
-			throw new IllegalStateException("Unable to initialise XML processing: " + cause, e);
+			throw new IllegalStateException("Unable to initialise XML processing: " + e.getMessage(), e);
 		}
 	}
 

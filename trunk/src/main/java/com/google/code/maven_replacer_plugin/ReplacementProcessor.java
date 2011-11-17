@@ -16,22 +16,22 @@ public class ReplacementProcessor {
 		this.replacerFactory = replacerFactory;
 	}
 	
-	public void replace(List<Replacement> contexts, boolean regex, String file,
+	public void replace(List<Replacement> replacements, boolean regex, String file,
 			String outputFile, int regexFlags) throws IOException {
 		String content = fileUtils.readFile(file);
-		for (Replacement context : contexts) {
-			content = replaceContent(regex, regexFlags, content, context);
+		for (Replacement replacement : replacements) {
+			content = replaceContent(regex, regexFlags, content, replacement);
 		}
 
 		fileUtils.writeToFile(outputFile, content);
 	}
 
-	private String replaceContent(boolean regex, int regexFlags, String content, Replacement context) {
-		if (isEmpty(context.getToken())) {
+	private String replaceContent(boolean regex, int regexFlags, String content, Replacement replacement) {
+		if (isEmpty(replacement.getToken())) {
 			throw new IllegalArgumentException("Token or token file required");
 		}
 
-		Replacer replacer = replacerFactory.create(context);
-		return replacer.replace(content, context, regex, regexFlags);
+		Replacer replacer = replacerFactory.create(replacement);
+		return replacer.replace(content, replacement, regex, regexFlags);
 	}
 }

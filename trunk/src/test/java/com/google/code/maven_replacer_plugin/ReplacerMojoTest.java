@@ -191,7 +191,7 @@ public class ReplacerMojoTest {
 		Replacement replacement = mock(Replacement.class);
 		List<Replacement> replacements = asList(replacement);
 
-		when(tokenValueMapFactory.contextsForFile(BASE_DIR  + File.separator + TOKEN_VALUE_MAP, true, false)).thenReturn(replacements);
+		when(tokenValueMapFactory.replacementsForFile(BASE_DIR  + File.separator + TOKEN_VALUE_MAP, true, false)).thenReturn(replacements);
 
 		mojo.setRegexFlags(regexFlags);
 		mojo.setRegex(REGEX);
@@ -210,7 +210,7 @@ public class ReplacerMojoTest {
 		Replacement replacement = mock(Replacement.class);
 		List<Replacement> replacements = asList(replacement);
 
-		when(tokenValueMapFactory.contextsForFile(BASE_DIR  + File.separator + TOKEN_VALUE_MAP, false, false)).thenReturn(replacements);
+		when(tokenValueMapFactory.replacementsForFile(BASE_DIR  + File.separator + TOKEN_VALUE_MAP, false, false)).thenReturn(replacements);
 
 		mojo.setRegexFlags(regexFlags);
 		mojo.setRegex(REGEX);
@@ -327,7 +327,7 @@ public class ReplacerMojoTest {
 		Replacement replacement = mock(Replacement.class);
 		List<Replacement> replacements = asList(replacement);
 
-		when(tokenValueMapFactory.contextsForVariable(TOKEN_VALUE_MAP, true, false)).thenReturn(replacements);
+		when(tokenValueMapFactory.replacementsForVariable(TOKEN_VALUE_MAP, true, false)).thenReturn(replacements);
 		mojo.setVariableTokenValueMap(TOKEN_VALUE_MAP);
 		mojo.setFile(FILE);
 		mojo.setBasedir(BASE_DIR);
