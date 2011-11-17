@@ -38,102 +38,111 @@ public class TokenValueMapFactoryTest {
 	}
 	
 	@Test
-	public void shouldReturnContextsFromFile() throws Exception {
+	public void shouldReturnReplacementsFromFile() throws Exception {
 		when(fileUtils.readFile(FILENAME)).thenReturn("token=value");
 		
-		List<Replacement> contexts = factory.contextsForFile(FILENAME, COMMENTS_DISABLED, false);
-		assertThat(contexts, notNullValue());
-		assertThat(contexts.size(), is(1));
-		assertThat(contexts.get(0).getToken(), equalTo("token"));
-		assertThat(contexts.get(0).getValue(), equalTo("value"));
+		List<Replacement> replacements = factory.replacementsForFile(FILENAME, COMMENTS_DISABLED, false);
+		assertThat(replacements, notNullValue());
+		assertThat(replacements.size(), is(1));
+		assertThat(replacements.get(0).getToken(), equalTo("token"));
+		assertThat(replacements.get(0).getValue(), equalTo("value"));
 	}
 
 	@Test
-	public void shouldReturnContextsFromFileAndIgnoreBlankLinesAndComments() throws Exception {
+	public void shouldReturnReplacementsFromFileAndIgnoreBlankLinesAndComments() throws Exception {
 		when(fileUtils.readFile(FILENAME)).thenReturn("\n  \ntoken1=value1\ntoken2 = value2\n#some comment\n");
 		
-		List<Replacement> contexts = factory.contextsForFile(FILENAME, COMMENTS_ENABLED, false);
-		assertThat(contexts, notNullValue());
-		assertThat(contexts.size(), is(2));
-		assertThat(contexts.get(0).getToken(), equalTo("token1"));
-		assertThat(contexts.get(0).getValue(), equalTo("value1"));
-		assertThat(contexts.get(1).getToken(), equalTo("token2"));
-		assertThat(contexts.get(1).getValue(), equalTo("value2"));
+		List<Replacement> replacements = factory.replacementsForFile(FILENAME, COMMENTS_ENABLED, false);
+		assertThat(replacements, notNullValue());
+		assertThat(replacements.size(), is(2));
+		assertThat(replacements.get(0).getToken(), equalTo("token1"));
+		assertThat(replacements.get(0).getValue(), equalTo("value1"));
+		assertThat(replacements.get(1).getToken(), equalTo("token2"));
+		assertThat(replacements.get(1).getValue(), equalTo("value2"));
 	}
 	
 	@Test
-	public void shouldReturnContextsFromFileAndIgnoreBlankLinesUsingCommentLinesIfCommentsDisabled() throws Exception {
+	public void shouldReturnReplacementsFromFileAndIgnoreBlankLinesUsingCommentLinesIfCommentsDisabled() throws Exception {
 		when(fileUtils.readFile(FILENAME)).thenReturn("\n  \ntoken1=value1\ntoken2=value2\n#some=#comment\n");
 		
-		List<Replacement> contexts = factory.contextsForFile(FILENAME, COMMENTS_DISABLED, false);
-		assertThat(contexts, notNullValue());
-		assertThat(contexts.size(), is(3));
-		assertThat(contexts.get(0).getToken(), equalTo("token1"));
-		assertThat(contexts.get(0).getValue(), equalTo("value1"));
-		assertThat(contexts.get(1).getToken(), equalTo("token2"));
-		assertThat(contexts.get(1).getValue(), equalTo("value2"));
-		assertThat(contexts.get(2).getToken(), equalTo("#some"));
-		assertThat(contexts.get(2).getValue(), equalTo("#comment"));
+		List<Replacement> replacements = factory.replacementsForFile(FILENAME, COMMENTS_DISABLED, false);
+		assertThat(replacements, notNullValue());
+		assertThat(replacements.size(), is(3));
+		assertThat(replacements.get(0).getToken(), equalTo("token1"));
+		assertThat(replacements.get(0).getValue(), equalTo("value1"));
+		assertThat(replacements.get(1).getToken(), equalTo("token2"));
+		assertThat(replacements.get(1).getValue(), equalTo("value2"));
+		assertThat(replacements.get(2).getToken(), equalTo("#some"));
+		assertThat(replacements.get(2).getValue(), equalTo("#comment"));
 	}
 	
 	@Test
 	public void shouldIgnoreTokensWithNoSeparatedValue() throws Exception {
 		when(fileUtils.readFile(FILENAME)).thenReturn("#comment\ntoken2");
-		List<Replacement> contexts = factory.contextsForFile(FILENAME, COMMENTS_DISABLED, false);
-		assertThat(contexts, notNullValue());
-		assertTrue(contexts.isEmpty());
+		List<Replacement> replacements = factory.replacementsForFile(FILENAME, COMMENTS_DISABLED, false);
+		assertThat(replacements, notNullValue());
+		assertTrue(replacements.isEmpty());
 	}
 	
 	@Test
-	public void shouldReturnRegexContextsFromFile() throws Exception {
+	public void shouldReturnRegexReplacementsFromFile() throws Exception {
 		when(fileUtils.readFile(FILENAME)).thenReturn("\\=tok\\=en1=val\\=ue1\nto$ke..n2=value2");
 		
-		List<Replacement> contexts = factory.contextsForFile(FILENAME, COMMENTS_ENABLED, false);
-		assertThat(contexts, notNullValue());
-		assertThat(contexts.size(), is(2));
-		assertThat(contexts.get(0).getToken(), equalTo("\\=tok\\=en1"));
-		assertThat(contexts.get(0).getValue(), equalTo("val\\=ue1"));
-		assertThat(contexts.get(1).getToken(), equalTo("to$ke..n2"));
-		assertThat(contexts.get(1).getValue(), equalTo("value2"));
+		List<Replacement> replacements = factory.replacementsForFile(FILENAME, COMMENTS_ENABLED, false);
+		assertThat(replacements, notNullValue());
+		assertThat(replacements.size(), is(2));
+		assertThat(replacements.get(0).getToken(), equalTo("\\=tok\\=en1"));
+		assertThat(replacements.get(0).getValue(), equalTo("val\\=ue1"));
+		assertThat(replacements.get(1).getToken(), equalTo("to$ke..n2"));
+		assertThat(replacements.get(1).getValue(), equalTo("value2"));
 	}
 	
 	@Test
-	public void shouldReturnRegexContextsFromFileUnescaping() throws Exception {
+	public void shouldReturnRegexReplacementsFromFileUnescaping() throws Exception {
 		when(fileUtils.readFile(FILENAME)).thenReturn("\\\\=tok\\\\=en1=val\\\\=ue1\nto$ke..n2=value2");
 		
-		List<Replacement> contexts = factory.contextsForFile(FILENAME, COMMENTS_ENABLED, true);
-		assertThat(contexts, notNullValue());
-		assertThat(contexts.size(), is(2));
-		assertThat(contexts.get(0).getToken(), equalTo("\\=tok\\=en1"));
-		assertThat(contexts.get(0).getValue(), equalTo("val\\=ue1"));
-		assertThat(contexts.get(1).getToken(), equalTo("to$ke..n2"));
-		assertThat(contexts.get(1).getValue(), equalTo("value2"));
+		List<Replacement> replacements = factory.replacementsForFile(FILENAME, COMMENTS_ENABLED, true);
+		assertThat(replacements, notNullValue());
+		assertThat(replacements.size(), is(2));
+		assertThat(replacements.get(0).getToken(), equalTo("\\=tok\\=en1"));
+		assertThat(replacements.get(0).getValue(), equalTo("val\\=ue1"));
+		assertThat(replacements.get(1).getToken(), equalTo("to$ke..n2"));
+		assertThat(replacements.get(1).getValue(), equalTo("value2"));
 	}
 	
 	@Test (expected = IllegalArgumentException.class)
 	public void shouldThrowExceptionIfNoTokenForValue() throws Exception {
 		when(fileUtils.readFile(FILENAME)).thenReturn("=value");
-		factory.contextsForFile(FILENAME, COMMENTS_DISABLED, false);
+		factory.replacementsForFile(FILENAME, COMMENTS_DISABLED, false);
 	}
 	
 	@Test
 	public void shouldSupportEmptyFileAndReturnNoReplacements() throws Exception {
 		when(fileUtils.readFile(FILENAME)).thenReturn("");
-		List<Replacement> contexts = factory.contextsForFile(FILENAME, COMMENTS_DISABLED, false);
-		assertThat(contexts, notNullValue());
-		assertTrue(contexts.isEmpty());
+		List<Replacement> replacements = factory.replacementsForFile(FILENAME, COMMENTS_DISABLED, false);
+		assertThat(replacements, notNullValue());
+		assertTrue(replacements.isEmpty());
 	}
 	
 	@Test
-	public void shouldReturnListOfContextsFromVariable() {
-		List<Replacement> contexts = factory.contextsForVariable("#comment,token1=value1,token2=value2", true, false);
-		assertThat(contexts, notNullValue());
-		assertThat(contexts.size(), is(2));
-		assertThat(contexts, hasItem(contextWith("token1", "value1")));
-		assertThat(contexts, hasItem(contextWith("token2", "value2")));
+	public void shouldReturnListOfReplacementsFromVariable() {
+		List<Replacement> replacements = factory.replacementsForVariable("#comment,token1=value1,token2=value2", true, false);
+		assertThat(replacements, notNullValue());
+		assertThat(replacements.size(), is(2));
+		assertThat(replacements, hasItem(replacementWith("token1", "value1")));
+		assertThat(replacements, hasItem(replacementWith("token2", "value2")));
+	}
+	
+	
+	@Test
+	public void shouldReturnListOfReplacementsFromSingleVariable() {
+		List<Replacement> replacements = factory.replacementsForVariable("token1=value1", true, false);
+		assertThat(replacements, notNullValue());
+		assertThat(replacements.size(), is(1));
+		assertThat(replacements, hasItem(replacementWith("token1", "value1")));
 	}
 
-	private Matcher<Replacement> contextWith(final String token, final String value) {
+	private Matcher<Replacement> replacementWith(final String token, final String value) {
 		return new BaseMatcher<Replacement>() {
 			public boolean matches(Object o) {
 				Replacement replacement = (Replacement)o;

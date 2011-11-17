@@ -285,16 +285,16 @@ public class ReplacerMojo extends AbstractMojo {
 				return;
 			}
 
-			List<Replacement> contexts = getDelimiterReplacements(buildContexts());
+			List<Replacement> replacements = getDelimiterReplacements(buildReplacements());
 			addIncludesFilesAndExcludedFiles();
 
 			if (isEmptyCollection(includes)) {
-				replaceContents(processor, contexts, file);
+				replaceContents(processor, replacements, file);
 				return;
 			}
 
 			for (String file : fileSelector.listIncludes(basedir, includes, excludes)) {
-				replaceContents(processor, contexts, file);
+				replaceContents(processor, replacements, file);
 			}
 		} catch (Exception e) {
 			getLog().error(e.getMessage());
@@ -347,10 +347,10 @@ public class ReplacerMojo extends AbstractMojo {
 		}
 	}
 
-	private void replaceContents(ReplacementProcessor processor, List<Replacement> contexts, String inputFile) throws IOException {
+	private void replaceContents(ReplacementProcessor processor, List<Replacement> replacements, String inputFile) throws IOException {
 		String outputFileName = outputFilenameBuilder.buildFrom(inputFile, this);
 		try {
-			processor.replace(contexts, regex, getBaseDirPrefixedFilename(inputFile), outputFileName, patternFlagsFactory.buildFlags(regexFlags));
+			processor.replace(replacements, regex, getBaseDirPrefixedFilename(inputFile), outputFileName, patternFlagsFactory.buildFlags(regexFlags));
 		} catch (PatternSyntaxException e) {
 			if (!isEmptyCollection(delimiters)) {
 				getLog().error(String.format(REGEX_PATTERN_WITH_DELIMITERS_MESSAGE, e.getMessage()));
@@ -360,13 +360,13 @@ public class ReplacerMojo extends AbstractMojo {
 		summaryBuilder.add(getBaseDirPrefixedFilename(inputFile), outputFileName, getLog());
 	}
 
-	private List<Replacement> buildContexts() throws IOException {
+	private List<Replacement> buildReplacements() throws IOException {
 		if (replacements != null) {
 			return replacements;
 		}
 		
 		if (variableTokenValueMap != null) {
-			return tokenValueMapFactory.contextsForVariable(variableTokenValueMap, isCommentsEnabled(), unescape);
+			return tokenValueMapFactory.replacementsForVariable(variableTokenValueMap, isCommentsEnabled(), unescape);
 		}
 		
 		if (tokenValueMap == null) {
@@ -376,7 +376,7 @@ public class ReplacerMojo extends AbstractMojo {
 			return Arrays.asList(replacement);
 		}
 		
-		return tokenValueMapFactory.contextsForFile(getBaseDirPrefixedFilename(tokenValueMap), isCommentsEnabled(), unescape);
+		return tokenValueMapFactory.replacementsForFile(getBaseDirPrefixedFilename(tokenValueMap), isCommentsEnabled(), unescape);
 	}
 
 	private List<Replacement> getDelimiterReplacements(List<Replacement> replacements) {

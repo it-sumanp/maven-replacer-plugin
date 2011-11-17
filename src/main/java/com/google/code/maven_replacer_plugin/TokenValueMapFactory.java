@@ -22,46 +22,46 @@ public class TokenValueMapFactory {
 		this.fileUtils = fileUtils;
 	}
 	
-	public List<Replacement> contextsForVariable(String variable, boolean commentsEnabled, boolean unescape) {
+	public List<Replacement> replacementsForVariable(String variable, boolean commentsEnabled, boolean unescape) {
 		StringTokenizer tokenizer = new StringTokenizer(variable, ",");
 		String fragment = null;
-		List<Replacement> contexts = new ArrayList<Replacement>();
+		List<Replacement> replacements = new ArrayList<Replacement>();
 		while (tokenizer.hasMoreTokens()) {
 			fragment = tokenizer.nextToken();
 			if (ignoreFragment(fragment, commentsEnabled)) {
 				continue;
 			}
 
-			appendContext(contexts, fragment, unescape);
+			appendReplacement(replacements, fragment, unescape);
 		}
-		return contexts;
+		return replacements;
 	}
 
-	public List<Replacement> contextsForFile(String tokenValueMapFile, boolean commentsEnabled, boolean unescape) 
+	public List<Replacement> replacementsForFile(String tokenValueMapFile, boolean commentsEnabled, boolean unescape) 
 		throws IOException {
 		String contents = fileUtils.readFile(tokenValueMapFile);
 		BufferedReader reader = new BufferedReader(new StringReader(contents));
 
 		String fragment = null;
-		List<Replacement> contexts = new ArrayList<Replacement>();
+		List<Replacement> replacements = new ArrayList<Replacement>();
 		while ((fragment = reader.readLine()) != null) {
 			fragment = fragment.trim();
 			if (ignoreFragment(fragment, commentsEnabled)) {
 				continue;
 			}
 
-			appendContext(contexts, fragment, unescape);
+			appendReplacement(replacements, fragment, unescape);
 		}
-		return contexts;
+		return replacements;
 	}
 	
-	private void appendContext(List<Replacement> contexts, String fragment, boolean unescape) {
+	private void appendReplacement(List<Replacement> replacements, String fragment, boolean unescape) {
 		StringBuilder token = new StringBuilder();
 		String value = "";
 		boolean settingToken = true;
 		for (int i=0; i < fragment.length(); i++) {
 			if (i == 0 && fragment.charAt(0) == SEPARATOR) {
-				throw new IllegalArgumentException(getNoValueErrorMsgFor(fragment) + "1");
+				throw new IllegalArgumentException(getNoValueErrorMsgFor(fragment));
 			}
 
 			if (settingToken && !isSeparatorAt(i, fragment)) {
@@ -80,7 +80,7 @@ public class TokenValueMapFactory {
 			return;
 		}
 		value = value.trim();
-		contexts.add(new Replacement(fileUtils, tokenVal, value, unescape, null));
+		replacements.add(new Replacement(fileUtils, tokenVal, value, unescape, null));
 	}
 
 	private boolean isSeparatorAt(int i, String line) {
@@ -88,8 +88,7 @@ public class TokenValueMapFactory {
 	}
 
 	private String getNoValueErrorMsgFor(String line) {
-		return "No value for token: " + line + ". Make sure that " +
-				"tokens have values in pairs in the format: token=value";
+		return "No value for token: " + line + ". Make sure that tokens have values in pairs in the format: token=value";
 	}
 
 	private boolean ignoreFragment(String line, boolean commentsEnabled) {
