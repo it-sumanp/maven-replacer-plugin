@@ -32,7 +32,7 @@ public class ReplacementProcessorTest {
 	@Mock
 	private Replacer replacer;
 	@Mock
-	private Replacement context;
+	private Replacement replacement;
 	@Mock
 	private ReplacerFactory replacerFactory;
 	
@@ -41,42 +41,42 @@ public class ReplacementProcessorTest {
 	@Before
 	public void setUp() throws Exception {
 		when(fileUtils.readFile(FILE)).thenReturn(CONTENT);
-		when(context.getToken()).thenReturn(TOKEN);
-		when(context.getValue()).thenReturn(VALUE);
-		when(replacerFactory.create(context)).thenReturn(replacer);
+		when(replacement.getToken()).thenReturn(TOKEN);
+		when(replacement.getValue()).thenReturn(VALUE);
+		when(replacerFactory.create(replacement)).thenReturn(replacer);
 		
 		processor = new ReplacementProcessor(fileUtils, replacerFactory);
 	}
 	
 	@Test
 	public void shouldWriteReplacedRegexTextToFile() throws Exception {
-		when(replacer.replace(CONTENT, context, true, REGEX_FLAGS)).thenReturn(NEW_CONTENT);
+		when(replacer.replace(CONTENT, replacement, true, REGEX_FLAGS)).thenReturn(NEW_CONTENT);
 		
-		processor.replace(asList(context), USE_REGEX, FILE, OUTPUT_FILE, REGEX_FLAGS);
+		processor.replace(asList(replacement), USE_REGEX, FILE, OUTPUT_FILE, REGEX_FLAGS);
 		verify(fileUtils).writeToFile(OUTPUT_FILE, NEW_CONTENT);
 	}
 	
 	@Test
 	public void shouldWriteReplacedNonRegexTextToFile() throws Exception {
-		when(replacer.replace(CONTENT, context, false, REGEX_FLAGS)).thenReturn(NEW_CONTENT);
+		when(replacer.replace(CONTENT, replacement, false, REGEX_FLAGS)).thenReturn(NEW_CONTENT);
 		
-		processor.replace(asList(context), NO_REGEX, FILE, OUTPUT_FILE, REGEX_FLAGS);
+		processor.replace(asList(replacement), NO_REGEX, FILE, OUTPUT_FILE, REGEX_FLAGS);
 		verify(fileUtils).writeToFile(OUTPUT_FILE, NEW_CONTENT);
 	}
 	
 	@Test (expected = IllegalArgumentException.class)
 	public void shouldThrowExceptionIfNoToken() throws Exception {
-		when(context.getToken()).thenReturn(null);
+		when(replacement.getToken()).thenReturn(null);
 		
-		processor.replace(asList(context), USE_REGEX, FILE, OUTPUT_FILE, REGEX_FLAGS);
+		processor.replace(asList(replacement), USE_REGEX, FILE, OUTPUT_FILE, REGEX_FLAGS);
 		verifyZeroInteractions(fileUtils);
 	}
 	
 	@Test (expected = IllegalArgumentException.class)
 	public void shouldThrowExceptionIfEmptyToken() throws Exception {
-		when(context.getToken()).thenReturn("");
+		when(replacement.getToken()).thenReturn("");
 		
-		processor.replace(asList(context), USE_REGEX, FILE, OUTPUT_FILE, REGEX_FLAGS);
+		processor.replace(asList(replacement), USE_REGEX, FILE, OUTPUT_FILE, REGEX_FLAGS);
 		verifyZeroInteractions(fileUtils);
 	}
 }
