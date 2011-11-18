@@ -58,7 +58,7 @@ public class XPathReplacer implements Replacer {
 		}
 	}
 
-	private void replaceContent(NodeList replacementNodes, Replacement context, boolean regex, int regexFlags) throws Exception {
+	private void replaceContent(NodeList replacementNodes, Replacement replacement, boolean regex, int regexFlags) throws Exception {
 		for (int i=0; i < replacementNodes.getLength(); i++) {
 			Node replacementNode = replacementNodes.item(i);
 			Node parent = replacementNode.getParentNode();
@@ -67,7 +67,7 @@ public class XPathReplacer implements Replacer {
 			}
 
 			String replacementNodeStr = convertNodeToString(replacementNode);
-			String replacedNodeStr = tokenReplacer.replace(replacementNodeStr, context, regex, regexFlags);
+			String replacedNodeStr = tokenReplacer.replace(replacementNodeStr, replacement, regex, regexFlags);
 
 			Node replacedNode = convertXmlToNode(replacedNodeStr);
 			Node newNode = parent.getOwnerDocument().importNode(replacedNode, true);
