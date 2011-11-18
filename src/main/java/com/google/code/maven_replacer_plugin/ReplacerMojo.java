@@ -55,14 +55,14 @@ public class ReplacerMojo extends AbstractMojo {
 	 *
 	 * @parameter expression=""
 	 */
-	private List<String> includes;
+	private List<String> includes = new ArrayList<String>();
 
 	/**
 	 * List of excluded files pattern in ant format. Cannot use with outputFile.
 	 *
 	 * @parameter expression=""
 	 */
-	private List<String> excludes;
+	private List<String> excludes = new ArrayList<String>();
 
 	/**
 	 * Comma separated list of includes. This is split up and used the same way a array of includes would be.
@@ -326,17 +326,11 @@ public class ReplacerMojo extends AbstractMojo {
 	private void addIncludesFilesAndExcludedFiles() {
 		if (filesToInclude != null) {
 			String[] splitFiles = filesToInclude.split(",");
-			if (includes == null) {
-				includes = new ArrayList<String>();
-			}
 			addToList(Arrays.asList(splitFiles), includes);
 		}
 
 		if (filesToExclude != null) {
 			String[] splitFiles = filesToExclude.split(",");
-			if (excludes == null) {
-				excludes = new ArrayList<String>();
-			}
 			addToList(Arrays.asList(splitFiles), excludes);
 		}
 	}
