@@ -1,6 +1,5 @@
 package com.google.code.maven_replacer_plugin;
 
-import java.io.ByteArrayOutputStream;
 import java.io.StringReader;
 import java.io.StringWriter;
 
@@ -61,17 +60,23 @@ public class XPathReplacer implements Replacer {
 	private void replaceContent(NodeList replacementNodes, Replacement replacement, boolean regex, int regexFlags) throws Exception {
 		for (int i=0; i < replacementNodes.getLength(); i++) {
 			Node replacementNode = replacementNodes.item(i);
-			Node parent = replacementNode.getParentNode();
-			if (parent.getOwnerDocument() == null) {
-				throw new UnsupportedOperationException("Cannot replace a node's content not part of a parent node.");
+
+			if (replacementNode.getNodeType() == Node.ATTRIBUTE_NODE) {
+				// In case of an attribute node, we can just replace it's text content.
+				String replacedValue = tokenReplacer.replace(replacementNode.getTextContent(), replacement, regex, regexFlags);
+				replacementNode.setNodeValue(replacedValue);
+			} else {
+				String replacementNodeStr = convertNodeToString(replacementNode);
+				String replacedNodeStr = tokenReplacer.replace(replacementNodeStr, replacement, regex, regexFlags);
+
+				Node parent = replacementNode.getParentNode();
+				if (parent.getOwnerDocument() == null) {
+					throw new UnsupportedOperationException("Cannot replace a node's content not part of a parent node.");
+				}
+				Node replacedNode = convertXmlToNode(replacedNodeStr);
+				Node newNode = parent.getOwnerDocument().importNode(replacedNode, true);
+				parent.replaceChild(newNode, replacementNode);
 			}
-
-			String replacementNodeStr = convertNodeToString(replacementNode);
-			String replacedNodeStr = tokenReplacer.replace(replacementNodeStr, replacement, regex, regexFlags);
-
-			Node replacedNode = convertXmlToNode(replacedNodeStr);
-			Node newNode = parent.getOwnerDocument().importNode(replacedNode, true);
-			parent.replaceChild(newNode, replacementNode);
 		}
 	}
 
@@ -101,11 +106,11 @@ public class XPathReplacer implements Replacer {
 	private String writeXml(Document doc) throws Exception {
 		OutputFormat of = new OutputFormat(doc);
 		of.setPreserveSpace(true);
+		of.setEncoding(doc.getXmlEncoding());
 
-		ByteArrayOutputStream bos = new ByteArrayOutputStream();
-		XMLSerializer serializer = new XMLSerializer(bos, of);
+		StringWriter sw = new StringWriter();
+		XMLSerializer serializer = new XMLSerializer(sw, of);
 		serializer.serialize(doc);
-		bos.flush();
-		return bos.toString();
+		return sw.toString();
 	}
 }

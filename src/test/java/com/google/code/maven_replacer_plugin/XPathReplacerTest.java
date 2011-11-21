@@ -1,12 +1,12 @@
 package com.google.code.maven_replacer_plugin;
 
+import org.junit.Before;
+import org.junit.Test;
+
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-
-import org.junit.Before;
-import org.junit.Test;
 
 public class XPathReplacerTest {
 	private static final int NO_FLAGS = -1;
@@ -20,6 +20,22 @@ public class XPathReplacerTest {
 		replacement = mock(Replacement.class);
 		tokenReplacer = mock(TokenReplacer.class);
 		replacer = new XPathReplacer(tokenReplacer);
+	}
+	
+	@Test
+	public void shouldReplaceAttributeValueLocatedByXpath() throws Exception {
+		when(replacement.getXpath()).thenReturn("/root/@id");
+		when(replacement.getToken()).thenReturn("token");
+		when(replacement.getValue()).thenReturn("value");
+		when(tokenReplacer.replace("token", replacement, false, NO_FLAGS)).thenReturn("value");
+
+		String xml = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
+			"<root id=\"token\" class=\"test\"><element id=\"ID\">foo</element></root>";
+		String result = replacer.replace(xml, replacement, false, NO_FLAGS);
+		// verify that the id attribute in the <root> tag got replaced
+		assertThat(result, containsString("<root class=\"test\" id=\"value\">"));
+		//verify that the id attribute in the <element> tag remained untouched
+		assertThat(result, containsString("<element id=\"ID\">"));
 	}
 
 	@Test
@@ -59,7 +75,8 @@ public class XPathReplacerTest {
 		try {
 			replacer.replace("<test>token</test>", replacement, false, NO_FLAGS);
 		} catch (Exception e) {
-			assertThat(e.getMessage(), containsString("Extra illegal tokens: 'xpath'"));
+			//XML parser produces localized error messages!
+			assertThat(e.getMessage(), containsString(": 'xpath'"));
 			throw e;
 		}
 	}
