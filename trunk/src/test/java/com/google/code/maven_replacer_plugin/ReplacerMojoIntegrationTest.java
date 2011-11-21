@@ -139,7 +139,8 @@ public class ReplacerMojoIntegrationTest {
 		
 		String results = FileUtils.readFileToString(new File(filenameAndPath));
 		assertThat(results, equalTo(xml));
-		verify(log).error(argThat(containsString("Extra illegal tokens: 'bad', 'xpath'")));
+		//XML parser produces localized error messages!
+		verify(log).error(argThat(containsString(": 'bad', 'xpath'")));
 		verify(log).info("Replacement run on 0 file.");
 	}
 	
