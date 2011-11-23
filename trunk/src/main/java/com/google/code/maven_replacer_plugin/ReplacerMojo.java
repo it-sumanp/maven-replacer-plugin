@@ -288,7 +288,7 @@ public class ReplacerMojo extends AbstractMojo {
 			List<Replacement> replacements = getDelimiterReplacements(buildReplacements());
 			addIncludesFilesAndExcludedFiles();
 
-			if (isEmptyCollection(includes)) {
+			if (includes.isEmpty()) {
 				replaceContents(processor, replacements, file);
 				return;
 			}
@@ -346,7 +346,7 @@ public class ReplacerMojo extends AbstractMojo {
 		try {
 			processor.replace(replacements, regex, getBaseDirPrefixedFilename(inputFile), outputFileName, patternFlagsFactory.buildFlags(regexFlags));
 		} catch (PatternSyntaxException e) {
-			if (!isEmptyCollection(delimiters)) {
+			if (!delimiters.isEmpty()) {
 				getLog().error(String.format(REGEX_PATTERN_WITH_DELIMITERS_MESSAGE, e.getMessage()));
 				throw e;
 			}
@@ -374,7 +374,7 @@ public class ReplacerMojo extends AbstractMojo {
 	}
 
 	private List<Replacement> getDelimiterReplacements(List<Replacement> replacements) {
-		if (isEmptyCollection(delimiters)) {
+		if (delimiters.isEmpty()) {
 			return replacements;
 		}
 		
@@ -388,10 +388,6 @@ public class ReplacerMojo extends AbstractMojo {
 		return newReplacements;
 	}
 	
-	private boolean isEmptyCollection(Collection<?> c) {
-		return c == null || c.isEmpty();
-	}
-
 	private List<DelimiterBuilder> buildDelimiters() {
 		List<DelimiterBuilder> built = new ArrayList<DelimiterBuilder>();
 		for (String delimiter : delimiters) {
