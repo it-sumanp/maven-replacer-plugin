@@ -75,12 +75,12 @@ public class TokenValueMapFactory {
 			}
 		}
 
-		String tokenVal = token.toString().trim();
-		if (tokenVal.length() == 0 || settingToken) {
+		if (settingToken) {
 			return;
 		}
-		value = value.trim();
-		replacements.add(new Replacement(fileUtils, tokenVal, value, unescape, null));
+		
+		String tokenVal = token.toString().trim();
+		replacements.add(new Replacement(fileUtils, tokenVal, value.trim(), unescape, null));
 	}
 
 	private boolean isSeparatorAt(int i, String line) {
