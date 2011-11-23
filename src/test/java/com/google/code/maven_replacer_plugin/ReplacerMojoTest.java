@@ -100,6 +100,7 @@ public class ReplacerMojoTest {
 		mojo.setRegex(REGEX);
 		mojo.setReplacements(replacements);
 		mojo.setFile(FILE);
+		mojo.setIgnoreMissingFile(true);
 		mojo.setOutputFile(OUTPUT_FILE);
 		mojo.setBasedir(BASE_DIR);
 		mojo.execute();
