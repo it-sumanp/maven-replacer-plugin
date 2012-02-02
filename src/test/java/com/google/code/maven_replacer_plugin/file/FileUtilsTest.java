@@ -4,6 +4,7 @@ import static java.util.Arrays.asList;
 import static org.apache.commons.lang.StringUtils.join;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -19,6 +20,7 @@ import org.junit.Test;
 import org.junit.rules.TemporaryFolder;
 
 public class FileUtilsTest {
+	private static final String NON_ASCII_CONTENT = "한국어/조선말";
 	private static final String CONTENT = "content";
 
 	@Rule
@@ -64,6 +66,24 @@ public class FileUtilsTest {
 		String tempFile = System.getProperty("java.io.tmpdir") + "/" + UUID.randomUUID() + "/tempfile";
 		fileUtils.writeToFile(tempFile, CONTENT);
 		assertThat(org.apache.commons.io.FileUtils.readFileToString(new File(tempFile)), equalTo(CONTENT));
+	}
+	
+	@Test
+	public void shouldWriteFileWithoutSpecifiedEncoding() throws Exception {
+		String tempFile = System.getProperty("java.io.tmpdir") + "/" + UUID.randomUUID() + "/tempfile";
+		fileUtils.writeToFile(tempFile, NON_ASCII_CONTENT);
+		assertThat(fileUtils.readFile(tempFile), equalTo(NON_ASCII_CONTENT));
+	}
+	
+	@Test
+	public void shouldWriteFileWithSpecifiedEncoding() throws Exception {
+		String tempFile = System.getProperty("java.io.tmpdir") + "/" + UUID.randomUUID() + "/tempfile";
+		fileUtils.setEncoding("UTF-8");
+		fileUtils.writeToFile(tempFile, NON_ASCII_CONTENT);
+		assertThat(fileUtils.readFile(tempFile), equalTo(NON_ASCII_CONTENT));
+		
+		fileUtils.setEncoding("US-ASCII");
+		assertThat(fileUtils.readFile(tempFile), not(equalTo(NON_ASCII_CONTENT)));
 	}
 	
 	@Test

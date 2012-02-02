@@ -6,6 +6,8 @@ import java.io.File;
 import java.io.IOException;
 
 public class FileUtils {
+	private String encoding;
+
 	public boolean fileNotExists(String filename) {
 		return isBlank(filename) || !new File(filename).exists();
 	}
@@ -27,12 +29,19 @@ public class FileUtils {
 	}
 
 	public String readFile(String file) throws IOException {
+		if (encoding != null) {
+			return org.apache.commons.io.FileUtils.readFileToString(new File(file), encoding);
+		}
 		return org.apache.commons.io.FileUtils.readFileToString(new File(file));
 	}
 
 	public void writeToFile(String outputFile, String content) throws IOException {
 		ensureFolderStructureExists(outputFile);
-		org.apache.commons.io.FileUtils.writeStringToFile(new File(outputFile), content);
+		if (encoding != null) { 
+			org.apache.commons.io.FileUtils.writeStringToFile(new File(outputFile), content, encoding);
+		} else {
+			org.apache.commons.io.FileUtils.writeStringToFile(new File(outputFile), content);
+		}
 	}
 	
 	public String createFullPath(String... dirsAndFilename) {
@@ -44,5 +53,9 @@ public class FileUtils {
 		fullPath.append(dirsAndFilename[dirsAndFilename.length - 1]);
 		
 		return fullPath.toString();
+	}
+
+	public void setEncoding(String encoding) {
+		this.encoding = encoding;
 	}
 }
