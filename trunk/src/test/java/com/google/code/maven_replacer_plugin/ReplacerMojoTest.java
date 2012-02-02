@@ -41,6 +41,7 @@ import com.google.code.maven_replacer_plugin.include.FileSelector;
 @RunWith(MockitoJUnitRunner.class)
 public class ReplacerMojoTest {
 
+	private static final String ENCODING = "encoding";
 	private static final String XPATH = "xpath";
 	private static final String REGEX_FLAG = "regex flag";
 	private static final String FILE = "file";
@@ -103,12 +104,14 @@ public class ReplacerMojoTest {
 		mojo.setIgnoreMissingFile(true);
 		mojo.setOutputFile(OUTPUT_FILE);
 		mojo.setBasedir(BASE_DIR);
+		mojo.setEncoding(ENCODING);
 		mojo.execute();
 		
 		assertSame(FILE, mojo.getFile());
 		verify(processor).replace(replacements, REGEX, BASE_DIR + File.separator + FILE, OUTPUT_FILE, REGEX_PATTERN_FLAGS);
 		verify(summaryBuilder).add(BASE_DIR + File.separator + FILE, OUTPUT_FILE, log);
 		verify(summaryBuilder).print(log);
+		verify(fileUtils).setEncoding(ENCODING);
 	}
 	
 	@Test
@@ -128,6 +131,7 @@ public class ReplacerMojoTest {
 		verify(processor).replace(replacements, REGEX, FILE, OUTPUT_FILE, REGEX_PATTERN_FLAGS);
 		verify(summaryBuilder).add(FILE, OUTPUT_FILE, log);
 		verify(summaryBuilder).print(log);
+		verify(fileUtils).setEncoding(null);
 	}
 	
 	@Test

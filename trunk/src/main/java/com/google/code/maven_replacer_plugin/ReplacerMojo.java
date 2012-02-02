@@ -299,6 +299,14 @@ public class ReplacerMojo extends AbstractMojo {
 	 */
 	private String xpath;
 	
+	/**
+	 * File encoding used when reading and writing files. 
+	 * Default system encoding used when not specified.
+	 * 
+	 * @parameter expression=""
+	 */
+	private String encoding;
+	
 	public ReplacerMojo() {
 		super();
 		this.fileUtils = new FileUtils();
@@ -327,6 +335,7 @@ public class ReplacerMojo extends AbstractMojo {
 	}
 
 	public void execute() throws MojoExecutionException {
+		fileUtils.setEncoding(encoding);
 		try {
 			if (checkFileExists()) {
 				getLog().info("Ignoring missing file");
@@ -606,5 +615,9 @@ public class ReplacerMojo extends AbstractMojo {
 
 	public void setXpath(String xpath) {
 		this.xpath = xpath;
+	}
+	
+	public void setEncoding(String encoding) {
+		this.encoding = encoding;
 	}
 }
