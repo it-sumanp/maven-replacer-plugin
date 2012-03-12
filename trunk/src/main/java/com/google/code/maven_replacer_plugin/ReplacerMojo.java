@@ -307,6 +307,24 @@ public class ReplacerMojo extends AbstractMojo {
 	 */
 	private String encoding;
 	
+	/**
+	 * Regular expression is run on an input file's name to create the output file with.
+	 * Must be used in conjunction with outputFilePattern.
+	 * 
+	 * @parameter expression=""
+	 */
+	private String inputFilePattern;
+	
+	/**
+	 * Regular expression groups from inputFilePattern are used in this pattern to create an output file per input file.
+	 * Must be used in conjunction with inputFilePattern.
+	 * 
+	 * The parameter outputFile is ignored when outputFilePattern is used.
+	 * 
+	 * @parameter expression=""
+	 */
+	private String outputFilePattern;
+	
 	public ReplacerMojo() {
 		super();
 		this.fileUtils = new FileUtils();
@@ -624,5 +642,21 @@ public class ReplacerMojo extends AbstractMojo {
 	
 	public void setEncoding(String encoding) {
 		this.encoding = encoding;
+	}
+
+	public void setInputFilePattern(String inputFilePattern) {
+		this.inputFilePattern = inputFilePattern;
+	}
+
+	public void setOutputFilePattern(String outputFilePattern) {
+		this.outputFilePattern = outputFilePattern;
+	}
+	
+	public String getInputFilePattern() {
+		return inputFilePattern;
+	}
+	
+	public String getOutputFilePattern() {
+		return outputFilePattern;
 	}
 }

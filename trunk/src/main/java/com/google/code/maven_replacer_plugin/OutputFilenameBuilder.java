@@ -11,14 +11,31 @@ public class OutputFilenameBuilder {
 	public OutputFilenameBuilder() {
 		fileUtils = new FileUtils();
 	}
-
+	
 	public String buildFrom(String inputFilename, ReplacerMojo mojo) {
-		if (mojo.getOutputDir() != null) {
-			String result = mojo.isPreserveDir() ? inputFilename : stripPath(inputFilename);
+		String based = buildOutputFile(inputFilename, mojo);
+		if (mojo.getInputFilePattern() != null && mojo.getOutputFilePattern() != null) {
+			based = based.replaceAll(mojo.getInputFilePattern(), mojo.getOutputFilePattern());
+		}
+		
+		return based;
+	}
+	
+	private String buildOutputFile(String inputFilename, ReplacerMojo mojo) {
+		if (mojo.getOutputDir() != null && mojo.getOutputFile() != null) {
+			String cleanResult = mojo.isPreserveDir() ? mojo.getOutputFile() : stripPath(mojo.getOutputFile());
 			if (mojo.getOutputBasedir() != null) {
-				return fileUtils.createFullPath(mojo.getOutputBasedir(), mojo.getOutputDir(), result);
+				return fileUtils.createFullPath(mojo.getOutputBasedir(), mojo.getOutputDir(), cleanResult);
 			}
-			return fileUtils.createFullPath(mojo.getBasedir(), mojo.getOutputDir(), result);
+			return fileUtils.createFullPath(mojo.getBasedir(), mojo.getOutputDir(), cleanResult);
+		}
+		
+		if (mojo.getOutputDir() != null) {
+			String cleanResult = mojo.isPreserveDir() ? inputFilename : stripPath(inputFilename);
+			if (mojo.getOutputBasedir() != null) {
+				return fileUtils.createFullPath(mojo.getOutputBasedir(), mojo.getOutputDir(), cleanResult);
+			}
+			return fileUtils.createFullPath(mojo.getBasedir(), mojo.getOutputDir(), cleanResult);
 		}
 		
 		if (mojo.getOutputFile() != null) {
