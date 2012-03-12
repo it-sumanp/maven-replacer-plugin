@@ -47,8 +47,10 @@ public class FileUtils {
 	public String createFullPath(String... dirsAndFilename) {
 		StringBuilder fullPath = new StringBuilder();
 		for (int i=0; i < dirsAndFilename.length - 1; i++) {
-			fullPath.append(dirsAndFilename[i]);
-			fullPath.append(File.separator);
+			if (dirsAndFilename[i] != null) {
+				fullPath.append(dirsAndFilename[i]);
+				fullPath.append(File.separator);
+			}
 		}
 		fullPath.append(dirsAndFilename[dirsAndFilename.length - 1]);
 		
