@@ -51,6 +51,30 @@ public class OutputFilenameBuilderTest {
 	}
 	
 	@Test
+	public void shouldPrefixOutputDirWhenUsingOutputDirAndOutputFile() {
+		when(mojo.getOutputDir()).thenReturn(OUTPUT_DIR);
+		when(mojo.getOutputFile()).thenReturn(OUTPUT_FILE);
+		
+		String output = builder.buildFrom(INPUT_FILE, mojo);
+		assertThat(output, equalTo(fileUtils.createFullPath(BASE_DIR, OUTPUT_DIR, OUTPUT_FILE)));
+	}
+	
+	@Test
+	public void shouldReturnReplacedOutputFilenameFromPatterns() {
+		when(mojo.getInputFilePattern()).thenReturn("(.+)");
+		when(mojo.getOutputFilePattern()).thenReturn("$1");
+		
+		String output = builder.buildFrom(INPUT_FILE, mojo);
+		assertThat(output, equalTo(fileUtils.createFullPath(BASE_DIR, INPUT_FILE)));
+		
+		when(mojo.getInputFilePattern()).thenReturn("(.+)");
+		when(mojo.getOutputFilePattern()).thenReturn("$1-new");
+		
+		output = builder.buildFrom(INPUT_FILE, mojo);
+		assertThat(output, equalTo(fileUtils.createFullPath(BASE_DIR, INPUT_FILE + "-new")));
+	}
+	
+	@Test
 	public void shouldPrefixBasedirWhenNotUsingOutputBasedir() {
 		when(mojo.getOutputDir()).thenReturn(OUTPUT_DIR);
 		

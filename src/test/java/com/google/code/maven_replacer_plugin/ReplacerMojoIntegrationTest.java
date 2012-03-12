@@ -372,6 +372,51 @@ public class ReplacerMojoIntegrationTest {
 	}
 	
 	@Test
+	public void shouldWriteIntoTransformedOutputFilesFromInputFilePattern() throws Exception {
+		String inputFile = createTempFile("test-filename", TOKEN);
+		mojo.setFile(inputFile);
+		mojo.setInputFilePattern("(.*)test-(.+)");
+		mojo.setOutputFilePattern("$1test-$2.replaced");
+		mojo.setToken(TOKEN);
+		mojo.setValue(VALUE);
+		mojo.execute();
+		
+		String results = FileUtils.readFileToString(new File(inputFile + ".replaced"));
+		assertThat(results, equalTo(VALUE));
+		verify(log).info("Replacement run on 1 file.");	
+	}
+	
+	@Test
+	public void shouldWriteIntoTransformedOutputFilesFromInputFilePatternFromIncludes() throws Exception {
+		String inputFile = createTempFile("test-filename", TOKEN);
+		mojo.setIncludes(asList(inputFile));
+		mojo.setInputFilePattern("(.*)test-(.+)");
+		mojo.setOutputFilePattern("$1test-$2.replaced");
+		mojo.setToken(TOKEN);
+		mojo.setValue(VALUE);
+		mojo.execute();
+		
+		String results = FileUtils.readFileToString(new File(inputFile + ".replaced"));
+		assertThat(results, equalTo(VALUE));
+		verify(log).info("Replacement run on 1 file.");	
+	}
+	
+	@Test
+	public void shouldWriteIntoTransformedOutputFilesFromInputFilePatternFromFilesToInclude() throws Exception {
+		String inputFile = createTempFile("test-filename", TOKEN);
+		mojo.setFilesToInclude(inputFile);
+		mojo.setInputFilePattern("(.*)test-(.+)");
+		mojo.setOutputFilePattern("$1test-$2.replaced");
+		mojo.setToken(TOKEN);
+		mojo.setValue(VALUE);
+		mojo.execute();
+		
+		String results = FileUtils.readFileToString(new File(inputFile + ".replaced"));
+		assertThat(results, equalTo(VALUE));
+		verify(log).info("Replacement run on 1 file.");	
+	}
+	
+	@Test
 	public void shouldReplaceContentsWithTokenValuesInInlineMap() throws Exception {
 		String variableTokenValueMap = TOKEN + "=" + VALUE;
 		
