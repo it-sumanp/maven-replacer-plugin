@@ -348,6 +348,30 @@ public class ReplacerMojoIntegrationTest {
 	}
 	
 	@Test
+	public void shouldReplaceContentsWithTokenValuesInMapWithAbsolutePath() throws Exception {
+		String tokenValueMapFilename = createTempFile(asList(TOKEN + "=" + VALUE));
+		String absolutePath = new File(tokenValueMapFilename).getAbsolutePath();
+		mojo.setTokenValueMap(absolutePath);
+		mojo.setFile(filenameAndPath);
+		mojo.execute();
+		
+		String results = FileUtils.readFileToString(new File(filenameAndPath));
+		assertThat(results, equalTo(VALUE));
+	}
+	
+	@Test
+	public void shouldReplaceContentsWithTokenValuesInMapWithAbsolutePathAndIncludes() throws Exception {
+		String tokenValueMapFilename = createTempFile(asList(TOKEN + "=" + VALUE));
+		String absolutePath = new File(tokenValueMapFilename).getAbsolutePath();
+		mojo.setTokenValueMap(absolutePath);
+		mojo.setIncludes(asList(filenameAndPath));
+		mojo.execute();
+		
+		String results = FileUtils.readFileToString(new File(filenameAndPath));
+		assertThat(results, equalTo(VALUE));
+	}
+	
+	@Test
 	public void shouldReplaceContentsWithTokenValuesInInlineMap() throws Exception {
 		String variableTokenValueMap = TOKEN + "=" + VALUE;
 		
@@ -501,7 +525,7 @@ public class ReplacerMojoIntegrationTest {
 		utils.ensureFolderStructureExists(fullname);
 		File file = new File(fullname);
 		FileUtils.writeStringToFile(file, contents);
-		file.deleteOnExit();
+		//file.deleteOnExit();
 		return fullname;
 	}
 	
@@ -509,7 +533,7 @@ public class ReplacerMojoIntegrationTest {
 		String filename = new Throwable().fillInStackTrace().getStackTrace()[1].getMethodName();
 		File file = new File("target/" + filename);
 		FileUtils.writeLines(file, contents);
-		file.deleteOnExit();
+		//file.deleteOnExit();
 		return "target/" + file.getName();
 	}
 	

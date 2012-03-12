@@ -427,7 +427,12 @@ public class ReplacerMojo extends AbstractMojo {
 			return Arrays.asList(replacement);
 		}
 		
-		return tokenValueMapFactory.replacementsForFile(getBaseDirPrefixedFilename(tokenValueMap), isCommentsEnabled(), unescape);
+		String tokenValueMapFile = getBaseDirPrefixedFilename(tokenValueMap);
+		if (fileUtils.fileNotExists(tokenValueMapFile)) {
+			getLog().info("'" + tokenValueMapFile + "' does not exist and assuming this is an absolute file name.");
+			tokenValueMapFile = tokenValueMap;
+		}
+		return tokenValueMapFactory.replacementsForFile(tokenValueMapFile, isCommentsEnabled(), unescape);
 	}
 
 	private List<Replacement> getDelimiterReplacements(List<Replacement> replacements) {
