@@ -525,7 +525,7 @@ public class ReplacerMojoIntegrationTest {
 		utils.ensureFolderStructureExists(fullname);
 		File file = new File(fullname);
 		FileUtils.writeStringToFile(file, contents);
-		//file.deleteOnExit();
+		file.deleteOnExit();
 		return fullname;
 	}
 	
@@ -533,7 +533,7 @@ public class ReplacerMojoIntegrationTest {
 		String filename = new Throwable().fillInStackTrace().getStackTrace()[1].getMethodName();
 		File file = new File("target/" + filename);
 		FileUtils.writeLines(file, contents);
-		//file.deleteOnExit();
+		file.deleteOnExit();
 		return "target/" + file.getName();
 	}
 	
