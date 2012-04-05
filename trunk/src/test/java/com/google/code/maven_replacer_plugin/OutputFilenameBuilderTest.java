@@ -1,7 +1,10 @@
 package com.google.code.maven_replacer_plugin;
 
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.endsWith;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.not;
+import static org.hamcrest.text.StringContains.containsString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -72,6 +75,21 @@ public class OutputFilenameBuilderTest {
 		
 		output = builder.buildFrom(INPUT_FILE, mojo);
 		assertThat(output, equalTo(fileUtils.createFullPath(BASE_DIR, INPUT_FILE + "-new")));
+	}
+	
+	@Test
+	public void shouldNotReturnReplacedOutputFilenameWhenMissingEitherInputOrOutputPattern() {
+		when(mojo.getInputFilePattern()).thenReturn(null);
+		when(mojo.getOutputFilePattern()).thenReturn("$1-new");
+		
+		String output = builder.buildFrom(INPUT_FILE, mojo);
+		assertThat(output, not(endsWith("-new")));
+		
+		when(mojo.getInputFilePattern()).thenReturn("(.+)");
+		when(mojo.getOutputFilePattern()).thenReturn(null);
+		
+		output = builder.buildFrom(INPUT_FILE, mojo);
+		assertThat(output, equalTo(fileUtils.createFullPath(BASE_DIR, INPUT_FILE)));
 	}
 	
 	@Test
