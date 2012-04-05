@@ -112,8 +112,7 @@ public class FileUtilsTest {
 	
 	@Test
 	public void shouldSkipNullsGracefullyWhenBuildingPath() {
-		String[] dirsAndFilename = {"1", null, "2", null, "3"};
-		String result = fileUtils.createFullPath(dirsAndFilename);
+		String result = fileUtils.createFullPath("1", null, "2", null, "3");
 		assertThat(result, equalTo(join(asList("1", "2", "3"), File.separator)));
 	}
 	
