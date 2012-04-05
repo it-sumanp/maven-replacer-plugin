@@ -4,6 +4,7 @@ import static java.util.Arrays.asList;
 import static org.apache.commons.lang.StringUtils.join;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -107,6 +108,13 @@ public class FileUtilsTest {
 	public void shouldBuildFullPathFromDirsAndFilename() {
 		String result = fileUtils.createFullPath("1", "2", "3", "tempFile");
 		assertThat(result, equalTo(join(asList("1", "2", "3", "tempFile"), File.separator)));
+	}
+	
+	@Test
+	public void shouldSkipNullsGracefullyWhenBuildingPath() {
+		String[] dirsAndFilename = {"1", null, "2", null, "3"};
+		String result = fileUtils.createFullPath(dirsAndFilename);
+		assertThat(result, equalTo(join(asList("1", "2", "3"), File.separator)));
 	}
 	
 	@Test
