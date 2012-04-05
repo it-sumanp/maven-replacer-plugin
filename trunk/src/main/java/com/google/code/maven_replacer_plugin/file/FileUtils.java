@@ -52,7 +52,10 @@ public class FileUtils {
 				fullPath.append(File.separator);
 			}
 		}
-		fullPath.append(dirsAndFilename[dirsAndFilename.length - 1]);
+		String last = dirsAndFilename[dirsAndFilename.length - 1];
+		if (last != null) {
+			fullPath.append(last);
+		}
 		
 		return fullPath.toString();
 	}
