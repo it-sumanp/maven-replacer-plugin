@@ -560,7 +560,7 @@ public class ReplacerMojoIntegrationTest {
 	}
 	
 	@Test
-	public void shouldReplaceVersionInPom() throws Exception {
+	public void shouldReplaceVersionInPomAsWithXPathTextMatch() throws Exception {
 		Replacement replacement = new Replacement();
 		replacement.setToken("(.+)");
 		replacement.setValue("$1-SNAPSHOT");
