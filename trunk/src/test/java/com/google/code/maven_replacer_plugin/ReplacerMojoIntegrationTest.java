@@ -574,6 +574,23 @@ public class ReplacerMojoIntegrationTest {
 		assertThat(results, containsString("<version>1.5.1-SNAPSHOT</version>"));
 	}
 	
+	@Test
+	public void shouldReplaceVersionInPomAsWithXPathAttrMatch() throws Exception {
+		Replacement replacement = new Replacement();
+		replacement.setToken("(.+)");
+		replacement.setValue("value");
+		replacement.setXpath("//@name");
+		mojo.setReplacements(asList(replacement));
+		mojo.setFile("src/test/resources/attr-xpath.xml");
+		mojo.setOutputFile("target/attr-xpath-replaced.xml");
+		mojo.execute();
+		
+		String results = FileUtils.readFileToString(new File(mojo.getOutputFile()));
+		assertThat(results, containsString("<person name=\"value\" other=\"token\"/>"));
+		assertThat(results, containsString("<other name=\"value\" other=\"token\"/>"));
+		assertThat(results, containsString("<other other=\"token\"/>"));
+	}
+	
 	private String createTempFile(String contents) throws IOException {
 		String filename = new Throwable().fillInStackTrace().getStackTrace()[1].getMethodName();
 		return createTempFile(filename, contents);
