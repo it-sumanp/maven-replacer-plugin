@@ -559,6 +559,21 @@ public class ReplacerMojoIntegrationTest {
 		assertThat(results, equalTo(VALUE));
 	}
 	
+	@Test
+	public void shouldReplaceVersionInPom() throws Exception {
+		Replacement replacement = new Replacement();
+		replacement.setToken("(.+)");
+		replacement.setValue("$1-SNAPSHOT");
+		replacement.setXpath("/project/version/text()");
+		mojo.setReplacements(asList(replacement));
+		mojo.setFile("src/test/resources/pom-for-replace.xml");
+		mojo.setOutputFile("target/pom-replaced.xml");
+		mojo.execute();
+		
+		String results = FileUtils.readFileToString(new File(mojo.getOutputFile()));
+		assertThat(results, containsString("<version>1.5.1-SNAPSHOT</version>"));
+	}
+	
 	private String createTempFile(String contents) throws IOException {
 		String filename = new Throwable().fillInStackTrace().getStackTrace()[1].getMethodName();
 		return createTempFile(filename, contents);

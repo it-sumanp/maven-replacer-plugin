@@ -61,11 +61,12 @@ public class XPathReplacer implements Replacer {
 		for (int i=0; i < replacementNodes.getLength(); i++) {
 			Node replacementNode = replacementNodes.item(i);
 
-			if (replacementNode.getNodeType() == Node.ATTRIBUTE_NODE) {
-				// In case of an attribute node, we can just replace it's text content.
+			switch (replacementNode.getNodeType()) {
+			case Node.ATTRIBUTE_NODE: case Node.TEXT_NODE:
 				String replacedValue = tokenReplacer.replace(replacementNode.getTextContent(), replacement, regex, regexFlags);
 				replacementNode.setNodeValue(replacedValue);
-			} else {
+				break;
+			default:
 				String replacementNodeStr = convertNodeToString(replacementNode);
 				String replacedNodeStr = tokenReplacer.replace(replacementNodeStr, replacement, regex, regexFlags);
 
