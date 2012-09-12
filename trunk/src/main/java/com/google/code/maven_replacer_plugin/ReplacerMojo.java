@@ -435,13 +435,15 @@ public class ReplacerMojo extends AbstractMojo {
 		}
 		
 		if (variableTokenValueMap != null) {
-			return tokenValueMapFactory.replacementsForVariable(variableTokenValueMap, isCommentsEnabled(), unescape);
+			return tokenValueMapFactory.replacementsForVariable(variableTokenValueMap, isCommentsEnabled(), 
+					unescape, encoding);
 		}
 		
 		if (tokenValueMap == null) {
-			Replacement replacement = new Replacement(fileUtils, token, value, unescape, xpath);
-			replacement.setTokenFile(tokenFile, encoding);
-			replacement.setValueFile(valueFile, encoding);
+			Replacement replacement = new Replacement(fileUtils, token, value, unescape, xpath, encoding);
+			replacement.setEncoding(encoding);
+			replacement.setTokenFile(tokenFile);
+			replacement.setValueFile(valueFile);
 			return Arrays.asList(replacement);
 		}
 		

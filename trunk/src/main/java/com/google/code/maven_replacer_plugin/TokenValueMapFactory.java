@@ -22,7 +22,7 @@ public class TokenValueMapFactory {
 		this.fileUtils = fileUtils;
 	}
 	
-	public List<Replacement> replacementsForVariable(String variable, boolean commentsEnabled, boolean unescape) {
+	public List<Replacement> replacementsForVariable(String variable, boolean commentsEnabled, boolean unescape, String encoding) {
 		StringTokenizer tokenizer = new StringTokenizer(variable, ",");
 		String fragment = null;
 		List<Replacement> replacements = new ArrayList<Replacement>();
@@ -32,7 +32,7 @@ public class TokenValueMapFactory {
 				continue;
 			}
 
-			appendReplacement(replacements, fragment, unescape);
+			appendReplacement(replacements, fragment, unescape, encoding);
 		}
 		return replacements;
 	}
@@ -51,12 +51,12 @@ public class TokenValueMapFactory {
 				continue;
 			}
 
-			appendReplacement(replacements, fragment, unescape);
+			appendReplacement(replacements, fragment, unescape, encoding);
 		}
 		return replacements;
 	}
 	
-	private void appendReplacement(List<Replacement> replacements, String fragment, boolean unescape) {
+	private void appendReplacement(List<Replacement> replacements, String fragment, boolean unescape, String encoding) {
 		StringBuilder token = new StringBuilder();
 		String value = "";
 		boolean settingToken = true;
@@ -81,7 +81,7 @@ public class TokenValueMapFactory {
 		}
 		
 		String tokenVal = token.toString().trim();
-		replacements.add(new Replacement(fileUtils, tokenVal, value.trim(), unescape, null));
+		replacements.add(new Replacement(fileUtils, tokenVal, value.trim(), unescape, null, encoding));
 	}
 
 	private boolean isSeparatorAt(int i, String line) {

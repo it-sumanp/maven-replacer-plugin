@@ -127,7 +127,8 @@ public class TokenValueMapFactoryTest {
 	
 	@Test
 	public void shouldReturnListOfReplacementsFromVariable() {
-		List<Replacement> replacements = factory.replacementsForVariable("#comment,token1=value1,token2=value2", true, false);
+		List<Replacement> replacements = factory.replacementsForVariable("#comment,token1=value1,token2=value2"
+				, true, false, ENCODING);
 		assertThat(replacements, notNullValue());
 		assertThat(replacements.size(), is(2));
 		assertThat(replacements, hasItem(replacementWith("token1", "value1")));
@@ -137,7 +138,7 @@ public class TokenValueMapFactoryTest {
 	
 	@Test
 	public void shouldReturnListOfReplacementsFromSingleVariable() {
-		List<Replacement> replacements = factory.replacementsForVariable("token1=value1", true, false);
+		List<Replacement> replacements = factory.replacementsForVariable("token1=value1", true, false, ENCODING);
 		assertThat(replacements, notNullValue());
 		assertThat(replacements.size(), is(1));
 		assertThat(replacements, hasItem(replacementWith("token1", "value1")));

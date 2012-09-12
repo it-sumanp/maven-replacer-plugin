@@ -337,14 +337,16 @@ public class ReplacerMojoTest {
 		Replacement replacement = mock(Replacement.class);
 		List<Replacement> replacements = asList(replacement);
 
-		when(tokenValueMapFactory.replacementsForVariable(TOKEN_VALUE_MAP, true, false)).thenReturn(replacements);
+		when(tokenValueMapFactory.replacementsForVariable(TOKEN_VALUE_MAP, true, false, ENCODING))
+			.thenReturn(replacements);
 		mojo.setVariableTokenValueMap(TOKEN_VALUE_MAP);
 		mojo.setFile(FILE);
 		mojo.setBasedir(BASE_DIR);
+		mojo.setEncoding(ENCODING);
 		mojo.execute();
 
 		assertThat(mojo.getVariableTokenValueMap(), equalTo(TOKEN_VALUE_MAP));
-		verify(processor).replace(replacements, true, BASE_DIR  + File.separator + FILE, OUTPUT_FILE, 0, NO_ENCODING_SET);
+		verify(processor).replace(replacements, true, BASE_DIR  + File.separator + FILE, OUTPUT_FILE, 0, ENCODING);
 		verify(summaryBuilder).add(BASE_DIR + File.separator + FILE, OUTPUT_FILE, log);
 		verify(summaryBuilder).print(log);
 	}
