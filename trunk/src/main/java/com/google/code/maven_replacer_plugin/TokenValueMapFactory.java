@@ -37,9 +37,10 @@ public class TokenValueMapFactory {
 		return replacements;
 	}
 
-	public List<Replacement> replacementsForFile(String tokenValueMapFile, boolean commentsEnabled, boolean unescape) 
+	public List<Replacement> replacementsForFile(String tokenValueMapFile, boolean commentsEnabled, 
+			boolean unescape, String encoding) 
 		throws IOException {
-		String contents = fileUtils.readFile(tokenValueMapFile);
+		String contents = fileUtils.readFile(tokenValueMapFile, encoding);
 		BufferedReader reader = new BufferedReader(new StringReader(contents));
 
 		String fragment = null;

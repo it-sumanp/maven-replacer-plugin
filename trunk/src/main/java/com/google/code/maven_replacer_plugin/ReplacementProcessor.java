@@ -17,13 +17,13 @@ public class ReplacementProcessor {
 	}
 	
 	public void replace(List<Replacement> replacements, boolean regex, String file,
-			String outputFile, int regexFlags) throws IOException {
-		String content = fileUtils.readFile(file);
+			String outputFile, int regexFlags, String encoding) throws IOException {
+		String content = fileUtils.readFile(file, encoding);
 		for (Replacement replacement : replacements) {
 			content = replaceContent(regex, regexFlags, content, replacement);
 		}
 
-		fileUtils.writeToFile(outputFile, content);
+		fileUtils.writeToFile(outputFile, content, encoding);
 	}
 
 	private String replaceContent(boolean regex, int regexFlags, String content, Replacement replacement) {

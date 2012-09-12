@@ -353,7 +353,6 @@ public class ReplacerMojo extends AbstractMojo {
 	}
 
 	public void execute() throws MojoExecutionException {
-		fileUtils.setEncoding(encoding);
 		try {
 			if (checkFileExists()) {
 				getLog().info("Ignoring missing file");
@@ -419,7 +418,8 @@ public class ReplacerMojo extends AbstractMojo {
 	private void replaceContents(ReplacementProcessor processor, List<Replacement> replacements, String inputFile) throws IOException {
 		String outputFileName = outputFilenameBuilder.buildFrom(inputFile, this);
 		try {
-			processor.replace(replacements, regex, getBaseDirPrefixedFilename(inputFile), outputFileName, patternFlagsFactory.buildFlags(regexFlags));
+			processor.replace(replacements, regex, getBaseDirPrefixedFilename(inputFile), 
+					outputFileName, patternFlagsFactory.buildFlags(regexFlags), encoding);
 		} catch (PatternSyntaxException e) {
 			if (!delimiters.isEmpty()) {
 				getLog().error(String.format(REGEX_PATTERN_WITH_DELIMITERS_MESSAGE, e.getMessage()));
@@ -440,8 +440,8 @@ public class ReplacerMojo extends AbstractMojo {
 		
 		if (tokenValueMap == null) {
 			Replacement replacement = new Replacement(fileUtils, token, value, unescape, xpath);
-			replacement.setTokenFile(tokenFile);
-			replacement.setValueFile(valueFile);
+			replacement.setTokenFile(tokenFile, encoding);
+			replacement.setValueFile(valueFile, encoding);
 			return Arrays.asList(replacement);
 		}
 		
@@ -450,7 +450,7 @@ public class ReplacerMojo extends AbstractMojo {
 			getLog().info("'" + tokenValueMapFile + "' does not exist and assuming this is an absolute file name.");
 			tokenValueMapFile = tokenValueMap;
 		}
-		return tokenValueMapFactory.replacementsForFile(tokenValueMapFile, isCommentsEnabled(), unescape);
+		return tokenValueMapFactory.replacementsForFile(tokenValueMapFile, isCommentsEnabled(), unescape, encoding);
 	}
 
 	private List<Replacement> getDelimiterReplacements(List<Replacement> replacements) {

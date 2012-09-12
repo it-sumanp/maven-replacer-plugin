@@ -30,15 +30,15 @@ public class Replacement {
 		setXpath(xpath);
 	}
 
-	public void setTokenFile(String tokenFile) throws IOException {
+	public void setTokenFile(String tokenFile, String encoding) throws IOException {
 		if (tokenFile != null) {
-			setToken(fileUtils.readFile(tokenFile));
+			setToken(fileUtils.readFile(tokenFile, encoding));
 		}
 	}
 
-	public void setValueFile(String valueFile) throws IOException {
+	public void setValueFile(String valueFile, String encoding) throws IOException {
 		if (valueFile != null) {
-			setValue(fileUtils.readFile(valueFile));
+			setValue(fileUtils.readFile(valueFile, encoding));
 		}
 	}
 

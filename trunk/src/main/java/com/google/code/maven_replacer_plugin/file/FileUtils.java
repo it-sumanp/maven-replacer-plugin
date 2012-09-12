@@ -6,8 +6,6 @@ import java.io.File;
 import java.io.IOException;
 
 public class FileUtils {
-	private String encoding;
-
 	public boolean fileNotExists(String filename) {
 		return isBlank(filename) || !new File(filename).exists();
 	}
@@ -28,14 +26,14 @@ public class FileUtils {
 		}
 	}
 
-	public String readFile(String file) throws IOException {
+	public String readFile(String file, String encoding) throws IOException {
 		if (encoding != null) {
 			return org.apache.commons.io.FileUtils.readFileToString(new File(file), encoding);
 		}
 		return org.apache.commons.io.FileUtils.readFileToString(new File(file));
 	}
 
-	public void writeToFile(String outputFile, String content) throws IOException {
+	public void writeToFile(String outputFile, String content, String encoding) throws IOException {
 		ensureFolderStructureExists(outputFile);
 		if (encoding != null) { 
 			org.apache.commons.io.FileUtils.writeStringToFile(new File(outputFile), content, encoding);
@@ -58,9 +56,5 @@ public class FileUtils {
 		}
 		
 		return fullPath.toString();
-	}
-
-	public void setEncoding(String encoding) {
-		this.encoding = encoding;
 	}
 }
