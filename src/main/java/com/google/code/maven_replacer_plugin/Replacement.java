@@ -14,7 +14,7 @@ public class Replacement {
 	private boolean unescape;
 	private String token;
 	private String value;
-
+	private String encoding;
 	private String xpath;
 	
 	public Replacement() {
@@ -22,21 +22,23 @@ public class Replacement {
 		this.unescape = false;
 	}
 
-	public Replacement(FileUtils fileUtils, String token, String value, boolean unescape, String xpath) {
+	public Replacement(FileUtils fileUtils, String token, String value, boolean unescape, 
+			String xpath, String encoding) {
 		this.fileUtils = fileUtils;
 		setUnescape(unescape);
 		setToken(token);
 		setValue(value);
 		setXpath(xpath);
+		setEncoding(encoding);
 	}
 
-	public void setTokenFile(String tokenFile, String encoding) throws IOException {
+	public void setTokenFile(String tokenFile) throws IOException {
 		if (tokenFile != null) {
 			setToken(fileUtils.readFile(tokenFile, encoding));
 		}
 	}
 
-	public void setValueFile(String valueFile, String encoding) throws IOException {
+	public void setValueFile(String valueFile) throws IOException {
 		if (valueFile != null) {
 			setValue(fileUtils.readFile(valueFile, encoding));
 		}
@@ -76,7 +78,7 @@ public class Replacement {
 
 	public static Replacement from(Replacement replacement) {
 		return new Replacement(replacement.fileUtils, replacement.token, replacement.value, 
-				replacement.unescape, replacement.xpath);
+				replacement.unescape, replacement.xpath, replacement.encoding);
 	}
 
 	public Replacement withDelimiter(DelimiterBuilder delimiter) {
@@ -90,5 +92,13 @@ public class Replacement {
 	
 	public String getXpath() {
 		return xpath;
+	}
+
+	public void setEncoding(String encoding) {
+		this.encoding = encoding;
+	}
+
+	public String getEncoding() {
+		return encoding;
 	}
 }
