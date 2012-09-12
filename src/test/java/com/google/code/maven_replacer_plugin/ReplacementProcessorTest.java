@@ -26,6 +26,7 @@ public class ReplacementProcessorTest {
 	private static final String TOKEN = "token";
 	private static final String CONTENT = "content";
 	private static final String VALUE = "value";
+	private static final String ENCODING = "encoding";
 	
 	@Mock
 	private FileUtils fileUtils;
@@ -40,7 +41,7 @@ public class ReplacementProcessorTest {
 
 	@Before
 	public void setUp() throws Exception {
-		when(fileUtils.readFile(FILE)).thenReturn(CONTENT);
+		when(fileUtils.readFile(FILE, ENCODING)).thenReturn(CONTENT);
 		when(replacement.getToken()).thenReturn(TOKEN);
 		when(replacement.getValue()).thenReturn(VALUE);
 		when(replacerFactory.create(replacement)).thenReturn(replacer);
@@ -52,23 +53,23 @@ public class ReplacementProcessorTest {
 	public void shouldWriteReplacedRegexTextToFile() throws Exception {
 		when(replacer.replace(CONTENT, replacement, true, REGEX_FLAGS)).thenReturn(NEW_CONTENT);
 		
-		processor.replace(asList(replacement), USE_REGEX, FILE, OUTPUT_FILE, REGEX_FLAGS);
-		verify(fileUtils).writeToFile(OUTPUT_FILE, NEW_CONTENT);
+		processor.replace(asList(replacement), USE_REGEX, FILE, OUTPUT_FILE, REGEX_FLAGS, ENCODING);
+		verify(fileUtils).writeToFile(OUTPUT_FILE, NEW_CONTENT, ENCODING);
 	}
 	
 	@Test
 	public void shouldWriteReplacedNonRegexTextToFile() throws Exception {
 		when(replacer.replace(CONTENT, replacement, false, REGEX_FLAGS)).thenReturn(NEW_CONTENT);
 		
-		processor.replace(asList(replacement), NO_REGEX, FILE, OUTPUT_FILE, REGEX_FLAGS);
-		verify(fileUtils).writeToFile(OUTPUT_FILE, NEW_CONTENT);
+		processor.replace(asList(replacement), NO_REGEX, FILE, OUTPUT_FILE, REGEX_FLAGS, ENCODING);
+		verify(fileUtils).writeToFile(OUTPUT_FILE, NEW_CONTENT, ENCODING);
 	}
 	
 	@Test (expected = IllegalArgumentException.class)
 	public void shouldThrowExceptionIfNoToken() throws Exception {
 		when(replacement.getToken()).thenReturn(null);
 		
-		processor.replace(asList(replacement), USE_REGEX, FILE, OUTPUT_FILE, REGEX_FLAGS);
+		processor.replace(asList(replacement), USE_REGEX, FILE, OUTPUT_FILE, REGEX_FLAGS, ENCODING);
 		verifyZeroInteractions(fileUtils);
 	}
 	
@@ -76,7 +77,7 @@ public class ReplacementProcessorTest {
 	public void shouldThrowExceptionIfEmptyToken() throws Exception {
 		when(replacement.getToken()).thenReturn("");
 		
-		processor.replace(asList(replacement), USE_REGEX, FILE, OUTPUT_FILE, REGEX_FLAGS);
+		processor.replace(asList(replacement), USE_REGEX, FILE, OUTPUT_FILE, REGEX_FLAGS, ENCODING);
 		verifyZeroInteractions(fileUtils);
 	}
 }

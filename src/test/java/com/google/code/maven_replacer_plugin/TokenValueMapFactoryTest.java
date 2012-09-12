@@ -26,6 +26,7 @@ public class TokenValueMapFactoryTest {
 	private static final String FILENAME = "some file";
 	private static final boolean COMMENTS_ENABLED = true;
 	private static final boolean COMMENTS_DISABLED = false;
+	private static final String ENCODING = "encoding";
 
 	@Mock
 	private FileUtils fileUtils;
@@ -39,9 +40,9 @@ public class TokenValueMapFactoryTest {
 	
 	@Test
 	public void shouldReturnReplacementsFromFile() throws Exception {
-		when(fileUtils.readFile(FILENAME)).thenReturn("token=value");
+		when(fileUtils.readFile(FILENAME, ENCODING)).thenReturn("token=value");
 		
-		List<Replacement> replacements = factory.replacementsForFile(FILENAME, COMMENTS_DISABLED, false);
+		List<Replacement> replacements = factory.replacementsForFile(FILENAME, COMMENTS_DISABLED, false, ENCODING);
 		assertThat(replacements, notNullValue());
 		assertThat(replacements.size(), is(1));
 		assertThat(replacements.get(0).getToken(), equalTo("token"));
@@ -50,9 +51,9 @@ public class TokenValueMapFactoryTest {
 
 	@Test
 	public void shouldReturnReplacementsFromFileAndIgnoreBlankLinesAndComments() throws Exception {
-		when(fileUtils.readFile(FILENAME)).thenReturn("\n  \ntoken1=value1\ntoken2 = value2\n#some comment\n");
+		when(fileUtils.readFile(FILENAME, ENCODING)).thenReturn("\n  \ntoken1=value1\ntoken2 = value2\n#some comment\n");
 		
-		List<Replacement> replacements = factory.replacementsForFile(FILENAME, COMMENTS_ENABLED, false);
+		List<Replacement> replacements = factory.replacementsForFile(FILENAME, COMMENTS_ENABLED, false, ENCODING);
 		assertThat(replacements, notNullValue());
 		assertThat(replacements.size(), is(2));
 		assertThat(replacements.get(0).getToken(), equalTo("token1"));
@@ -63,9 +64,9 @@ public class TokenValueMapFactoryTest {
 	
 	@Test
 	public void shouldReturnReplacementsFromFileAndIgnoreBlankLinesUsingCommentLinesIfCommentsDisabled() throws Exception {
-		when(fileUtils.readFile(FILENAME)).thenReturn("\n  \ntoken1=value1\ntoken2=value2\n#some=#comment\n");
+		when(fileUtils.readFile(FILENAME, ENCODING)).thenReturn("\n  \ntoken1=value1\ntoken2=value2\n#some=#comment\n");
 		
-		List<Replacement> replacements = factory.replacementsForFile(FILENAME, COMMENTS_DISABLED, false);
+		List<Replacement> replacements = factory.replacementsForFile(FILENAME, COMMENTS_DISABLED, false, ENCODING);
 		assertThat(replacements, notNullValue());
 		assertThat(replacements.size(), is(3));
 		assertThat(replacements.get(0).getToken(), equalTo("token1"));
@@ -78,17 +79,17 @@ public class TokenValueMapFactoryTest {
 	
 	@Test
 	public void shouldIgnoreTokensWithNoSeparatedValue() throws Exception {
-		when(fileUtils.readFile(FILENAME)).thenReturn("#comment\ntoken2");
-		List<Replacement> replacements = factory.replacementsForFile(FILENAME, COMMENTS_DISABLED, false);
+		when(fileUtils.readFile(FILENAME, ENCODING)).thenReturn("#comment\ntoken2");
+		List<Replacement> replacements = factory.replacementsForFile(FILENAME, COMMENTS_DISABLED, false, ENCODING);
 		assertThat(replacements, notNullValue());
 		assertTrue(replacements.isEmpty());
 	}
 	
 	@Test
 	public void shouldReturnRegexReplacementsFromFile() throws Exception {
-		when(fileUtils.readFile(FILENAME)).thenReturn("\\=tok\\=en1=val\\=ue1\nto$ke..n2=value2");
+		when(fileUtils.readFile(FILENAME, ENCODING)).thenReturn("\\=tok\\=en1=val\\=ue1\nto$ke..n2=value2");
 		
-		List<Replacement> replacements = factory.replacementsForFile(FILENAME, COMMENTS_ENABLED, false);
+		List<Replacement> replacements = factory.replacementsForFile(FILENAME, COMMENTS_ENABLED, false, ENCODING);
 		assertThat(replacements, notNullValue());
 		assertThat(replacements.size(), is(2));
 		assertThat(replacements.get(0).getToken(), equalTo("\\=tok\\=en1"));
@@ -99,9 +100,9 @@ public class TokenValueMapFactoryTest {
 	
 	@Test
 	public void shouldReturnRegexReplacementsFromFileUnescaping() throws Exception {
-		when(fileUtils.readFile(FILENAME)).thenReturn("\\\\=tok\\\\=en1=val\\\\=ue1\nto$ke..n2=value2");
+		when(fileUtils.readFile(FILENAME, ENCODING)).thenReturn("\\\\=tok\\\\=en1=val\\\\=ue1\nto$ke..n2=value2");
 		
-		List<Replacement> replacements = factory.replacementsForFile(FILENAME, COMMENTS_ENABLED, true);
+		List<Replacement> replacements = factory.replacementsForFile(FILENAME, COMMENTS_ENABLED, true, ENCODING);
 		assertThat(replacements, notNullValue());
 		assertThat(replacements.size(), is(2));
 		assertThat(replacements.get(0).getToken(), equalTo("\\=tok\\=en1"));
@@ -112,14 +113,14 @@ public class TokenValueMapFactoryTest {
 	
 	@Test (expected = IllegalArgumentException.class)
 	public void shouldThrowExceptionIfNoTokenForValue() throws Exception {
-		when(fileUtils.readFile(FILENAME)).thenReturn("=value");
-		factory.replacementsForFile(FILENAME, COMMENTS_DISABLED, false);
+		when(fileUtils.readFile(FILENAME, ENCODING)).thenReturn("=value");
+		factory.replacementsForFile(FILENAME, COMMENTS_DISABLED, false, ENCODING);
 	}
 	
 	@Test
 	public void shouldSupportEmptyFileAndReturnNoReplacements() throws Exception {
-		when(fileUtils.readFile(FILENAME)).thenReturn("");
-		List<Replacement> replacements = factory.replacementsForFile(FILENAME, COMMENTS_DISABLED, false);
+		when(fileUtils.readFile(FILENAME, ENCODING)).thenReturn("");
+		List<Replacement> replacements = factory.replacementsForFile(FILENAME, COMMENTS_DISABLED, false, ENCODING);
 		assertThat(replacements, notNullValue());
 		assertTrue(replacements.isEmpty());
 	}

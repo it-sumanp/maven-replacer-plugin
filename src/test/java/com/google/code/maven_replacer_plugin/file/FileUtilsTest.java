@@ -4,7 +4,6 @@ import static java.util.Arrays.asList;
 import static org.apache.commons.lang.StringUtils.join;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
-import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -65,26 +64,24 @@ public class FileUtilsTest {
 	@Test
 	public void shouldWriteToFileEnsuringFolderStructureExists() throws Exception {
 		String tempFile = System.getProperty("java.io.tmpdir") + "/" + UUID.randomUUID() + "/tempfile";
-		fileUtils.writeToFile(tempFile, CONTENT);
+		fileUtils.writeToFile(tempFile, CONTENT, "UTF-8");
 		assertThat(org.apache.commons.io.FileUtils.readFileToString(new File(tempFile)), equalTo(CONTENT));
 	}
 	
 	@Test
 	public void shouldWriteFileWithoutSpecifiedEncoding() throws Exception {
 		String tempFile = System.getProperty("java.io.tmpdir") + "/" + UUID.randomUUID() + "/tempfile";
-		fileUtils.writeToFile(tempFile, NON_ASCII_CONTENT);
-		assertThat(fileUtils.readFile(tempFile), equalTo(NON_ASCII_CONTENT));
+		fileUtils.writeToFile(tempFile, NON_ASCII_CONTENT, "UTF-8");
+		assertThat(fileUtils.readFile(tempFile, "UTF-8"), equalTo(NON_ASCII_CONTENT));
 	}
 	
 	@Test
 	public void shouldWriteFileWithSpecifiedEncoding() throws Exception {
 		String tempFile = System.getProperty("java.io.tmpdir") + "/" + UUID.randomUUID() + "/tempfile";
-		fileUtils.setEncoding("UTF-8");
-		fileUtils.writeToFile(tempFile, NON_ASCII_CONTENT);
-		assertThat(fileUtils.readFile(tempFile), equalTo(NON_ASCII_CONTENT));
+		fileUtils.writeToFile(tempFile, NON_ASCII_CONTENT, "UTF-8");
+		assertThat(fileUtils.readFile(tempFile, "UTF-8"), equalTo(NON_ASCII_CONTENT));
 		
-		fileUtils.setEncoding("US-ASCII");
-		assertThat(fileUtils.readFile(tempFile), not(equalTo(NON_ASCII_CONTENT)));
+		assertThat(fileUtils.readFile(tempFile, "US-ASCII"), not(equalTo(NON_ASCII_CONTENT)));
 	}
 	
 	@Test
@@ -94,7 +91,7 @@ public class FileUtilsTest {
 		writer.write("test\n123\\t456");
 		writer.close();
 
-		String data = fileUtils.readFile(file.getAbsolutePath());
+		String data = fileUtils.readFile(file.getAbsolutePath(), "UTF-8");
 		assertThat(data, equalTo("test\n123\\t456"));
 	}
 	
