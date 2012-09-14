@@ -13,11 +13,11 @@ public class SummaryBuilderTest {
 		Log log = mock(Log.class);
 		
 		SummaryBuilder builder = new SummaryBuilder();
-		builder.add("INPUT", "OUTPUT", log);
-		builder.add("INPUT", "OUTPUT", log);
+		builder.add("INPUT", "OUTPUT", "ENCODING", log);
+		builder.add("INPUT", "OUTPUT", "ENCODING", log);
 		
 		builder.print(log);
-		verify(log, times(2)).debug("Replacement run on INPUT and writing to OUTPUT");
+		verify(log, times(2)).debug("Replacement run on INPUT and writing to OUTPUT with encoding ENCODING");
 		verify(log).info("Replacement run on 2 files.");
 	}
 }
