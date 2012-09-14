@@ -303,7 +303,7 @@ public class ReplacerMojo extends AbstractMojo {
 	 * File encoding used when reading and writing files. 
 	 * Default system encoding used when not specified.
 	 * 
-	 * @parameter expression=""
+	 * @parameter expression="${encoding}" default-value="${project.build.sourceEncoding}"
 	 */
 	private String encoding;
 	
