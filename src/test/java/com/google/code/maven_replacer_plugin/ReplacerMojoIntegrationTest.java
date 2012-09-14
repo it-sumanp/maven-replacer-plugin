@@ -26,6 +26,8 @@ import org.junit.Before;
 import org.junit.Test;
 
 public class ReplacerMojoIntegrationTest {
+	private static final String ENCODING = "UTF-8";
+	
 	private static final String EXPECTED_XPATH = scrub(
 		"<?xml version=\"1.0\" encoding=\"UTF-8\"?>" +
 		"<people>" +
@@ -224,13 +226,14 @@ public class ReplacerMojoIntegrationTest {
 		mojo.setFile(filenameAndPath);
 		mojo.setToken(TOKEN);
 		mojo.setValue(VALUE);
+		mojo.setEncoding(ENCODING);
 		mojo.execute();
 		
 		String results = FileUtils.readFileToString(new File(filenameAndPath));
 		assertThat(results, equalTo(VALUE));
 		verify(log, never()).info(anyString());
 		verify(log).debug("Replacement run on ." + File.separator + filenameAndPath + 
-				" and writing to ." + File.separator + filenameAndPath);
+				" and writing to ." + File.separator + filenameAndPath + " with encoding " + ENCODING);
 	}
 	
 	@Test

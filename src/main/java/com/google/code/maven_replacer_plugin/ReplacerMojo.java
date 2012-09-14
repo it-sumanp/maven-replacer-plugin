@@ -426,7 +426,7 @@ public class ReplacerMojo extends AbstractMojo {
 				throw e;
 			}
 		}
-		summaryBuilder.add(getBaseDirPrefixedFilename(inputFile), outputFileName, getLog());
+		summaryBuilder.add(getBaseDirPrefixedFilename(inputFile), outputFileName, encoding, getLog());
 	}
 
 	private List<Replacement> buildReplacements() throws IOException {
