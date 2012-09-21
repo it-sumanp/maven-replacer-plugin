@@ -48,7 +48,7 @@ public class ReplacerMojo extends AbstractMojo {
 	 * The file must be text (ascii). 
 	 * Based on current execution path.
 	 *
-	 * @parameter expression=""
+	 * @parameter 
 	 */
 	private String file;
 
@@ -57,7 +57,7 @@ public class ReplacerMojo extends AbstractMojo {
 	 * In Ant format (*\/directory/**.properties) 
 	 * Cannot use with outputFile.
 	 *
-	 * @parameter expression=""
+	 * @parameter
 	 */
 	private List<String> includes = new ArrayList<String>();
 
@@ -66,7 +66,7 @@ public class ReplacerMojo extends AbstractMojo {
 	 * In Ant format (*\/directory/**.properties) 
 	 * Cannot use with outputFile.
 	 *
-	 * @parameter expression=""
+	 * @parameter
 	 */
 	private List<String> excludes = new ArrayList<String>();
 
@@ -76,7 +76,7 @@ public class ReplacerMojo extends AbstractMojo {
 	 * In Ant format (*\/directory/**.properties). 
 	 * Files not found are ignored by default. 
 	 *
-	 * @parameter expression=""
+	 * @parameter 
 	 */
 	private String filesToInclude;
 
@@ -86,7 +86,7 @@ public class ReplacerMojo extends AbstractMojo {
 	 * In Ant format (**\/directory/do-not-replace.properties). 
 	 * The files replaced will be derived from the list of includes and excludes.
 	 *
-	 * @parameter expression=""
+	 * @parameter 
 	 */
 	private String filesToExclude;
 
@@ -95,7 +95,7 @@ public class ReplacerMojo extends AbstractMojo {
 	 * The text to replace within the given file. 
 	 * This may or may not be a regular expression (see regex notes above).
 	 *
-	 * @parameter expression=""
+	 * @parameter 
 	 */
 	private String token;
 
@@ -104,7 +104,7 @@ public class ReplacerMojo extends AbstractMojo {
 	 * May be multiple words or lines. 
 	 * This is useful if you do not wish to expose the token within your pom or the token is long.
 	 *
-	 * @parameter expression=""
+	 * @parameter 
 	 */
 	private String tokenFile;
 
@@ -114,7 +114,7 @@ public class ReplacerMojo extends AbstractMojo {
 	 * Set to true to not fail build if the file is not found. 
 	 * First checks if file exists and exits without attempting to replace anything.
 	 *
-	 * @parameter expression=""
+	 * @parameter 
 	 */
 	private boolean ignoreMissingFile;
 
@@ -124,7 +124,7 @@ public class ReplacerMojo extends AbstractMojo {
 	 * If no value is given, the tokens found are replaced with an empty string (effectively removing any tokens found). 
 	 * You can also reference grouped regex matches made in the token here by $1, $2, etc.
 	 *
-	 * @parameter expression=""
+	 * @parameter 
 	 */
 	private String value;
 
@@ -133,7 +133,7 @@ public class ReplacerMojo extends AbstractMojo {
 	 * May be multiple words or lines.
 	 * This is useful if you do not wish to expose the value within your pom or the value is long.
 	 *
-	 * @parameter expression=""
+	 * @parameter 
 	 */
 	private String valueFile;
 
@@ -141,7 +141,7 @@ public class ReplacerMojo extends AbstractMojo {
 	 * Indicates if the token should be located with regular expressions. 
 	 * This should be set to false if the token contains regex characters which may miss the desired tokens or even replace the wrong tokens.
 	 *
-	 * @parameter expression=""
+	 * @parameter 
 	 */
 	private boolean regex = true;
 
@@ -152,7 +152,7 @@ public class ReplacerMojo extends AbstractMojo {
 	 * If it does exist, the contents are overwritten. 
 	 * You should not use outputFile when using a list of includes.
 	 *
-	 * @parameter expression=""
+	 * @parameter 
 	 */
 	private String outputFile;
 
@@ -161,7 +161,7 @@ public class ReplacerMojo extends AbstractMojo {
 	 * Destination directory relative to the execution directory for all replaced files to be written to. 
 	 * Use with outputDir to have files written to a specific base location.
 	 *
-	 * @parameter expression=""
+	 * @parameter 
 	 */
 	private String outputDir;
 
@@ -172,7 +172,7 @@ public class ReplacerMojo extends AbstractMojo {
 	 * Each token/value pair should be in the format: "token=value" (without quotations). 
 	 * If your token contains ='s you must escape the = character to \=. e.g. tok\=en=value
 	 *
-	 * @parameter expression=""
+	 * @parameter 
 	 */
 	private String tokenValueMap;
 
@@ -182,7 +182,7 @@ public class ReplacerMojo extends AbstractMojo {
 	 * This feature is useful for multi-module projects.
 	 * Default "." which is the default Maven basedir. 
 	 *
-	 * @parameter expression="${basedir}"
+	 * @parameter default-value="."
 	 */
 	private String basedir = ".";
 
@@ -198,7 +198,7 @@ public class ReplacerMojo extends AbstractMojo {
 	 * * UNICODE_CASE
 	 * * UNIX_LINES
 	 * 
-	 * @parameter expression=""
+	 * @parameter 
 	 */
 	private List<String> regexFlags;
 
@@ -207,7 +207,7 @@ public class ReplacerMojo extends AbstractMojo {
 	 * Each replacement element to contain sub-elements as token/value pairs. 
 	 * Each token within the given file will be replaced by it's respective value.
 	 *
-	 * @parameter expression=""
+	 * @parameter 
 	 */
 	private List<Replacement> replacements;
 
@@ -217,7 +217,7 @@ public class ReplacerMojo extends AbstractMojo {
 	 * If your token starts with an '#' then you must supply the commentsEnabled parameter and with a value of false.
 	 * Default is true.
 	 *
-	 * @parameter expression=""
+	 * @parameter default-value="true" 
 	 */
 	private boolean commentsEnabled = true;
 	
@@ -226,7 +226,7 @@ public class ReplacerMojo extends AbstractMojo {
 	 * Having this existing but blank will cause the outputDir
 	 * to be based on the execution directory. 
 	 *
-	 * @parameter expression=""
+	 * @parameter 
 	 */
 	private String outputBasedir;
 	
@@ -235,7 +235,7 @@ public class ReplacerMojo extends AbstractMojo {
 	 * being written to an outputDir. 
 	 * Default is true.
 	 *
-	 * @parameter expression=""
+	 * @parameter default-value="true" 
 	 */
 	private boolean preserveDir = true;
 
@@ -243,7 +243,7 @@ public class ReplacerMojo extends AbstractMojo {
 	 * Stops printing a summary of files that have had replacements performed upon them when true. 
 	 * Default is false.
 	 *
-	 * @parameter expression=""
+	 * @parameter default-value="false" 
 	 */
 	private boolean quiet = false;
 
@@ -252,7 +252,7 @@ public class ReplacerMojo extends AbstractMojo {
 	 * e.g. token\n is unescaped to token(carriage return).
 	 * Default is false.
 	 *
-	 * @parameter expression=""
+	 * @parameter default-value="false" 
 	 */
 	private boolean unescape;
 	
@@ -262,7 +262,7 @@ public class ReplacerMojo extends AbstractMojo {
 	 * e.g. @ would match @token@. 
 	 * e.g. ${} would match ${token}.
 	 *
-	 * @parameter expression=""
+	 * @parameter 
 	 */
 	private List<String> delimiters = new ArrayList<String>();
 	
@@ -273,7 +273,7 @@ public class ReplacerMojo extends AbstractMojo {
 	 * Format is comma separated. e.g. token=value,token2=value2
 	 * Comments are not supported.
 	 *
-	 * @parameter expression=""
+	 * @parameter 
 	 */
 	private String variableTokenValueMap;
 	
@@ -286,7 +286,7 @@ public class ReplacerMojo extends AbstractMojo {
 	 * 
 	 * Default is false.
 	 *
-	 * @parameter expression=""
+	 * @parameter default-value="false" 
 	 */
 	private boolean ignoreErrors;
 	
@@ -295,7 +295,7 @@ public class ReplacerMojo extends AbstractMojo {
 	 * This is useful if you have the same token appearing in many nodes but 
 	 * wish to only replace the contents of one or more of them.
 	 *
-	 * @parameter expression=""
+	 * @parameter 
 	 */
 	private String xpath;
 	
@@ -303,7 +303,7 @@ public class ReplacerMojo extends AbstractMojo {
 	 * File encoding used when reading and writing files. 
 	 * Default system encoding used when not specified.
 	 * 
-	 * @parameter expression="${encoding}" default-value="${project.build.sourceEncoding}"
+	 * @parameter default-value="${project.build.sourceEncoding}"
 	 */
 	private String encoding;
 	
@@ -311,7 +311,7 @@ public class ReplacerMojo extends AbstractMojo {
 	 * Regular expression is run on an input file's name to create the output file with.
 	 * Must be used in conjunction with outputFilePattern.
 	 * 
-	 * @parameter expression=""
+	 * @parameter 
 	 */
 	private String inputFilePattern;
 	
@@ -321,7 +321,7 @@ public class ReplacerMojo extends AbstractMojo {
 	 * 
 	 * The parameter outputFile is ignored when outputFilePattern is used.
 	 * 
-	 * @parameter expression=""
+	 * @parameter 
 	 */
 	private String outputFilePattern;
 	
