@@ -1,6 +1,7 @@
 package com.google.code.maven_replacer_plugin.file;
 
 import static org.apache.commons.lang.StringUtils.isBlank;
+import static org.apache.commons.lang.StringUtils.isNotBlank;
 
 import java.io.File;
 import java.io.IOException;
@@ -45,7 +46,7 @@ public class FileUtils {
 	public String createFullPath(String... dirsAndFilename) {
 		StringBuilder fullPath = new StringBuilder();
 		for (int i=0; i < dirsAndFilename.length - 1; i++) {
-			if (dirsAndFilename[i] != null) {
+			if (isNotBlank(dirsAndFilename[i])) {
 				fullPath.append(dirsAndFilename[i]);
 				fullPath.append(File.separator);
 			}
@@ -56,5 +57,9 @@ public class FileUtils {
 		}
 		
 		return fullPath.toString();
+	}
+
+	public boolean isAbsolutePath(String file) {
+		return new File(file).isAbsolute();
 	}
 }

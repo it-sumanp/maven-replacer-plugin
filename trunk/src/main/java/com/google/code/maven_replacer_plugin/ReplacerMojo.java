@@ -1,6 +1,6 @@
 package com.google.code.maven_replacer_plugin;
 
-import static org.apache.commons.lang.StringUtils.isEmpty;
+import static org.apache.commons.lang.StringUtils.isBlank;
 
 import java.io.File;
 import java.io.IOException;
@@ -391,7 +391,7 @@ public class ReplacerMojo extends AbstractMojo {
 	}
 
 	private String getBaseDirPrefixedFilename(String file) {
-		if (isEmpty(basedir)) {
+		if (isBlank(basedir) || fileUtils.isAbsolutePath(file)) {
 			return file;
 		}
 		return basedir + File.separator + file;
