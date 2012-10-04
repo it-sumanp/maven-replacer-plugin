@@ -116,6 +116,20 @@ public class ReplacerMojoTest {
 	}
 	
 	@Test
+	public void shouldIgnoreBaseDirWhenFileIsAbsolutePathed() throws Exception {
+		Replacement replacement = mock(Replacement.class);
+		List<Replacement> replacements = asList(replacement);
+
+		when(fileUtils.isAbsolutePath(FILE)).thenReturn(true);
+		mojo.setReplacements(replacements);
+		mojo.setFile(FILE);
+		mojo.execute();
+		verify(processor).replace(replacements, REGEX, FILE, OUTPUT_FILE, 0, null);
+		verify(summaryBuilder).add(FILE, OUTPUT_FILE, null, log);
+		verify(summaryBuilder).print(log);
+	}
+	
+	@Test
 	public void shouldReplaceContentsInLocalFile() throws Exception {
 		Replacement replacement = mock(Replacement.class);
 		List<Replacement> replacements = asList(replacement);

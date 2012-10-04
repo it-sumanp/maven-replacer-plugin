@@ -122,4 +122,10 @@ public class FileUtilsTest {
 			assertEquals(e.getMessage(), "Error creating directory.");
 		}
 	}
+	
+	@Test
+	public void shouldReturnTrueWhenAbsolutePathFilename() {
+		assertFalse(fileUtils.isAbsolutePath("target/somedir/somepath"));
+		assertTrue(fileUtils.isAbsolutePath(new File("target/somefile").getAbsolutePath()));
+	}
 }

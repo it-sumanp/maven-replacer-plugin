@@ -79,6 +79,18 @@ public class ReplacerMojoIntegrationTest {
 	}
 	
 	@Test
+	public void shouldReplaceContentsInAbsolutePathedFile() throws Exception {
+		mojo.setFile(new File(filenameAndPath).getAbsolutePath());
+		mojo.setToken(TOKEN);
+		mojo.setValue(VALUE);
+		mojo.execute();
+		
+		String results = FileUtils.readFileToString(new File(filenameAndPath));
+		assertThat(results, equalTo(VALUE));
+		verify(log).info("Replacement run on 1 file.");
+	}
+	
+	@Test
 	public void shouldReplaceRegexTokenLocatedByXPath() throws Exception {
 		filenameAndPath = createTempFile(xml);
 
