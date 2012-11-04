@@ -116,6 +116,18 @@ public class ReplacerMojoTest {
 	}
 	
 	@Test
+	public void shouldSkipAndDoNothing() throws Exception {
+		mojo.setToken(TOKEN);
+		mojo.setValue(VALUE);
+		mojo.setFile(FILE);
+		mojo.setSkip(true);
+		mojo.execute();
+		
+		verifyZeroInteractions(processor);
+		verifyZeroInteractions(summaryBuilder);
+	}
+	
+	@Test
 	public void shouldIgnoreBaseDirWhenFileIsAbsolutePathed() throws Exception {
 		Replacement replacement = mock(Replacement.class);
 		List<Replacement> replacements = asList(replacement);
