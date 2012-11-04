@@ -1,12 +1,12 @@
 package com.google.code.maven_replacer_plugin;
 
-import org.junit.Before;
-import org.junit.Test;
-
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+
+import org.junit.Before;
+import org.junit.Test;
 
 public class XPathReplacerTest {
 	private static final int NO_FLAGS = -1;
@@ -36,6 +36,18 @@ public class XPathReplacerTest {
 		assertThat(result, containsString("<root class=\"test\" id=\"value\">"));
 		//verify that the id attribute in the <element> tag remained untouched
 		assertThat(result, containsString("<element id=\"ID\">"));
+	}
+	
+	@Test
+	public void shouldReplaceAttributeValueLocatedByXpathInChild() throws Exception {
+		when(replacement.getXpath()).thenReturn("foo/bar/@baz");
+		when(replacement.getToken()).thenReturn("token");
+		when(replacement.getValue()).thenReturn("value");
+		when(tokenReplacer.replace("token", replacement, false, NO_FLAGS)).thenReturn("value");
+
+		String xml = "<foo><bar baz=\"token\"/></foo>";
+		String result = replacer.replace(xml, replacement, false, NO_FLAGS);
+		assertThat(result, containsString("<foo><bar baz=\"value\"/></foo>"));
 	}
 
 	@Test
