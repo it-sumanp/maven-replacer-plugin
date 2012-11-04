@@ -222,6 +222,14 @@ public class ReplacerMojo extends AbstractMojo {
 	private boolean commentsEnabled = true;
 	
 	/**
+	 * Skip running this plugin. 
+	 * Default is false.
+	 *
+	 * @parameter default-value="false" 
+	 */
+	private boolean skip = false;
+	
+	/**
 	 * Base directory (appended) to use for outputDir.
 	 * Having this existing but blank will cause the outputDir
 	 * to be based on the execution directory. 
@@ -354,6 +362,11 @@ public class ReplacerMojo extends AbstractMojo {
 
 	public void execute() throws MojoExecutionException {
 		try {
+			if (skip) {
+				getLog().info("Skipping");
+				return;
+			}
+			
 			if (checkFileExists()) {
 				getLog().info("Ignoring missing file");
 				return;
@@ -376,7 +389,7 @@ public class ReplacerMojo extends AbstractMojo {
 				throw new MojoExecutionException(e.getMessage(), e);
 			}
 		} finally {
-			if (!quiet) {
+			if (!skip && !quiet) {
 				summaryBuilder.print(getLog());
 			}
 		}
@@ -660,5 +673,13 @@ public class ReplacerMojo extends AbstractMojo {
 	
 	public String getOutputFilePattern() {
 		return outputFilePattern;
+	}
+
+	public void setSkip(boolean skip) {
+		this.skip = skip;
+	}
+	
+	public boolean isSkip() {
+		return skip;
 	}
 }
