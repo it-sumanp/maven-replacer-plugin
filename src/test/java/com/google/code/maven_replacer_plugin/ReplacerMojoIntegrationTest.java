@@ -91,6 +91,21 @@ public class ReplacerMojoIntegrationTest {
 	}
 	
 	@Test
+	public void shouldReplaceContentsMaintainingSpacesAndNewLines() throws Exception {
+		String valueWithSpacing = " new value" + System.getProperty("line.separator") + " replaced ";
+		mojo.setFile(filenameAndPath);
+		Replacement replacement = new Replacement();
+		replacement.setToken(TOKEN);
+		replacement.setValue(valueWithSpacing);
+		mojo.setReplacements(asList(replacement));
+		mojo.execute();
+		
+		String results = FileUtils.readFileToString(new File(filenameAndPath));
+		assertThat(results, equalTo(valueWithSpacing));
+		verify(log).info("Replacement run on 1 file.");
+	}
+	
+	@Test
 	public void shouldReplaceRegexTokenLocatedByXPath() throws Exception {
 		filenameAndPath = createTempFile(xml);
 
