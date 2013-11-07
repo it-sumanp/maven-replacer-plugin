@@ -93,6 +93,6 @@ public class TokenValueMapFactory {
 	}
 
 	private boolean ignoreFragment(String line, boolean commentsEnabled) {
-		return line.length() == 0 || (commentsEnabled && line.startsWith(COMMENT_PREFIX));
+		return line.length() == 0 || commentsEnabled && line.startsWith(COMMENT_PREFIX);
 	}
 }
