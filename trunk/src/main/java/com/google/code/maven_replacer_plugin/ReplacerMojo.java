@@ -332,7 +332,14 @@ public class ReplacerMojo extends AbstractMojo {
 	 * @parameter 
 	 */
 	private String outputFilePattern;
-	
+
+    /**
+     * Set a maximum number of files which can be replaced per execution.
+     *
+     * @parameter
+     */
+    private Integer maxReplacements = Integer.MAX_VALUE;
+
 	public ReplacerMojo() {
 		super();
 		this.fileUtils = new FileUtils();
@@ -345,8 +352,8 @@ public class ReplacerMojo extends AbstractMojo {
 		this.processor = new ReplacementProcessor(fileUtils, replacerFactory);
 	}
 
-	public ReplacerMojo(FileUtils fileUtils, ReplacementProcessor processor, ReplacerFactory replacerFactory, 
-			TokenValueMapFactory tokenValueMapFactory, FileSelector fileSelector, 
+	public ReplacerMojo(FileUtils fileUtils, ReplacementProcessor processor, ReplacerFactory replacerFactory,
+			TokenValueMapFactory tokenValueMapFactory, FileSelector fileSelector,
 			PatternFlagsFactory patternFlagsFactory, OutputFilenameBuilder outputFilenameBuilder,
 			SummaryBuilder summaryBuilder) {
 		super();
@@ -366,7 +373,7 @@ public class ReplacerMojo extends AbstractMojo {
 				getLog().info("Skipping");
 				return;
 			}
-			
+
 			if (checkFileExists()) {
 				getLog().info("Ignoring missing file");
 				return;
@@ -376,11 +383,11 @@ public class ReplacerMojo extends AbstractMojo {
 			addIncludesFilesAndExcludedFiles();
 
 			if (includes.isEmpty()) {
-				replaceContents(processor, replacements, file);
+                replaceContents(processor, limit(replacements), file);
 				return;
 			}
 
-			for (String file : fileSelector.listIncludes(basedir, includes, excludes)) {
+            for (String file : limit(fileSelector.listIncludes(basedir, includes, excludes))) {
 				replaceContents(processor, replacements, file);
 			}
 		} catch (Exception e) {
@@ -395,7 +402,15 @@ public class ReplacerMojo extends AbstractMojo {
 		}
 	}
 
-	private boolean checkFileExists() throws MojoExecutionException {
+    private <T> List<T> limit(List<T> all) {
+        if (all.size() > maxReplacements) {
+            getLog().info("Max replacements has been exceeded. Limiting to the first: " + maxReplacements);
+            return all.subList(0, maxReplacements);
+        }
+        return all;
+    }
+
+    private boolean checkFileExists() throws MojoExecutionException {
 		if (ignoreMissingFile && file == null) {
 			getLog().error(INVALID_IGNORE_MISSING_FILE_MESSAGE);
 			throw new MojoExecutionException(INVALID_IGNORE_MISSING_FILE_MESSAGE);
@@ -431,7 +446,7 @@ public class ReplacerMojo extends AbstractMojo {
 	private void replaceContents(ReplacementProcessor processor, List<Replacement> replacements, String inputFile) throws IOException {
 		String outputFileName = outputFilenameBuilder.buildFrom(inputFile, this);
 		try {
-			processor.replace(replacements, regex, getBaseDirPrefixedFilename(inputFile), 
+			processor.replace(replacements, regex, getBaseDirPrefixedFilename(inputFile),
 					outputFileName, patternFlagsFactory.buildFlags(regexFlags), encoding);
 		} catch (PatternSyntaxException e) {
 			if (!delimiters.isEmpty()) {
@@ -446,12 +461,12 @@ public class ReplacerMojo extends AbstractMojo {
 		if (replacements != null) {
 			return replacements;
 		}
-		
+
 		if (variableTokenValueMap != null) {
-			return tokenValueMapFactory.replacementsForVariable(variableTokenValueMap, isCommentsEnabled(), 
+			return tokenValueMapFactory.replacementsForVariable(variableTokenValueMap, isCommentsEnabled(),
 					unescape, encoding);
 		}
-		
+
 		if (tokenValueMap == null) {
 			Replacement replacement = new Replacement(fileUtils, token, value, unescape, xpath, encoding);
 			replacement.setEncoding(encoding);
@@ -459,7 +474,7 @@ public class ReplacerMojo extends AbstractMojo {
 			replacement.setValueFile(valueFile);
 			return Arrays.asList(replacement);
 		}
-		
+
 		String tokenValueMapFile = getBaseDirPrefixedFilename(tokenValueMap);
 		if (fileUtils.fileNotExists(tokenValueMapFile)) {
 			getLog().info("'" + tokenValueMapFile + "' does not exist and assuming this is an absolute file name.");
@@ -472,7 +487,7 @@ public class ReplacerMojo extends AbstractMojo {
 		if (delimiters.isEmpty()) {
 			return replacements;
 		}
-		
+
 		List<Replacement> newReplacements = new ArrayList<Replacement>();
 		for (Replacement replacement : replacements) {
 			for (DelimiterBuilder delimiter : buildDelimiters()) {
@@ -482,7 +497,7 @@ public class ReplacerMojo extends AbstractMojo {
 		}
 		return newReplacements;
 	}
-	
+
 	private List<DelimiterBuilder> buildDelimiters() {
 		List<DelimiterBuilder> built = new ArrayList<DelimiterBuilder>();
 		for (String delimiter : delimiters) {
@@ -498,7 +513,7 @@ public class ReplacerMojo extends AbstractMojo {
 	public void setFile(String file) {
 		this.file = file;
 	}
-	
+
 	public String getFile() {
 		return file;
 	}
@@ -590,11 +605,11 @@ public class ReplacerMojo extends AbstractMojo {
 	public void setOutputBasedir(String outputBasedir) {
 		this.outputBasedir = outputBasedir;
 	}
-	
+
 	public boolean isPreserveDir() {
 		return preserveDir;
 	}
-	
+
 	public void setPreserveDir(boolean preserveDir) {
 		this.preserveDir = preserveDir;
 	}
@@ -630,7 +645,7 @@ public class ReplacerMojo extends AbstractMojo {
 	public void setUnescape(boolean unescape) {
 		this.unescape = unescape;
 	}
-	
+
 	public boolean isUnescape() {
 		return unescape;
 	}
@@ -638,7 +653,7 @@ public class ReplacerMojo extends AbstractMojo {
 	public void setVariableTokenValueMap(String variableTokenValueMap) {
 		this.variableTokenValueMap = variableTokenValueMap;
 	}
-	
+
 	public String getVariableTokenValueMap() {
 		return variableTokenValueMap;
 	}
@@ -654,7 +669,7 @@ public class ReplacerMojo extends AbstractMojo {
 	public void setXpath(String xpath) {
 		this.xpath = xpath;
 	}
-	
+
 	public void setEncoding(String encoding) {
 		this.encoding = encoding;
 	}
@@ -666,11 +681,11 @@ public class ReplacerMojo extends AbstractMojo {
 	public void setOutputFilePattern(String outputFilePattern) {
 		this.outputFilePattern = outputFilePattern;
 	}
-	
+
 	public String getInputFilePattern() {
 		return inputFilePattern;
 	}
-	
+
 	public String getOutputFilePattern() {
 		return outputFilePattern;
 	}
@@ -678,8 +693,12 @@ public class ReplacerMojo extends AbstractMojo {
 	public void setSkip(boolean skip) {
 		this.skip = skip;
 	}
-	
+
 	public boolean isSkip() {
 		return skip;
 	}
+
+    public void setMaxReplacements(Integer maxReplacements) {
+        this.maxReplacements = maxReplacements;
+    }
 }
