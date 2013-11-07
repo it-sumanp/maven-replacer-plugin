@@ -5,6 +5,7 @@ import static org.apache.commons.lang.StringUtils.join;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.not;
+import static org.hamcrest.text.StringStartsWith.startsWith;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
@@ -118,7 +119,7 @@ public class FileUtilsTest {
 			fileUtils.ensureFolderStructureExists("/f*\"%e$d/a%*bc$:\\te\"st");
 			fail("Should have thrown Error");
 		} catch (IllegalStateException e) {
-			assertThat(e.getMessage(), equalTo("Error creating directory: \\f*\"%e$d\\a%*bc$:"));
+			assertThat(e.getMessage(), startsWith("Error creating directory"));
 		}
 	}
 	
