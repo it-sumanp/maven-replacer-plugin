@@ -22,7 +22,7 @@ public class Replacement {
 		this.unescape = false;
 	}
 
-	public Replacement(FileUtils fileUtils, String token, String value, boolean unescape, 
+	public Replacement(FileUtils fileUtils, String token, String value, boolean unescape,
 			String xpath, String encoding) {
 		this.fileUtils = fileUtils;
 		setUnescape(unescape);
@@ -34,13 +34,13 @@ public class Replacement {
 
 	public void setTokenFile(String tokenFile) throws IOException {
 		if (tokenFile != null) {
-			setToken(fileUtils.readFile(tokenFile, encoding));
+			setToken(fileUtils.readFile(tokenFile, getEncoding()));
 		}
 	}
 
 	public void setValueFile(String valueFile) throws IOException {
 		if (valueFile != null) {
-			setValue(fileUtils.readFile(valueFile, encoding));
+			setValue(fileUtils.readFile(valueFile, getEncoding()));
 		}
 	}
 
@@ -55,7 +55,7 @@ public class Replacement {
 	public String getValue() {
 		return unescape ? unescape(value) : value;
 	}
-	
+
 	public void setToken(String token) {
 		this.token = token;
 	}
@@ -77,7 +77,7 @@ public class Replacement {
 	}
 
 	public static Replacement from(Replacement replacement) {
-		return new Replacement(replacement.fileUtils, replacement.token, replacement.value, 
+		return new Replacement(replacement.fileUtils, replacement.token, replacement.value,
 				replacement.unescape, replacement.xpath, replacement.encoding);
 	}
 
@@ -89,7 +89,7 @@ public class Replacement {
 	public void setXpath(String xpath) {
 		this.xpath = xpath;
 	}
-	
+
 	public String getXpath() {
 		return xpath;
 	}
