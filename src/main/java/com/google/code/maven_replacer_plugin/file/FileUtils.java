@@ -20,7 +20,7 @@ public class FileUtils {
 		if (!outputFile.isDirectory()) {
 			File parentPath = new File(outputFile.getParent());
 			if (!parentPath.exists() && !parentPath.mkdirs()) {
-				throw new IllegalStateException("Error creating directory.");
+				throw new IllegalStateException("Error creating directory: " + parentPath);
 			}
 		} else {
 			throw new IllegalArgumentException("outputFile cannot be a directory: " + file);
