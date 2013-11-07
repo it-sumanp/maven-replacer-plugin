@@ -5,6 +5,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.equalTo;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.argThat;
 import static org.mockito.Mockito.mock;
@@ -20,6 +21,7 @@ import java.util.regex.PatternSyntaxException;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.math.RandomUtils;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.logging.Log;
 import org.junit.Before;
@@ -487,7 +489,29 @@ public class ReplacerMojoIntegrationTest {
 		String include2Results = FileUtils.readFileToString(new File(include2));
 		assertThat(include2Results, equalTo(VALUE));
 	}
-	
+
+    @Test
+    public void shouldOnlyReplaceUpToMaxReplacements() throws Exception {
+        String randomBase = String.valueOf(RandomUtils.nextInt(10));
+        String include1 = createTempFile(randomBase + "/prefix1", TOKEN);
+        String include2 = createTempFile(randomBase + "/prefix2", TOKEN);
+        List<String> includes = asList("target/" + randomBase + "**/prefix*");
+
+        mojo.setPreserveDir(false);
+        mojo.setIncludes(includes);
+        mojo.setToken(TOKEN);
+        mojo.setMaxReplacements(1);
+        mojo.setValue(VALUE);
+        mojo.execute();
+
+        String include1Results = FileUtils.readFileToString(new File(include1));
+        String include2Results = FileUtils.readFileToString(new File(include2));
+        System.out.println(include1Results);
+        System.out.println(include2Results);
+        assertTrue((TOKEN.equals(include1Results) && VALUE.equals(include2Results))
+                || (VALUE.equals(include1Results) && TOKEN.equals(include2Results)));
+    }
+
 	@Test
 	public void shouldReplaceContentsInIncludeButNotExcludesAndNotPreserveWhenDisabled() throws Exception {
 		String include1 = createTempFile("test/prefix1", TOKEN);
