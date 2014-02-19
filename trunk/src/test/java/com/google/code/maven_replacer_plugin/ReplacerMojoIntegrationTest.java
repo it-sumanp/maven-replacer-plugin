@@ -81,6 +81,17 @@ public class ReplacerMojoIntegrationTest {
 	}
 	
 	@Test
+	public void shouldWarnOfMissingProperities() throws Exception {
+		String inputFile = createTempFile("test-filename-error", TOKEN);
+		mojo.setInputFilePattern("(.*)test-(.+)-error");
+		mojo.setOutputFilePattern("$1test-$2-error.replaced");
+		mojo.execute();
+		
+		assertFalse(new File(inputFile + ".replaced").exists());
+		verify(log).warn("No input file/s defined");
+	}
+	
+	@Test
 	public void shouldReplaceContentsInAbsolutePathedFile() throws Exception {
 		mojo.setFile(new File(filenameAndPath).getAbsolutePath());
 		mojo.setToken(TOKEN);
