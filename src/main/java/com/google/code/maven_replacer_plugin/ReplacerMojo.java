@@ -381,6 +381,11 @@ public class ReplacerMojo extends AbstractMojo {
 
 			List<Replacement> replacements = getDelimiterReplacements(buildReplacements());
 			addIncludesFilesAndExcludedFiles();
+			
+			if (includes.isEmpty() && isBlank(file)) {
+				getLog().warn("No input file/s defined");
+				return;
+			}
 
 			if (includes.isEmpty()) {
                 replaceContents(processor, limit(replacements), file);
