@@ -182,9 +182,9 @@ public class ReplacerMojo extends AbstractMojo {
 	 * This feature is useful for multi-module projects.
 	 * Default "." which is the default Maven basedir. 
 	 *
-	 * @parameter default-value="."
+	 * @parameter
 	 */
-	private String basedir = ".";
+	private String basedir = "";
 
 	/**
 	 * List of standard Java regular expression Pattern flags (see Java Doc). 

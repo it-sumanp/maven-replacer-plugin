@@ -3,6 +3,7 @@ package com.google.code.maven_replacer_plugin.include;
 import static java.util.Arrays.asList;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.hasItem;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertTrue;
 
@@ -54,5 +55,23 @@ public class FileSelectorTest {
 		
 		List<String> files = selector.listIncludes(BACK_DIR_SYMBOL, asList(TEST_FILE), null);
 		assertThat(files, equalTo(asList(TEST_FILE)));
+	}
+	
+	@Test
+	public void shouldSelectFilesFromAbsolutePaths() throws Exception {
+		File file = new File("src/test/resources/files/file1");
+
+		String include = file.getParentFile().getAbsolutePath() + "/**/*";
+		List<String> selected = selector.listIncludes(null, asList(include), null);
+		assertThat(selected, hasItem(file.getAbsolutePath()));
+	}
+	
+	@Test
+	public void shouldSelectFilesFromAbsolutePathsWhenTriggeredByFlag() throws Exception {
+		File file = new File("src/test/resources/files/file1");
+
+		String include = file.getParentFile().getAbsolutePath() + "/**/*";
+		List<String> selected = selector.listIncludes("USE_ABSOLUTE_PATH", asList(include), null);
+		assertThat(selected, hasItem(file.getAbsolutePath()));
 	}
 }
