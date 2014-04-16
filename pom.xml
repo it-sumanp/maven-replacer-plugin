@@ -40,6 +40,13 @@ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 	<issueManagement>
 		<url>http://code.google.com/p/maven-replacer-plugin</url>
 	</issueManagement>
+	<distributionManagement>
+    		<repository>
+      			<id>sonatype-nexus-staging</id>
+      			<name>Nexus Staging Repository</name>
+     	 		<url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+    		</repository>
+  	</distributionManagement>
 	<developers>
 		<developer>
 			<id>bakersemail@hotmail.com</id>
